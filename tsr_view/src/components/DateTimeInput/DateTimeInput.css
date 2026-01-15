@@ -1,0 +1,46 @@
+.datetimeinput-container {
+    width: 100%;
+}
+
+.datetimeinput-label {
+    font-weight: 600;
+    color: #00445C;
+    margin-bottom: 0.5rem;
+}
+
+.datetimeinput-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.datetimeinput-date {
+    width: 100%;
+}
+
+.datetimeinput-hour {
+    width: 100%;
+}
+
+.datetimeinput-minute {
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .datetimeinput-inputs {
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+
+    .datetimeinput-date {
+        flex: 4;
+    }
+
+    .datetimeinput-hour {
+        flex: 3;
+    }
+
+    .datetimeinput-minute {
+        flex: 3;
+    }
+}

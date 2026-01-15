@@ -5,6 +5,7 @@ import DateTimePicker from './components/DateTimePicker'
 import Select from './components/Select'
 import TextField from './components/TextField'
 import TextArea from './components/TextArea'
+import DateTimeInput from './components/DateTimeInput'
 import GridLayout from './Layouts'
 import './App.css'
 
@@ -34,6 +35,7 @@ function App() {
           <Select options={test_options} />
           <TextField />
           <TextArea />
+          <DateTimeInput />
         </div>
       </GridLayout>
     </>
