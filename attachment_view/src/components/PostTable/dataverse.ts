@@ -169,4 +169,3 @@ export const deleteEntityRecord = async (
     body: { id: recordId }
   })
 }
-

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { Post } from '../types'
-import { getSectionParam } from '../utils/sectionParam'
-import { SECTION_CONFIGS } from '../config/sections'
-import { useToast } from './useToast'
+import type { Post } from '../../types'
+import { getSectionParam } from '../../utils/sectionParam/index'
+import { SECTION_CONFIGS } from './sections'
+import { useToast } from '../Toast/useToast'
 
 const entityName = 'proto_activitymimeattachment'
 

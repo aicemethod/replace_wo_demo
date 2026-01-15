@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import type { SectionData } from '../types'
-import { getSectionParam } from '../utils/sectionParam'
-import { getSectionConfig } from '../config/sections'
+import type { SectionData } from './types'
+import { getSectionParam } from './utils/sectionParam/index'
+import { getSectionConfig } from './components/PostTable/sections'
 
 /**
  * セクションデータを管理するカスタムフック
@@ -42,4 +42,3 @@ export const useSectionData = () => {
 
   return { sectionData, sectionConfig }
 }
-

@@ -113,4 +113,3 @@ export const SearchBar = ({ searchQuery, onSearchChange, onMemoClick, onRefresh,
     </div>
   )
 }
-

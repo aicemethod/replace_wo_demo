@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { Post } from '../types'
-import type { SectionConfig } from '../config/sections'
-import { useToast } from './useToast'
-import { getEntityRecords, createEntityRecord, updateEntityRecord, deleteEntityRecord } from '../services/dataverse'
-import { mapDataverseToPost, mapPostToDataverse } from '../utils/dataverseMapper'
+import type { Post } from '../../types'
+import type { SectionConfig } from './sections'
+import { useToast } from '../Toast/useToast'
+import { getEntityRecords, createEntityRecord, updateEntityRecord, deleteEntityRecord } from './dataverse'
+import { mapDataverseToPost, mapPostToDataverse } from './dataverseMapper'
 
 /**
  * 投稿を管理するカスタムフック

@@ -1,5 +1,5 @@
-import type { Post, DataverseRecord } from '../types'
-import type { SectionConfig } from '../config/sections'
+import type { Post, DataverseRecord } from '../../types'
+import type { SectionConfig } from './sections'
 
 /**
  * DataverseレコードをPost型に変換
@@ -63,4 +63,3 @@ export const mapPostToDataverse = (
 
   return record
 }
-

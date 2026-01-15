@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { FiFileText, FiUser, FiEdit, FiCopy, FiTrash2, FiFile, FiUpload } from 'react-icons/fi'
-import type { Post } from '../types'
-import { formatDate } from '../utils/dateFormatter'
-import { ANIMATION_DELAY } from '../constants'
-import { PDF_MIME_TYPE, PDF_EXTENSION } from '../constants'
+import type { Post } from '../../types'
+import { formatDate } from '../../utils/dateFormatter/index'
+import { ANIMATION_DELAY, PDF_MIME_TYPE, PDF_EXTENSION } from './constants'
 
 interface PostCardProps {
   post: Post
@@ -393,4 +392,3 @@ export const PostCard = ({
     </div>
   )
 }
-

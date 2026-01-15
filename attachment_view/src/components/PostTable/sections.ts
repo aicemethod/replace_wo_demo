@@ -165,4 +165,3 @@ export const getSectionConfig = (sectionId: string | null): SectionConfig | null
   }
   return SECTION_CONFIGS[sectionId]
 }
-

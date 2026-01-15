@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import type { Toast } from '../types'
-import { TOAST_DURATION } from '../constants'
+import type { Toast } from '../../types'
+import { TOAST_DURATION } from './constants'
 
 /**
  * トースト通知を管理するカスタムフック
@@ -24,4 +24,3 @@ export const useToast = () => {
 
   return { toasts, showToast }
 }
-
