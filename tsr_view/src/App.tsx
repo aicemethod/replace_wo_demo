@@ -3,6 +3,7 @@ import SectionTitle from './components/SectionTitle'
 import Lookup from './components/Lookup'
 import DateTimePicker from './components/DateTimePicker'
 import Select from './components/Select'
+import TextField from './components/TextField'
 import GridLayout from './Layouts'
 import './App.css'
 
@@ -30,6 +31,7 @@ function App() {
         <div>
           <SectionTitle title='TSR' />
           <Select options={test_options} />
+          <TextField />
         </div>
       </GridLayout>
     </>
