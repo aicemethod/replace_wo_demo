@@ -1,0 +1,20 @@
+.sectiontitle-container {
+    margin-bottom: 0.5rem;
+}
+
+.sectiontitle-text {
+    color: #00445C;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+    .sectiontitle-text {
+        font-size: 1rem;
+    }
+}
+
+.sectiontitle-border {
+    border-bottom: 2px solid #00445C;
+    margin-top: 0.5rem;
+}

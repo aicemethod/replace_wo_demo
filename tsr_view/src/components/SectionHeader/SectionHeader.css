@@ -2,14 +2,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem;
+    padding: 0.75rem 0;
     position: relative;
-}
-
-@media (min-width: 640px) {
-    .sectionheader-container {
-        padding: 1rem;
-    }
 }
 
 .sectionheader-title {
