@@ -6,7 +6,7 @@ import Select from './components/Select'
 import TextField from './components/TextField'
 import TextArea from './components/TextArea'
 import DateTimeInput from './components/DateTimeInput'
-import GridLayout from './Layouts'
+import { GridLayout, SectionLayout } from './Layouts'
 import './App.css'
 
 function App() {
@@ -25,18 +25,18 @@ function App() {
     <>
       <SectionHeader title='TSR' />
       <GridLayout columns={2} gap="1rem">
-        <div>
+        <SectionLayout>
           <SectionTitle title='TSR' />
           <Lookup label='担当者氏名' options={test_options} />
           <DateTimePicker label='顧客ご確認日' />
-        </div>
-        <div>
+        </SectionLayout>
+        <SectionLayout>
           <SectionTitle title='TSR' />
           <Select options={test_options} />
           <TextField />
           <TextArea />
           <DateTimeInput />
-        </div>
+        </SectionLayout>
       </GridLayout>
     </>
   )
