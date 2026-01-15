@@ -1,0 +1,37 @@
+.gridlayout-container {
+    display: grid;
+    width: 100%;
+}
+
+/* 1列レイアウト */
+.gridlayout-container[data-columns="1"] {
+    grid-template-columns: 1fr;
+}
+
+/* 2列レイアウト */
+.gridlayout-container[data-columns="2"] {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .gridlayout-container[data-columns="2"] {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 3列レイアウト */
+.gridlayout-container[data-columns="3"] {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .gridlayout-container[data-columns="3"] {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .gridlayout-container[data-columns="3"] {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
