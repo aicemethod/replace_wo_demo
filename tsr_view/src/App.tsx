@@ -4,6 +4,7 @@ import Lookup from './components/Lookup'
 import DateTimePicker from './components/DateTimePicker'
 import Select from './components/Select'
 import TextField from './components/TextField'
+import TextArea from './components/TextArea'
 import GridLayout from './Layouts'
 import './App.css'
 
@@ -32,6 +33,7 @@ function App() {
           <SectionTitle title='TSR' />
           <Select options={test_options} />
           <TextField />
+          <TextArea />
         </div>
       </GridLayout>
     </>
