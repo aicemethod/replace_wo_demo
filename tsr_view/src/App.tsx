@@ -2,6 +2,7 @@ import SectionHeader from './components/SectionHeader'
 import SectionTitle from './components/SectionTitle'
 import Lookup from './components/Lookup'
 import DateTimePicker from './components/DateTimePicker'
+import Select from './components/Select'
 import GridLayout from './Layouts'
 import './App.css'
 
@@ -24,10 +25,11 @@ function App() {
         <div>
           <SectionTitle title='TSR' />
           <Lookup label='担当者氏名' options={test_options} />
-          <DateTimePicker />
+          <DateTimePicker label='顧客ご確認日' />
         </div>
         <div>
           <SectionTitle title='TSR' />
+          <Select options={test_options} />
         </div>
       </GridLayout>
     </>
