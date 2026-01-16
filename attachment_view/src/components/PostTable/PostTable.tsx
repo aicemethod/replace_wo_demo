@@ -160,9 +160,7 @@ export const PostTable = ({
   }, [handleDropdownClose])
 
   const handleToggleReportOutput = useCallback(() => {
-    // トグル処理は親コンポーネントで実装（必要に応じて）
-    showToast('帳票出力設定を更新しました')
-  }, [showToast])
+  }, [])
 
   const handleDownloadAttachment = useCallback(async (attachmentName: string, postId: string) => {
     if (typeof (window.parent as any).Xrm !== 'undefined' && (window.parent as any).Xrm?.WebApi) {
