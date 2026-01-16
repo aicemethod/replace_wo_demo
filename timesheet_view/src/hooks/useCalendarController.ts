@@ -6,7 +6,7 @@ import type { Dispatch, SetStateAction } from "react";
  * - 今日の日付にリセット
  */
 export const useCalendarController = (
-    viewMode: "1日" | "3日" | "週",
+    viewMode: "稼働日" | "週",
     setCurrentDate: Dispatch<SetStateAction<Date>>
 ): {
     handlePrev: () => void;
@@ -16,10 +16,8 @@ export const useCalendarController = (
     /** 表示モードに応じて日数を返す */
     const getShiftDays = (): number => {
         switch (viewMode) {
-            case "1日":
-                return 1;
-            case "3日":
-                return 3;
+            case "稼働日":
+                return 5;
             default:
                 return 7;
         }

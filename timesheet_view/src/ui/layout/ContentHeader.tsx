@@ -35,8 +35,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
 
     /** 表示モードボタン（多言語対応） */
     const viewModes: { value: ViewMode; label: string }[] = [
-        { value: "1日", label: t("contentHeader.viewMode.day") },
-        { value: "3日", label: t("contentHeader.viewMode.threeDays") },
+        { value: "稼働日", label: t("contentHeader.viewMode.weekdays") },
         { value: "週", label: t("contentHeader.viewMode.week") },
     ];
 

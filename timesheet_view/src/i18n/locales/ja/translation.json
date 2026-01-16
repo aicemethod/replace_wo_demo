@@ -15,8 +15,7 @@
         "indirectTab": "間接タスク",
         "createNew": "新しいタイムエントリを作成",
         "viewMode": {
-            "day": "1日",
-            "threeDays": "3日",
+            "weekdays": "稼働日",
             "week": "週"
         }
     },

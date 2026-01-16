@@ -7,7 +7,7 @@
 export type MainTab = "user" | "indirect";
 
 /** 表示モード種別 */
-export type ViewMode = "1日" | "3日" | "週";
+export type ViewMode = "稼働日" | "週";
 
 /** WorkOrder型 */
 export type WorkOrder = {

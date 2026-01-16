@@ -15,8 +15,7 @@
         "indirectTab": "Indirect Task",
         "createNew": "Create Time Entry",
         "viewMode": {
-            "day": "Day",
-            "threeDays": "3days",
+            "weekdays": "Mon-Fri",
             "week": "Week"
         }
     },

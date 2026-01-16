@@ -10,7 +10,7 @@ import "../styles/layout/CalendarView.css";
 import { useTranslation } from "react-i18next";
 
 /** カレンダービューモード */
-export type CalendarViewMode = "1日" | "3日" | "週";
+export type CalendarViewMode = "稼働日" | "週";
 
 /** CalendarView コンポーネントの Props */
 export type CalendarViewProps = {
@@ -66,8 +66,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         if (!api) return;
 
         const modeToView = {
-            "1日": "timeGridDay",
-            "3日": "timeGridThreeDay",
+            "稼働日": "timeGridWeekdays",
             "週": "timeGridWeek",
         } as const;
 
@@ -133,6 +132,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 firstDay={1}
                 initialDate={currentDate}
                 views={{
+                    timeGridWeekdays: {
+                        type: "timeGrid",
+                        duration: { days: 5 },
+                        hiddenDays: [0, 6], // 日曜日(0)と土曜日(6)を非表示
+                        buttonText: i18n.language.startsWith("ja") ? "稼働日" : "Mon-Fri",
+                    },
                     timeGridThreeDay: {
                         type: "timeGrid",
                         duration: { days: 3 },
