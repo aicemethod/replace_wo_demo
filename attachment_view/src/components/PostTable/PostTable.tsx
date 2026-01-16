@@ -159,7 +159,7 @@ export const PostTable = ({
     handleDropdownClose()
   }, [handleDropdownClose])
 
-  const handleToggleReportOutput = useCallback((postId: string) => {
+  const handleToggleReportOutput = useCallback(() => {
     // トグル処理は親コンポーネントで実装（必要に応じて）
     showToast('帳票出力設定を更新しました')
   }, [showToast])
