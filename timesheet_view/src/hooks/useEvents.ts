@@ -150,18 +150,35 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
     /** 選択中の WorkOrder に対応するイベントを強調 */
     const events = allEvents.map((e) => {
         // 休憩時間のイベントは薄いグレーで表示
-        const isBreakTime = 
-            e.title === "休憩" || 
-            e.title === "休憩1" || 
+        const isBreakTime =
+            e.title === "休憩" ||
+            e.title === "休憩1" ||
             e.title === "休憩2" ||
             e.extendedProps?.comment === "休憩" ||
             e.extendedProps?.comment === "休憩1" ||
-            e.extendedProps?.comment === "休憩2";
+            e.extendedProps?.comment === "休憩2" ||
+            e.extendedProps?.isBreakTime === true;
+
+        // 隙間時間のイベントも薄いグレーで表示
+        const isGapTime =
+            e.title === "隙間時間" ||
+            e.title === "隙間時間1" ||
+            e.title === "隙間時間2" ||
+            e.title?.includes("隙間") ||
+            e.extendedProps?.comment === "隙間時間" ||
+            e.extendedProps?.comment === "隙間時間1" ||
+            e.extendedProps?.comment === "隙間時間2" ||
+            e.extendedProps?.comment?.includes("隙間") ||
+            e.extendedProps?.isGapTime === true;
+
+        // 休憩時間または隙間時間の場合はグレーで表示
+        const isSpecialTime = isBreakTime || isGapTime;
+
         return {
             ...e,
-            backgroundColor: isBreakTime ? "#e0e0e0" : undefined,
-            borderColor: isBreakTime ? "#d0d0d0" : undefined,
-            textColor: isBreakTime ? "#666" : undefined,
+            backgroundColor: isSpecialTime ? "#e0e0e0" : undefined,
+            borderColor: isSpecialTime ? "#d0d0d0" : undefined,
+            textColor: isSpecialTime ? "#666" : undefined,
             extendedProps: {
                 ...e.extendedProps,
                 isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
