@@ -1,6 +1,7 @@
 import { FiImage } from 'react-icons/fi'
 import { StepidDropdown } from './StepidDropdown'
 import { FileAttachmentEditor } from './FileAttachmentEditor'
+import { ReportOutputToggle } from './ReportOutputToggle'
 import type { PostRowProps } from './types'
 import './PostRow.css'
 
@@ -16,6 +17,7 @@ export const PostRow = ({
   editContent,
   editFile,
   editStepid,
+  editHasReportOutput,
   openDropdownId,
   dropdownPosition,
   fileInputRef,
@@ -28,7 +30,10 @@ export const PostRow = ({
   onRemoveFile,
   onStepidChange,
   onDropdownToggle,
-  onDropdownClose
+  onDropdownClose,
+  onToggleReportOutput,
+  onDownloadAttachment,
+  onEditHasReportOutputChange
 }: PostRowProps) => {
   return (
     <tr
@@ -76,6 +81,22 @@ export const PostRow = ({
         </td>
       )}
 
+      {!isSectionD && (
+        <td className="posttable-td posttable-td-center">
+          {isEditing ? (
+            <ReportOutputToggle
+              checked={editHasReportOutput}
+              onChange={onEditHasReportOutputChange}
+            />
+          ) : (
+            <ReportOutputToggle
+              checked={post.hasReportOutput || false}
+              onChange={() => onToggleReportOutput(post.id)}
+            />
+          )}
+        </td>
+      )}
+
       <td className="posttable-td">
         {isEditing ? (
           <input
@@ -113,7 +134,12 @@ export const PostRow = ({
           />
         ) : (
           post.attachmentName ? (
-            <div className="posttable-attachment-link posttable-attachment-link-default">
+            <div
+              className="posttable-attachment-link"
+              onClick={() => onDownloadAttachment(post.attachmentName)}
+              style={{ cursor: 'pointer' }}
+              title="クリックしてダウンロード"
+            >
               <FiImage size={16} />
               <span className="posttable-file-name">{post.attachmentName}</span>
             </div>

@@ -12,6 +12,7 @@ export interface PostRowProps {
   editContent: string
   editFile: File | null
   editStepid: string | null
+  editHasReportOutput: boolean
   openDropdownId: string | null
   dropdownPosition: { top: number; left: number; width: number } | null
   fileInputRef: React.RefObject<HTMLInputElement | null>
@@ -25,6 +26,9 @@ export interface PostRowProps {
   onStepidChange: (value: string | null) => void
   onDropdownToggle: (dropdownId: string, position: { top: number; left: number; width: number }) => void
   onDropdownClose: () => void
+  onToggleReportOutput: (postId: string) => void
+  onDownloadAttachment: (attachmentName: string) => void
+  onEditHasReportOutputChange: (value: boolean) => void
 }
 
 export interface StepidDropdownProps {

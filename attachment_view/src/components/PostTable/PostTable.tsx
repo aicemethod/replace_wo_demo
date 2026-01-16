@@ -14,6 +14,7 @@ export const PostTable = () => {
     editContent,
     editFile,
     editStepid,
+    editHasReportOutput,
     openDropdownId,
     dropdownPosition,
     fileInputRef,
@@ -28,11 +29,14 @@ export const PostTable = () => {
     handleEditFileChange,
     handleSave,
     handleCancel,
+    handleToggleReportOutput,
+    handleDownloadAttachment,
     getStepidOptions,
     setEditTitle,
     setEditContent,
     setEditFile,
     setEditStepid,
+    setEditHasReportOutput,
     setOpenDropdownId,
     setDropdownPosition,
     setSelectedPostId
@@ -102,6 +106,7 @@ export const PostTable = () => {
                 <div className="posttable-checkbox-wrapper" />
               </th>
               {!isSectionD && <th className="posttable-th posttable-th-order">表示順</th>}
+              {!isSectionD && <th className="posttable-th posttable-th-center">帳票出力あり</th>}
               <th className="posttable-th posttable-th-title">タイトル</th>
               <th className="posttable-th posttable-th-comment">コメント</th>
               <th className="posttable-th posttable-th-attachment">添付ファイル</th>
@@ -122,6 +127,7 @@ export const PostTable = () => {
                 editContent={editContent}
                 editFile={editFile}
                 editStepid={editStepid}
+                editHasReportOutput={editHasReportOutput}
                 openDropdownId={openDropdownId}
                 dropdownPosition={dropdownPosition}
                 fileInputRef={fileInputRef}
@@ -135,6 +141,9 @@ export const PostTable = () => {
                 onStepidChange={handleStepidChange}
                 onDropdownToggle={handleDropdownToggle}
                 onDropdownClose={handleDropdownClose}
+                onToggleReportOutput={handleToggleReportOutput}
+                onDownloadAttachment={handleDownloadAttachment}
+                onEditHasReportOutputChange={setEditHasReportOutput}
               />
             ))}
           </tbody>

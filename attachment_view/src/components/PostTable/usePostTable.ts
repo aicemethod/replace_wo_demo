@@ -12,7 +12,8 @@ const initialPosts: Post[] = [
     memoUser: 'ユーザー1',
     userName: 'ユーザー名1',
     attachmentName: 'sample1.pdf',
-    stepid: '1'
+    stepid: '1',
+    hasReportOutput: true
   },
   {
     id: '2',
@@ -23,7 +24,8 @@ const initialPosts: Post[] = [
     memoUser: 'ユーザー2',
     userName: 'ユーザー名2',
     attachmentName: '',
-    stepid: '2'
+    stepid: '2',
+    hasReportOutput: false
   },
   {
     id: '3',
@@ -34,7 +36,8 @@ const initialPosts: Post[] = [
     memoUser: 'ユーザー3',
     userName: 'ユーザー名3',
     attachmentName: 'sample3.jpg',
-    stepid: '3'
+    stepid: '3',
+    hasReportOutput: true
   }
 ]
 
@@ -51,6 +54,7 @@ export const usePostTable = () => {
   const [editContent, setEditContent] = useState('')
   const [editFile, setEditFile] = useState<File | null>(null)
   const [editStepid, setEditStepid] = useState<string | null>(null)
+  const [editHasReportOutput, setEditHasReportOutput] = useState<boolean>(false)
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -70,6 +74,7 @@ export const usePostTable = () => {
     setEditContent('')
     setEditFile(null)
     setEditStepid(null)
+    setEditHasReportOutput(false)
     setOpenDropdownId(null)
     setDropdownPosition(null)
     setTimeout(() => {
@@ -77,7 +82,7 @@ export const usePostTable = () => {
     }, 100)
   }, [])
 
-  const handleSaveEdit = useCallback(async (postId: string, title: string, content: string, file: File | null, stepid: string | null) => {
+  const handleSaveEdit = useCallback(async (postId: string, title: string, content: string, file: File | null, stepid: string | null, hasReportOutput?: boolean) => {
     setEditTitle('')
     setEditContent('')
     setEditFile(null)
@@ -92,6 +97,7 @@ export const usePostTable = () => {
           content,
           attachmentName: file ? file.name : post.attachmentName,
           stepid: stepid || post.stepid,
+          hasReportOutput: hasReportOutput !== undefined ? hasReportOutput : post.hasReportOutput,
           updateDate: new Date()
         }
         : post
@@ -100,6 +106,23 @@ export const usePostTable = () => {
       setEditingPostId(null)
     }, 100)
     return true
+  }, [])
+
+  const handleToggleReportOutput = useCallback((postId: string) => {
+    setPosts(prev => prev.map(post =>
+      post.id === postId
+        ? { ...post, hasReportOutput: !post.hasReportOutput, updateDate: new Date() }
+        : post
+    ))
+  }, [])
+
+  const handleDownloadAttachment = useCallback((attachmentName: string) => {
+    // モックデータなので、実際のダウンロード処理は実装しない
+    // 実際の実装では、ファイルのURLやBlobを作成してダウンロード
+    const link = document.createElement('a')
+    link.href = '#' // 実際のファイルURLに置き換える
+    link.download = attachmentName
+    link.click()
   }, [])
 
   const handleDelete = useCallback((postId: string) => {
@@ -122,7 +145,8 @@ export const usePostTable = () => {
       memoUser: '新規ユーザー',
       userName: '新規ユーザー名',
       attachmentName: '',
-      stepid: null
+      stepid: null,
+      hasReportOutput: false
     }
     setPosts(prev => [newPost, ...prev])
     setEditingPostId(newId)
@@ -150,6 +174,7 @@ export const usePostTable = () => {
         setEditContent(post.content)
         setEditFile(null)
         setEditStepid(post.stepid !== null && post.stepid !== undefined ? String(post.stepid) : null)
+        setEditHasReportOutput(post.hasReportOutput || false)
         setSelectedPostId(null)
       }
     } else {
@@ -157,6 +182,7 @@ export const usePostTable = () => {
       setEditContent('')
       setEditFile(null)
       setEditStepid(null)
+      setEditHasReportOutput(false)
     }
   }, [editingPostId, posts])
 
@@ -194,10 +220,10 @@ export const usePostTable = () => {
       const post = posts.find(p => p.id === editingPostId)
       if (post) {
         const stepidValue = editStepid !== null && editStepid !== undefined && editStepid !== '' ? editStepid : null
-        await handleSaveEdit(editingPostId, editTitle, editContent, editFile, stepidValue)
+        await handleSaveEdit(editingPostId, editTitle, editContent, editFile, stepidValue, editHasReportOutput)
       }
     }
-  }, [editingPostId, posts, editTitle, editContent, editFile, editStepid, handleSaveEdit])
+  }, [editingPostId, posts, editTitle, editContent, editFile, editStepid, editHasReportOutput, handleSaveEdit])
 
   const handleCancel = useCallback(() => {
     const post = posts.find(p => p.id === editingPostId)
@@ -246,6 +272,7 @@ export const usePostTable = () => {
     editContent,
     editFile,
     editStepid,
+    editHasReportOutput,
     openDropdownId,
     dropdownPosition,
     fileInputRef,
@@ -264,12 +291,15 @@ export const usePostTable = () => {
     handleEditFileChange,
     handleSave,
     handleCancel,
+    handleToggleReportOutput,
+    handleDownloadAttachment,
     getStepidOptions,
     // セッター
     setEditTitle,
     setEditContent,
     setEditFile,
     setEditStepid,
+    setEditHasReportOutput,
     setOpenDropdownId,
     setDropdownPosition,
     setSelectedPostId

@@ -86,8 +86,13 @@
   width: 10%;
 }
 
+.posttable-th-report-output {
+  width: 12%;
+  text-align: center;
+}
+
 .posttable-th-title {
-  width: 25%;
+  width: 20%;
 }
 
 .posttable-th-comment {
@@ -294,12 +299,24 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  color: #666;
+  color: #115ea3;
   font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.posttable-attachment-link:hover {
+  color: #0d4d82;
+  text-decoration: underline;
 }
 
 .posttable-attachment-link-default {
   cursor: default;
+  color: #666;
+}
+
+.posttable-attachment-link-default:hover {
+  color: #666;
+  text-decoration: none;
 }
 
 .posttable-actions {

@@ -8,4 +8,5 @@ export type Post = {
   userName: string
   attachmentName: string
   stepid?: string | null
+  hasReportOutput?: boolean
 }
