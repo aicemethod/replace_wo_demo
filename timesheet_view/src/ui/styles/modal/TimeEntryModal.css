@@ -1,0 +1,425 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+    --border-color: #ccc;
+    --input-radius: 4px;
+    --input-padding: 8px 12px;
+    --input-font-size: 0.9rem;
+}
+
+/* =======================================
+   モーダル全体
+======================================= */
+.timeentry-modal-body {
+    /* padding: 10px 20px 20px 20px; */
+    box-sizing: border-box;
+}
+
+.timeentry-modal-body .select-display {
+    width: 100%;
+}
+
+/* =======================================
+   ラベル
+======================================= */
+.modal-label {
+    display: block;
+    font-weight: 500;
+    color: var(--main-color);
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/* =======================================
+   グリッド構造（左右カラム）
+======================================= */
+.modal-grid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    /* grid-template-columns: 1fr 1fr; */
+    /* ✅ 2グリッド */
+    gap: 24px;
+    margin-top: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 左右カラムの中身を均等整列 */
+.modal-grid>div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    /* 各フィールドの間隔 */
+}
+
+/* =======================================
+   日付・時間フィールド（修正版）
+======================================= */
+.datetime-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+/* 入力欄をラップしてアイコンを絶対配置できるようにする */
+.datetime-row-input {
+    position: relative;
+    width: 50%;
+}
+
+/* カレンダーアイコンの安定配置 */
+.datetime-row-input .icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--main-color);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: opacity 0.2s ease;
+}
+
+.datetime-row-input .icon:hover {
+    opacity: 0.7;
+}
+
+/* Select は固定幅で整列 */
+.datetime-row .select-display {
+    width: 85px;
+}
+
+/* =======================================
+   デフォルトのカレンダーアイコンを非表示
+======================================= */
+
+/* Chrome / Edge / Safari */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    display: none;
+    appearance: none;
+}
+
+/* Firefox */
+input[type="date"]::-moz-calendar-picker-indicator {
+    opacity: 0;
+    display: none;
+}
+
+/* Edge (旧) / Internet Explorer */
+input[type="date"]::-ms-clear,
+input[type="date"]::-ms-expand {
+    display: none;
+}
+
+
+
+/* =======================================
+   入力フィールド共通
+======================================= */
+.form-control,
+textarea,
+.date-input input,
+.time-input input,
+.minute-input input {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-radius);
+    padding: var(--input-padding);
+    font-size: 0.875rem;
+    font-weight: 400;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 36px;
+    line-height: 1.4;
+}
+
+.form-control:focus,
+.date-input input:focus,
+.time-input input:focus,
+.minute-input input:focus,
+textarea:focus {
+    border-color: var(--main-color);
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 137, 186, 0.3);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* =======================================
+   アイコン
+======================================= */
+.icon {
+    position: relative;
+    top: -1px;
+    color: var(--main-color);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: opacity 0.2s ease;
+}
+
+.icon:hover {
+    opacity: 0.7;
+}
+
+/* =======================================
+   リソース・リンク・カウント
+======================================= */
+.resource-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.resource-link {
+    color: var(--main-color);
+    font-weight: 500;
+    text-decoration: underline;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.resource-link:hover {
+    opacity: 0.8;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #666;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+/* =======================================
+   無効スタイル
+======================================= */
+input[disabled],
+textarea[disabled],
+.form-control[readonly] {
+    background-color: #f8f8f8;
+    color: #666;
+}
+
+/* =======================================
+   ボタン
+======================================= */
+.timeentry-create-button {
+    margin-left: 10px;
+}
+
+.timeentry-cancel-button {
+    margin-left: 10px;
+}
+
+/* 編集時のボタンレイアウト */
+.timeentry-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.timeentry-modal-footer-left {
+    display: flex;
+    align-items: center;
+}
+
+.timeentry-modal-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeentry-delete-button {
+    margin-right: auto;
+}
+
+/* =======================================
+   アニメーション（BaseModalと同期）
+======================================= */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+}
+
+.modal-content.fade-in {
+    animation: modalFadeIn 0.3s ease forwards;
+}
+
+.modal-content.fade-out {
+    animation: modalFadeOut 0.3s ease forwards;
+}
+
+/* =======================================
+   レスポンシブ対応
+======================================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    .modal-grid {
+        gap: 20px;
+    }
+
+    .timeentry-modal-body {
+        padding: 12px 16px;
+    }
+}
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+        /* ✅ スマホ時は1カラム */
+        gap: 16px;
+    }
+
+    .datetime-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .datetime-row-input {
+        width: 100%;
+    }
+
+    .datetime-row .select-display {
+        width: 100%;
+        max-width: 120px;
+    }
+
+    .timeentry-modal-body {
+        padding: 10px;
+    }
+
+    /* タブレットでは横並びを維持 */
+    .timeentry-modal-footer {
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .timeentry-modal-footer-left {
+        justify-content: flex-start;
+        width: auto;
+    }
+
+    .timeentry-modal-footer-right {
+        justify-content: flex-end;
+        width: auto;
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    .timeentry-cancel-button,
+    .timeentry-create-button {
+        margin-left: 0;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .modal-grid {
+        gap: 12px;
+    }
+
+    .timeentry-modal-body {
+        padding: 8px;
+    }
+
+    .modal-label {
+        font-size: 0.85rem;
+        margin-top: 10px;
+        margin-bottom: 4px;
+    }
+
+    .datetime-row {
+        gap: 6px;
+    }
+
+    .datetime-row .select-display {
+        max-width: 100px;
+    }
+
+    .resource-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .resource-link {
+        font-size: 0.8rem;
+    }
+
+    .timeentry-modal-footer {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .timeentry-modal-footer-left,
+    .timeentry-modal-footer-right {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .timeentry-modal-footer-right {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .timeentry-modal-footer-right button {
+        width: 100%;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .timeentry-modal-body {
+        padding: 6px;
+    }
+
+    .modal-label {
+        font-size: 0.8rem;
+        margin-top: 8px;
+        margin-bottom: 3px;
+    }
+
+    .datetime-row {
+        gap: 4px;
+    }
+
+    .datetime-row .select-display {
+        max-width: 80px;
+    }
+
+    .resource-link {
+        font-size: 0.75rem;
+    }
+}

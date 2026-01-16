@@ -1,111 +1,392 @@
-.app {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+/* ===========================================
+   App.css
+   メインアプリケーション用スタイル
+=========================================== */
+
+/* メインCSS変数をインポート */
+@import './ui/styles/variables.css';
+
+/* ===========================================
+   リセットCSS
+=========================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.language-switcher {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+html {
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.language-switcher button {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--text-primary);
+    /* background-color: var(--bg-primary); */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: var(--font-weight-normal);
 }
 
-.language-switcher button:hover {
-  background: #f0f0f0;
+main {
+    display: block;
 }
 
-.language-switcher button.active {
-  background: #646cff;
-  color: white;
-  border-color: #646cff;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
 }
 
-.wo-select {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  background: white;
-  cursor: pointer;
-  min-width: 200px;
+p {
+    margin: 0;
 }
 
-.wo-select:hover {
-  border-color: #999;
+a {
+    background-color: transparent;
+    color: inherit;
+    text-decoration: none;
 }
 
-.wo-select:focus {
-  outline: none;
-  border-color: #646cff;
+a:active,
+a:hover {
+    outline-width: 0;
 }
 
-.icon {
-  font-size: 2rem;
-  color: #646cff;
+abbr[title] {
+    border-bottom: none;
+    text-decoration: underline;
+    text-decoration: underline dotted;
 }
 
-.icon-small {
-  font-size: 1.2rem;
-  margin-right: 0.5rem;
-  color: #646cff;
+b,
+strong {
+    font-weight: bolder;
 }
 
-.section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
+code,
+kbd,
+samp {
+    font-family: monospace, monospace;
+    font-size: 1em;
 }
 
-.section h2 {
-  display: flex;
-  align-items: center;
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
+small {
+    font-size: 80%;
 }
 
-.date-picker {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  width: 200px;
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
 }
 
-.calendar-container {
-  margin-top: 1rem;
-  overflow: hidden;
+sub {
+    bottom: -0.25em;
 }
 
-.calendar-container .fc {
-  max-height: calc(100vh - 400px);
-  overflow-y: auto;
+sup {
+    top: -0.5em;
 }
 
-@media (prefers-color-scheme: dark) {
-  .section {
-    background: #1a1a1a;
-    color: rgba(255, 255, 255, 0.87);
-  }
-
-  .date-picker {
-    background: #1a1a1a;
-    color: rgba(255, 255, 255, 0.87);
-    border-color: #444;
-  }
+img {
+    border-style: none;
+    max-width: 100%;
+    height: auto;
 }
 
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
 
+button,
+input {
+    overflow: visible;
+}
+
+button,
+select {
+    text-transform: none;
+}
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+    -webkit-appearance: button;
+    cursor: pointer;
+}
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+}
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+    outline: 1px dotted ButtonText;
+}
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+legend {
+    box-sizing: border-box;
+    color: inherit;
+    display: table;
+    max-width: 100%;
+    padding: 0;
+    white-space: normal;
+}
+
+progress {
+    vertical-align: baseline;
+}
+
+textarea {
+    overflow: auto;
+    resize: vertical;
+}
+
+[type="checkbox"],
+[type="radio"] {
+    box-sizing: border-box;
+    padding: 0;
+}
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+    height: auto;
+}
+
+[type="search"] {
+    -webkit-appearance: textfield;
+    outline-offset: -2px;
+}
+
+[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    font: inherit;
+}
+
+details {
+    display: block;
+}
+
+summary {
+    display: list-item;
+}
+
+template {
+    display: none;
+}
+
+[hidden] {
+    display: none;
+}
+
+/* CSS変数は variables.css で定義済み */
+
+/* =============================
+   ページ全体の高さ継承
+============================= */
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    box-sizing: border-box;
+}
+
+/* =============================
+   アプリ全体コンテナ
+============================= */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: var(--spacing-sm);
+    box-sizing: border-box;
+}
+
+/* =============================
+   カード型メインセクション
+============================= */
+.content-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* =============================
+   中央コンテンツ（サイドバー＋カレンダー）
+============================= */
+.content-middle {
+    flex: 1;
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: space-between;
+    min-height: 600px;
+    box-sizing: border-box;
+}
+
+/* カレンダーエリア */
+.content-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+}
+
+/* サブグリッドの場合、コンテンツエリアの高さを調整 */
+.app-container.is-subgrid-mode .content-middle,
+.app-container.is-subgrid-mode .content-main {
+    min-height: auto;
+    max-height: 600px;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    .content-middle {
+        gap: var(--spacing-md);
+    }
+
+    .app-container {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    html {
+        height: auto;
+    }
+
+    .app-container {
+        display: block;
+        padding: var(--spacing-sm);
+    }
+
+    .content-middle {
+        flex-direction: column;
+        min-height: auto;
+        gap: var(--spacing-sm);
+    }
+
+    .content-card {
+        border-radius: var(--border-radius-md);
+    }
+
+    .content-main {
+        min-height: 500px;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .app-container {
+        padding: var(--spacing-xs);
+    }
+
+    .content-middle {
+        gap: var(--spacing-sm);
+    }
+
+    .content-main {
+        min-height: 400px;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .app-container {
+        padding: var(--spacing-xs);
+    }
+
+    .content-card {
+        border-radius: var(--border-radius-sm);
+    }
+}
+
+/* =============================
+   レスポンシブフォントサイズ
+============================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    body {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    body {
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-normal);
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    body {
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-tight);
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    body {
+        font-size: var(--font-size-xs);
+        line-height: var(--line-height-tight);
+    }
+}

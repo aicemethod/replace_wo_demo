@@ -1,0 +1,433 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+    --border-color: #dcdcdc;
+    --bg-light: #f9f9f9;
+    --text-gray: #555;
+}
+
+/* ===========================================
+   モーダル本文
+=========================================== */
+/* .modal-body {
+    background-color: #fff;
+} */
+
+/* ===========================================
+   ラベル・説明文
+=========================================== */
+.modal-label {
+    font-weight: 600;
+    color: var(--main-color);
+    font-size: 0.95rem;
+}
+
+.modal-description {
+    color: var(--text-gray);
+    font-weight: 500;
+    margin: 12px 0 16px;
+    line-height: 1.6;
+}
+
+/* ===========================================
+   レイアウト
+=========================================== */
+.modal-grid {
+    display: grid;
+    /* grid-template-columns: 1fr 1fr; */
+    grid-template-columns: 50% 50%;
+    gap: 10px;
+}
+
+.divider {
+    margin: 24px 0 20px;
+    border: none;
+    border-top: 1px solid var(--border-color);
+}
+
+.right-align {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.left-align {
+    text-align: left;
+    margin-top: 20px;
+}
+
+/* ===========================================
+   入力フィールド
+=========================================== */
+/* .input-field {
+    width: 100%;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0 10px;
+    font-size: 14px;
+    margin-top: 4px;
+    color: #333;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.input-field:focus {
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 2px rgba(0, 137, 186, 0.15);
+    outline: none;
+} */
+
+/* ===========================================
+   ボタン
+=========================================== */
+.btn-clear,
+.btn-search {
+    border: 1px solid var(--main-color);
+    background: #fff;
+    color: var(--main-color);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-clear:hover,
+.btn-search:hover {
+    opacity: 0.85;
+}
+
+/* ===========================================
+   リストエリア
+=========================================== */
+.list-description {
+    color: var(--text-gray);
+    font-weight: 500;
+    margin: 10px 0 20px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.task-grid {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 20px;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---- ヘッダー ---- */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+/* 件数ラベル */
+.count {
+    display: inline-block;
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-size: 0.85rem;
+    color: #555;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+
+/* ---- サブヘッダー ---- */
+.list-subheader {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: #fff;
+}
+
+.list-subheader-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.list-subheader .label-text,
+.list-subheader .task-icon {
+    color: var(--main-color);
+}
+
+.list-subheader .label-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* ---- リストボックス ---- */
+.list-box {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: #fff;
+    overflow-y: auto;
+    height: 240px;
+    max-height: 240px;
+    scrollbar-width: none;
+}
+
+.list-box::-webkit-scrollbar {
+    display: none;
+}
+
+.list-box.empty::before {
+    content: 'データがありません';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 0.9rem;
+    height: 100%;
+}
+
+/* ===========================================
+   カスタムチェックボックス
+=========================================== */
+.list-item-2line input[type='checkbox'],
+.list-item-favorite input[type='checkbox'],
+.subheader-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    min-width: 22px;
+    min-height: 22px;
+    margin-right: 10px;
+    border: 2px solid var(--main-color);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    box-shadow: 0 0 3px rgba(0, 137, 186, 0.3);
+}
+
+/* ホバー時 */
+.list-item-2line input[type='checkbox']:hover,
+.list-item-favorite input[type='checkbox']:hover,
+.subheader-checkbox:hover {
+    box-shadow: 0 0 5px rgba(0, 137, 186, 0.4);
+}
+
+/* チェック時 */
+.list-item-2line input[type='checkbox']:checked,
+.list-item-favorite input[type='checkbox']:checked,
+.subheader-checkbox:checked {
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+    box-shadow: 0 0 4px rgba(0, 137, 186, 0.4);
+}
+
+/* チェックマーク */
+.list-item-2line input[type='checkbox']:checked::after,
+.list-item-favorite input[type='checkbox']:checked::after,
+.subheader-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* 無効状態 */
+.disabled-item input[type='checkbox'] {
+    border-color: var(--main-color);
+    background-color: var(--main-color);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.disabled-item input[type='checkbox']::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* ---- リストアイテム ---- */
+.list-item-2line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 6px;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+}
+
+.list-item-2line:last-child {
+    border-bottom: none;
+}
+
+.list-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.category-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.task-name {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* ---- 選択済みリスト ---- */
+.list-item-favorite {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 5px;
+    padding: 5px;
+    border: 1.2px solid var(--main-color);
+    border-radius: 6px;
+    background-color: rgba(0, 137, 186, 0.08);
+}
+
+.list-item-favorite-left {
+    display: flex;
+    align-items: center;
+}
+
+/* ---- 削除ボタン ---- */
+.btn-delete,
+.btn-delete-all {
+    border: none;
+    background: transparent;
+    color: var(--main-color);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-delete:hover,
+.btn-delete-all:hover {
+    opacity: 0.7;
+}
+
+/* ---- 移動ボタン ---- */
+.move-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.move-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    font-size: 1.4rem;
+    color: var(--main-color);
+    background: #fff;
+    border: 2px solid var(--main-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.move-button:hover {
+    background-color: rgba(0, 137, 186, 0.08);
+    transform: translateY(-1px);
+}
+
+
+/* ---- 保存ボタン ---- */
+.userlist-create-button {
+    margin-left: 10px;
+}
+
+/* ===========================
+   空リスト・メッセージ表示用
+=========================== */
+
+/* メッセージテキスト */
+.no-results {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    margin: 40px 0;
+    user-select: none;
+}
+
+/* 空リスト時でも枠を維持 */
+.list-box {
+    position: relative;
+    min-height: 220px;
+    /* ← 高さを確保 */
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+}
+
+/* スクロールバー調整 */
+.list-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.list-box::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.list-box::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+
+/* ===========================================
+   レスポンシブ
+=========================================== */
+@media (max-width: 768px) {
+
+    .modal-grid,
+    .task-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .move-button {
+        /* width: 100%; */
+        padding: 10px 0;
+    }
+
+    .task-list {
+        padding: 12px;
+    }
+
+    .userlist-create-button {
+        margin-left: 0;
+    }
+}

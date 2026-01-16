@@ -1,0 +1,233 @@
+/* =============================
+   セレクト全体
+============================= */
+
+/* メインCSS変数をインポート */
+@import '../variables.css';
+
+.select-wrapper {
+    position: relative;
+    box-sizing: border-box;
+}
+
+.select-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--select-height);
+    width: 300px;
+    padding: 0 var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    transition: var(--transition-normal);
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+/* 開閉状態 */
+.select-wrapper.open .select-display {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 2px var(--main-color-light);
+}
+
+/* 無効化 */
+.select-wrapper.disabled .select-display {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =============================
+   テキスト
+============================= */
+.select-text {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    color: var(--main-color);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-family: var(--font-family);
+    line-height: var(--line-height-tight);
+}
+
+.select-text.placeholder {
+    color: var(--text-muted);
+}
+
+/* =============================
+   アイコン
+============================= */
+.select-icon {
+    display: flex;
+    align-items: center;
+    color: var(--main-color);
+    transition: transform var(--transition-slow);
+}
+
+.select-wrapper.open .select-icon {
+    transform: rotate(180deg);
+}
+
+/* =============================
+   ドロップダウンリスト
+============================= */
+.select-option-list {
+    position: absolute;
+    top: calc(100% + var(--spacing-sm));
+    left: 0;
+    max-height: 200px;
+    width: 100%;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    z-index: 20;
+    overflow-y: auto;
+    animation: dropdown-fade var(--transition-fast) ease-out;
+}
+
+/* 表示アニメーション */
+@keyframes dropdown-fade {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================
+   オプション項目
+============================= */
+.select-option {
+    height: 35px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    font-family: var(--font-family);
+    line-height: var(--line-height-tight);
+}
+
+.select-option:hover {
+    background-color: var(--main-color-light);
+}
+
+.select-option.selected {
+    background-color: var(--main-color-light);
+    color: var(--main-color);
+    font-weight: var(--font-weight-semibold);
+}
+
+.select-option.empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: var(--spacing-sm) 0;
+}
+
+/* =============================
+   スクロールバー非表示
+============================= */
+.select-option-list {
+    /* スクロールバーを非表示 */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.select-option-list::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .select-display {
+        height: var(--touch-target-small);
+        padding: 0 var(--spacing-md);
+        font-size: var(--font-size-sm);
+        /* iOS ズーム防止 */
+        border-radius: var(--border-radius-md);
+        min-height: var(--touch-target-small);
+    }
+
+    .select-text {
+        font-size: var(--font-size-sm);
+    }
+
+    .select-option {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        min-height: var(--touch-target-min);
+        /* タッチターゲットの最小サイズ */
+        display: flex;
+        align-items: center;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .select-display {
+        height: var(--touch-target-min);
+        padding: 0 var(--spacing-lg);
+        font-size: var(--font-size-sm);
+        border-radius: var(--border-radius-lg);
+        min-height: var(--touch-target-min);
+    }
+
+    .select-text {
+        font-size: var(--font-size-sm);
+    }
+
+    .select-option {
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: var(--font-size-sm);
+        min-height: 48px;
+    }
+
+    .select-option-list {
+        max-height: 250px;
+        border-radius: var(--border-radius-lg);
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .select-display {
+        height: 42px;
+        padding: 0 var(--spacing-md);
+        font-size: var(--font-size-xs);
+        border-radius: var(--border-radius-md);
+        min-height: 42px;
+    }
+
+    .select-text {
+        font-size: var(--font-size-xs);
+    }
+
+    .select-option {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-xs);
+        min-height: var(--touch-target-min);
+    }
+
+    .select-option-list {
+        max-height: 200px;
+        border-radius: var(--border-radius-md);
+    }
+}
