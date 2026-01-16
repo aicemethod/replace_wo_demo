@@ -45,6 +45,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     isSubgrid = false,
 }) => {
     const calendarRef = useRef<FullCalendar>(null);
+    const isInternalUpdateRef = useRef(false);
     const { i18n } = useTranslation();
 
     /** 言語に応じた FullCalendar locale の選択 */
@@ -56,7 +57,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         if (!api) return;
         const displayedDate = api.getDate();
         if (displayedDate.toDateString() !== currentDate.toDateString()) {
+            isInternalUpdateRef.current = true;
             api.gotoDate(currentDate);
+            // 次のレンダリングサイクルでフラグをリセット
+            setTimeout(() => {
+                isInternalUpdateRef.current = false;
+            }, 0);
         }
     }, [currentDate]);
 
@@ -70,7 +76,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             "週": "timeGridWeek",
         } as const;
 
+        isInternalUpdateRef.current = true;
         api.changeView(modeToView[viewMode]);
+        // 次のレンダリングサイクルでフラグをリセット
+        setTimeout(() => {
+            isInternalUpdateRef.current = false;
+        }, 0);
     }, [viewMode]);
 
     /** 日付範囲選択時 */
@@ -92,6 +103,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
     /** 表示範囲変更時（日付が変わった時） */
     const handleDatesSet = (info: any) => {
+        // プログラムによる内部更新の場合は無視
+        if (isInternalUpdateRef.current) {
+            return;
+        }
+        
         const newDate = info.start;
         if (
             onDateChange &&
