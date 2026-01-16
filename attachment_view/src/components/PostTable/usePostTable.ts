@@ -1,53 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Post } from '../../types'
-
-// モックデータ
-const initialPosts: Post[] = [
-  {
-    id: '1',
-    title: 'サンプルタイトル1',
-    content: 'これはサンプルのコンテンツです。',
-    changeDate: new Date(),
-    updateDate: new Date(),
-    memoUser: 'ユーザー1',
-    userName: 'ユーザー名1',
-    attachmentName: 'sample1.pdf',
-    stepid: '1',
-    hasReportOutput: true
-  },
-  {
-    id: '2',
-    title: 'サンプルタイトル2',
-    content: 'これは2つ目のサンプルコンテンツです。',
-    changeDate: new Date(),
-    updateDate: new Date(),
-    memoUser: 'ユーザー2',
-    userName: 'ユーザー名2',
-    attachmentName: '',
-    stepid: '2',
-    hasReportOutput: false
-  },
-  {
-    id: '3',
-    title: 'サンプルタイトル3',
-    content: 'これは3つ目のサンプルコンテンツです。',
-    changeDate: new Date(),
-    updateDate: new Date(),
-    memoUser: 'ユーザー3',
-    userName: 'ユーザー名3',
-    attachmentName: 'sample3.jpg',
-    stepid: '3',
-    hasReportOutput: true
-  }
-]
+import { getEntityRecords, createEntityRecord, updateEntityRecord, deleteEntityRecord } from './dataverse'
+import { mapDataverseToPost, mapPostToDataverse } from './mapper'
+import { getSectionConfig, getSectionParam } from './config'
 
 export const usePostTable = () => {
-  // 状態管理
-  const [posts, setPosts] = useState<Post[]>(initialPosts)
+  const [sectionConfig, setSectionConfig] = useState<ReturnType<typeof getSectionConfig>>(null)
+  const [posts, setPosts] = useState<Post[]>([])
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null)
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   // 編集用の状態
   const [editTitle, setEditTitle] = useState('')
@@ -63,7 +27,40 @@ export const usePostTable = () => {
   const hasNewRow = posts.some(p => p.id.startsWith('new-'))
   const selectedPost = selectedPostId ? posts.find(p => p.id === selectedPostId) : null
 
-  // ハンドラー関数
+  // セクション設定の初期化
+  useEffect(() => {
+    const sectionId = getSectionParam()
+    setSectionConfig(getSectionConfig(sectionId))
+  }, [])
+
+  // データ読み込み
+  const loadPosts = useCallback(async () => {
+    if (!sectionConfig) return
+
+    setIsLoading(true)
+    try {
+      const records = await getEntityRecords(
+        sectionConfig.entityName,
+        sectionConfig.filter,
+        sectionConfig.selectFields,
+        sectionConfig.orderBy
+      )
+      const mappedPosts = records.map(record => mapDataverseToPost(record, sectionConfig.fieldMapping))
+      setPosts(mappedPosts)
+    } catch (error) {
+      console.error('Failed to load posts:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [sectionConfig])
+
+  // 初期読み込み
+  useEffect(() => {
+    if (sectionConfig) {
+      loadPosts()
+    }
+  }, [sectionConfig, loadPosts])
+
   const handleEdit = useCallback((post: Post) => {
     setEditingPostId(post.id)
     setSelectedPostId(null)
@@ -83,56 +80,117 @@ export const usePostTable = () => {
   }, [])
 
   const handleSaveEdit = useCallback(async (postId: string, title: string, content: string, file: File | null, stepid: string | null, hasReportOutput?: boolean) => {
-    setEditTitle('')
-    setEditContent('')
-    setEditFile(null)
-    setEditStepid(null)
-    setOpenDropdownId(null)
-    setDropdownPosition(null)
-    setPosts(prev => prev.map(post =>
-      post.id === postId
-        ? {
-          ...post,
-          title,
-          content,
-          attachmentName: file ? file.name : post.attachmentName,
-          stepid: stepid || post.stepid,
-          hasReportOutput: hasReportOutput !== undefined ? hasReportOutput : post.hasReportOutput,
-          updateDate: new Date()
+    if (!sectionConfig) return false
+
+    try {
+      const postData: Partial<Post> = {
+        title,
+        content,
+        stepid,
+        hasReportOutput
+      }
+      const dataverseData = mapPostToDataverse(postData, sectionConfig.fieldMapping, sectionConfig.createStatusCode)
+
+      if (postId.startsWith('new-')) {
+        await createEntityRecord(sectionConfig.entityName, dataverseData)
+        await loadPosts()
+      } else {
+        await updateEntityRecord(sectionConfig.entityName, postId, dataverseData)
+        setPosts(prev => prev.map(post =>
+          post.id === postId
+            ? { ...post, ...postData, updateDate: new Date() }
+            : post
+        ))
+      }
+
+      setEditTitle('')
+      setEditContent('')
+      setEditFile(null)
+      setEditStepid(null)
+      setOpenDropdownId(null)
+      setDropdownPosition(null)
+      setTimeout(() => {
+        setEditingPostId(null)
+      }, 100)
+      return true
+    } catch (error) {
+      console.error('Failed to save:', error)
+      return false
+    }
+  }, [sectionConfig, loadPosts])
+
+  const handleToggleReportOutput = useCallback(async (postId: string) => {
+    if (!sectionConfig) return
+
+    try {
+      const post = posts.find(p => p.id === postId)
+      if (post) {
+        const dataverseData = mapPostToDataverse(
+          { hasReportOutput: !post.hasReportOutput },
+          sectionConfig.fieldMapping,
+          sectionConfig.updateStatusCode || sectionConfig.createStatusCode
+        )
+        await updateEntityRecord(sectionConfig.entityName, postId, dataverseData)
+        setPosts(prev => prev.map(p =>
+          p.id === postId
+            ? { ...p, hasReportOutput: !p.hasReportOutput, updateDate: new Date() }
+            : p
+        ))
+      }
+    } catch (error) {
+      console.error('Failed to toggle report output:', error)
+    }
+  }, [posts, sectionConfig])
+
+  const handleDownloadAttachment = useCallback(async (attachmentName: string, postId: string) => {
+    try {
+      const xrm = (window.parent as any).Xrm?.WebApi
+      if (!xrm) return
+
+      const annotation = await xrm.retrieveRecord('annotation', postId, '?$select=documentbody,mimetype,filename')
+      if (annotation.documentbody) {
+        const byteCharacters = atob(annotation.documentbody)
+        const byteNumbers = new Array(byteCharacters.length)
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i)
         }
-        : post
-    ))
-    setTimeout(() => {
-      setEditingPostId(null)
-    }, 100)
-    return true
+        const byteArray = new Uint8Array(byteNumbers)
+        const blob = new Blob([byteArray], { type: annotation.mimetype || 'application/pdf' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = annotation.filename || attachmentName
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Failed to download:', error)
+    }
   }, [])
 
-  const handleToggleReportOutput = useCallback((postId: string) => {
-    setPosts(prev => prev.map(post =>
-      post.id === postId
-        ? { ...post, hasReportOutput: !post.hasReportOutput, updateDate: new Date() }
-        : post
-    ))
-  }, [])
-
-  const handleDownloadAttachment = useCallback((attachmentName: string) => {
-    // モックデータなので、実際のダウンロード処理は実装しない
-    // 実際の実装では、ファイルのURLやBlobを作成してダウンロード
-    const link = document.createElement('a')
-    link.href = '#' // 実際のファイルURLに置き換える
-    link.download = attachmentName
-    link.click()
-  }, [])
-
-  const handleDelete = useCallback((postId: string) => {
-    setDeletingPostId(postId)
-    setTimeout(() => {
+  const handleDelete = useCallback(async (postId: string) => {
+    if (postId.startsWith('new-')) {
       setPosts(prev => prev.filter(post => post.id !== postId))
+      return
+    }
+
+    if (!sectionConfig) return
+
+    setDeletingPostId(postId)
+    try {
+      await deleteEntityRecord(sectionConfig.entityName, postId)
+      setTimeout(() => {
+        setPosts(prev => prev.filter(post => post.id !== postId))
+        setDeletingPostId(null)
+        setSelectedPostId(null)
+      }, 300)
+    } catch (error) {
+      console.error('Failed to delete:', error)
       setDeletingPostId(null)
-      setSelectedPostId(null)
-    }, 300)
-  }, [])
+    }
+  }, [sectionConfig])
 
   const handleAddNewRow = useCallback(() => {
     const newId = `new-${Date.now()}`
@@ -142,8 +200,8 @@ export const usePostTable = () => {
       content: '',
       changeDate: new Date(),
       updateDate: new Date(),
-      memoUser: '新規ユーザー',
-      userName: '新規ユーザー名',
+      memoUser: '',
+      userName: '',
       attachmentName: '',
       stepid: null,
       hasReportOutput: false
@@ -155,15 +213,12 @@ export const usePostTable = () => {
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true)
-    // 初期データにリセット
-    setTimeout(() => {
-      setPosts(initialPosts)
-      setEditingPostId(null)
-      setDeletingPostId(null)
-      setSelectedPostId(null)
-      setIsRefreshing(false)
-    }, 500)
-  }, [])
+    await loadPosts()
+    setEditingPostId(null)
+    setDeletingPostId(null)
+    setSelectedPostId(null)
+    setIsRefreshing(false)
+  }, [loadPosts])
 
   // 編集開始時に状態をリセット
   useEffect(() => {
@@ -228,7 +283,6 @@ export const usePostTable = () => {
   const handleCancel = useCallback(() => {
     const post = posts.find(p => p.id === editingPostId)
     if (post?.id.startsWith('new-')) {
-      // 新規行の場合は、先に編集状態を解除してから即座に削除
       setEditTitle('')
       setEditContent('')
       setEditFile(null)
@@ -236,7 +290,6 @@ export const usePostTable = () => {
       setOpenDropdownId(null)
       setDropdownPosition(null)
       setEditingPostId(null)
-      // 即座に削除（アニメーションなし）
       setPosts(prev => prev.filter(p => p.id !== editingPostId))
       setSelectedPostId(null)
     } else {
@@ -262,12 +315,12 @@ export const usePostTable = () => {
   }, [posts])
 
   return {
-    // 状態
     posts,
     editingPostId,
     deletingPostId,
     selectedPostId,
     isRefreshing,
+    isLoading,
     editTitle,
     editContent,
     editFile,
@@ -276,11 +329,9 @@ export const usePostTable = () => {
     openDropdownId,
     dropdownPosition,
     fileInputRef,
-    // 計算値
     isSectionD,
     hasNewRow,
     selectedPost,
-    // ハンドラー
     handleEdit,
     handleCancelEdit,
     handleSaveEdit,
@@ -294,7 +345,6 @@ export const usePostTable = () => {
     handleToggleReportOutput,
     handleDownloadAttachment,
     getStepidOptions,
-    // セッター
     setEditTitle,
     setEditContent,
     setEditFile,

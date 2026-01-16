@@ -136,7 +136,7 @@ export const PostRow = ({
           post.attachmentName ? (
             <div
               className="posttable-attachment-link"
-              onClick={() => onDownloadAttachment(post.attachmentName)}
+              onClick={() => onDownloadAttachment(post.attachmentName, post.id)}
               style={{ cursor: 'pointer' }}
               title="クリックしてダウンロード"
             >

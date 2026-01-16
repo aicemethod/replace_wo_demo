@@ -27,7 +27,7 @@ export interface PostRowProps {
   onDropdownToggle: (dropdownId: string, position: { top: number; left: number; width: number }) => void
   onDropdownClose: () => void
   onToggleReportOutput: (postId: string) => void
-  onDownloadAttachment: (attachmentName: string) => void
+  onDownloadAttachment: (attachmentName: string, postId: string) => void
   onEditHasReportOutputChange: (value: boolean) => void
 }
 
