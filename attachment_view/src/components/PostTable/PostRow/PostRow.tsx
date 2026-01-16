@@ -32,7 +32,6 @@ export const PostRow = ({
   onStepidChange,
   onDropdownToggle,
   onDropdownClose,
-  onToggleReportOutput,
   onDownloadAttachment,
   onEditHasReportOutputChange
 }: PostRowProps) => {
