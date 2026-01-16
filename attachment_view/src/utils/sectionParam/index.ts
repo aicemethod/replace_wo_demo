@@ -1,1 +1,0 @@
-export { getSectionParam } from './getSectionParam'

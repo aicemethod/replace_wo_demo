@@ -14,11 +14,3 @@
   display: flex;
   flex-direction: column;
 }
-
-.app-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  font-family: 'SegoeUI', 'Segoe UI', 'Helvetica Neue', sans-serif;
-}

@@ -1,61 +1,162 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Post } from '../../types'
-import { getSectionParam } from '../../utils/sectionParam/index'
 
-interface UsePostTableProps {
-  posts: Post[]
-  editingPostId: string | null
-  deletingPostId: string | null
-  onSaveEdit: (postId: string, title: string, content: string, file: File | null, stepid: string | null) => Promise<boolean>
-  onCancelEdit: () => void
-  showToast: (message: string, type?: 'success' | 'info') => void
-}
+// モックデータ
+const initialPosts: Post[] = [
+  {
+    id: '1',
+    title: 'サンプルタイトル1',
+    content: 'これはサンプルのコンテンツです。',
+    changeDate: new Date(),
+    updateDate: new Date(),
+    memoUser: 'ユーザー1',
+    userName: 'ユーザー名1',
+    attachmentName: 'sample1.pdf',
+    stepid: '1'
+  },
+  {
+    id: '2',
+    title: 'サンプルタイトル2',
+    content: 'これは2つ目のサンプルコンテンツです。',
+    changeDate: new Date(),
+    updateDate: new Date(),
+    memoUser: 'ユーザー2',
+    userName: 'ユーザー名2',
+    attachmentName: '',
+    stepid: '2'
+  },
+  {
+    id: '3',
+    title: 'サンプルタイトル3',
+    content: 'これは3つ目のサンプルコンテンツです。',
+    changeDate: new Date(),
+    updateDate: new Date(),
+    memoUser: 'ユーザー3',
+    userName: 'ユーザー名3',
+    attachmentName: 'sample3.jpg',
+    stepid: '3'
+  }
+]
 
-/**
- * PostTableコンポーネントのロジック
- */
-export const usePostTable = ({
-  posts,
-  editingPostId,
-  deletingPostId,
-  onSaveEdit,
-  onCancelEdit,
-  showToast
-}: UsePostTableProps) => {
+export const usePostTable = () => {
+  // 状態管理
+  const [posts, setPosts] = useState<Post[]>(initialPosts)
+  const [editingPostId, setEditingPostId] = useState<string | null>(null)
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null)
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // 編集用の状態
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
   const [editFile, setEditFile] = useState<File | null>(null)
   const [editStepid, setEditStepid] = useState<string | null>(null)
-  const [editingPost, setEditingPost] = useState<Post | null>(null)
-  const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null)
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const currentSection = getSectionParam()
-  const isSectionD = currentSection === 'D'
+  const isSectionD = false
   const hasNewRow = posts.some(p => p.id.startsWith('new-'))
   const selectedPost = selectedPostId ? posts.find(p => p.id === selectedPostId) : null
+
+  // ハンドラー関数
+  const handleEdit = useCallback((post: Post) => {
+    setEditingPostId(post.id)
+    setSelectedPostId(null)
+  }, [])
+
+  const handleCancelEdit = useCallback(() => {
+    setEditTitle('')
+    setEditContent('')
+    setEditFile(null)
+    setEditStepid(null)
+    setOpenDropdownId(null)
+    setDropdownPosition(null)
+    setTimeout(() => {
+      setEditingPostId(null)
+    }, 100)
+  }, [])
+
+  const handleSaveEdit = useCallback(async (postId: string, title: string, content: string, file: File | null, stepid: string | null) => {
+    setEditTitle('')
+    setEditContent('')
+    setEditFile(null)
+    setEditStepid(null)
+    setOpenDropdownId(null)
+    setDropdownPosition(null)
+    setPosts(prev => prev.map(post =>
+      post.id === postId
+        ? {
+          ...post,
+          title,
+          content,
+          attachmentName: file ? file.name : post.attachmentName,
+          stepid: stepid || post.stepid,
+          updateDate: new Date()
+        }
+        : post
+    ))
+    setTimeout(() => {
+      setEditingPostId(null)
+    }, 100)
+    return true
+  }, [])
+
+  const handleDelete = useCallback((postId: string) => {
+    setDeletingPostId(postId)
+    setTimeout(() => {
+      setPosts(prev => prev.filter(post => post.id !== postId))
+      setDeletingPostId(null)
+      setSelectedPostId(null)
+    }, 300)
+  }, [])
+
+  const handleAddNewRow = useCallback(() => {
+    const newId = `new-${Date.now()}`
+    const newPost: Post = {
+      id: newId,
+      title: '',
+      content: '',
+      changeDate: new Date(),
+      updateDate: new Date(),
+      memoUser: '新規ユーザー',
+      userName: '新規ユーザー名',
+      attachmentName: '',
+      stepid: null
+    }
+    setPosts(prev => [newPost, ...prev])
+    setEditingPostId(newId)
+    setSelectedPostId(null)
+  }, [])
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true)
+    // 初期データにリセット
+    setTimeout(() => {
+      setPosts(initialPosts)
+      setEditingPostId(null)
+      setDeletingPostId(null)
+      setSelectedPostId(null)
+      setIsRefreshing(false)
+    }, 500)
+  }, [])
 
   // 編集開始時に状態をリセット
   useEffect(() => {
     if (editingPostId && posts.length > 0) {
       const post = posts.find(p => p.id === editingPostId)
       if (post) {
-        setEditingPost(post)
         setEditTitle(post.title)
         setEditContent(post.content)
-        setEditFile(post.attachmentFile || null)
+        setEditFile(null)
         setEditStepid(post.stepid !== null && post.stepid !== undefined ? String(post.stepid) : null)
         setSelectedPostId(null)
       }
     } else {
-      setEditingPost(null)
       setEditTitle('')
       setEditContent('')
       setEditFile(null)
       setEditStepid(null)
-      setSelectedPostId(null)
     }
   }, [editingPostId, posts])
 
@@ -78,8 +179,8 @@ export const usePostTable = ({
   }, [openDropdownId])
 
   const handleCheckboxChange = useCallback((postId: string) => {
-    setSelectedPostId(prev => prev === postId ? null : postId)
-  }, [])
+    setSelectedPostId(selectedPostId === postId ? null : postId)
+  }, [selectedPostId])
 
   const handleEditFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -89,67 +190,33 @@ export const usePostTable = ({
   }, [])
 
   const handleSave = useCallback(async () => {
-    if (editingPostId && editingPost) {
-      const stepidValue = editStepid !== null && editStepid !== undefined && editStepid !== '' ? editStepid : null
-      const success = await onSaveEdit(editingPostId, editTitle, editContent, editFile, stepidValue)
-      if (success) {
-        setEditingPost(null)
-        setEditTitle('')
-        setEditContent('')
-        setEditFile(null)
-        setEditStepid(null)
-        setSelectedPostId(null)
+    if (editingPostId) {
+      const post = posts.find(p => p.id === editingPostId)
+      if (post) {
+        const stepidValue = editStepid !== null && editStepid !== undefined && editStepid !== '' ? editStepid : null
+        await handleSaveEdit(editingPostId, editTitle, editContent, editFile, stepidValue)
       }
     }
-  }, [editingPostId, editingPost, editTitle, editContent, editFile, editStepid, onSaveEdit])
+  }, [editingPostId, posts, editTitle, editContent, editFile, editStepid, handleSaveEdit])
 
   const handleCancel = useCallback(() => {
-    setEditingPost(null)
-    setEditTitle('')
-    setEditContent('')
-    setEditFile(null)
-    setEditStepid(null)
-    onCancelEdit()
-  }, [onCancelEdit])
-
-  const handleDownloadAttachment = useCallback(async (annotationId: string, filename: string) => {
-    if (typeof (window.parent as any).Xrm !== 'undefined' && (window.parent as any).Xrm?.WebApi) {
-      try {
-        const annotation = await (window.parent as any).Xrm.WebApi.retrieveRecord(
-          'annotation',
-          annotationId,
-          '?$select=documentbody,mimetype,filename'
-        )
-
-        if (annotation.documentbody) {
-          const base64Data = annotation.documentbody
-          const byteCharacters = atob(base64Data)
-          const byteNumbers = new Array(byteCharacters.length)
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i)
-          }
-          const byteArray = new Uint8Array(byteNumbers)
-          const blob = new Blob([byteArray], { type: annotation.mimetype || 'application/pdf' })
-
-          const url = URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.href = url
-          link.download = annotation.filename || filename || 'attachment.pdf'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-        } else {
-          showToast('添付ファイルが見つかりません', 'info')
-        }
-      } catch (err: any) {
-        console.error('Failed to download attachment:', err)
-        showToast('ファイルのダウンロードに失敗しました', 'info')
-      }
+    const post = posts.find(p => p.id === editingPostId)
+    if (post?.id.startsWith('new-')) {
+      // 新規行の場合は、先に編集状態を解除してから即座に削除
+      setEditTitle('')
+      setEditContent('')
+      setEditFile(null)
+      setEditStepid(null)
+      setOpenDropdownId(null)
+      setDropdownPosition(null)
+      setEditingPostId(null)
+      // 即座に削除（アニメーションなし）
+      setPosts(prev => prev.filter(p => p.id !== editingPostId))
+      setSelectedPostId(null)
     } else {
-      showToast('Xrm.WebApiが利用できません', 'info')
+      handleCancelEdit()
     }
-  }, [showToast])
+  }, [editingPostId, posts, handleCancelEdit])
 
   const getStepidOptions = useCallback((post: Post) => {
     const usedStepids = new Set<string>()
@@ -158,7 +225,7 @@ export const usePostTable = ({
         usedStepids.add(String(p.stepid))
       }
     })
-    
+
     const options = []
     for (let i = 1; i <= posts.length; i++) {
       const value = String(i)
@@ -169,32 +236,42 @@ export const usePostTable = ({
   }, [posts])
 
   return {
+    // 状態
+    posts,
+    editingPostId,
+    deletingPostId,
+    selectedPostId,
+    isRefreshing,
     editTitle,
     editContent,
     editFile,
     editStepid,
-    editingPost,
-    fileInputRef,
-    selectedPostId,
     openDropdownId,
     dropdownPosition,
-    currentSection,
+    fileInputRef,
+    // 計算値
     isSectionD,
     hasNewRow,
     selectedPost,
-    setEditTitle,
-    setEditContent,
-    setEditFile,
-    setEditStepid,
-    setFileInputRef,
-    setSelectedPostId,
-    setOpenDropdownId,
-    setDropdownPosition,
+    // ハンドラー
+    handleEdit,
+    handleCancelEdit,
+    handleSaveEdit,
+    handleDelete,
+    handleAddNewRow,
+    handleRefresh,
     handleCheckboxChange,
     handleEditFileChange,
     handleSave,
     handleCancel,
-    handleDownloadAttachment,
-    getStepidOptions
+    getStepidOptions,
+    // セッター
+    setEditTitle,
+    setEditContent,
+    setEditFile,
+    setEditStepid,
+    setOpenDropdownId,
+    setDropdownPosition,
+    setSelectedPostId
   }
 }

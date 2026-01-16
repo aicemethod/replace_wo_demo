@@ -1,1 +1,0 @@
-export { MemoModal } from './MemoModal'
