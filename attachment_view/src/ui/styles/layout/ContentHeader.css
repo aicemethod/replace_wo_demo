@@ -1,0 +1,314 @@
+/* =============================
+   コンテンツヘッダー（タブ＋日付ナビ）
+============================= */
+.tab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #fff;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+/* =============================
+   左側（タブ＋新規作成ボタン）
+============================= */
+.tab-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* メインタブ */
+.main-tabs {
+    display: flex;
+    border: 1px solid var(--main-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.main-tabs .tab-item {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 16px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--main-color);
+    background-color: #fff;
+    border: none;
+    border-right: 1px solid var(--main-color);
+    cursor: pointer;
+    transition: 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.main-tabs .tab-item.active {
+    background-color: var(--main-color);
+    color: #fff;
+}
+
+.main-tabs .tab-item:last-child {
+    border-right: none;
+}
+
+/* =============================
+   右側（日付ナビ＋期間切替）
+============================= */
+.tab-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* 今日ボタン */
+.today-button {
+    background: none;
+    border: none;
+    color: var(--main-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 8px 12px;
+    transition: 0.2s;
+    border-radius: 6px;
+    line-height: 1.4;
+}
+
+.today-button:hover {
+    opacity: 0.8;
+    background-color: rgba(0, 137, 186, 0.08);
+}
+
+/* 矢印ボタン */
+.arrow-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--main-color);
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.arrow-button:hover {
+    background-color: rgba(0, 137, 186, 0.1);
+}
+
+/* 日付表示エリア */
+.date-display {
+    height: 40px;
+    width: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--main-color);
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    line-height: 1.4;
+}
+
+/* ビュー切替タブ */
+.view-tabs {
+    display: flex;
+    border: 1px solid var(--main-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.view-tab {
+    padding: 8px 12px;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    color: var(--main-color);
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+    min-width: 50px;
+    line-height: 1.4;
+}
+
+.view-tab.active {
+    background-color: var(--main-color);
+    color: #fff;
+}
+
+.view-tab:not(:last-child) {
+    border-right: 1px solid var(--main-color);
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    .tab-header {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .date-display {
+        width: 150px;
+        font-size: 12px;
+    }
+}
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .tab-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 10px;
+    }
+
+    .tab-header-left,
+    .tab-header-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tab-header-left {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .main-tabs,
+    .view-tabs {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .view-tab {
+        flex: 1;
+        min-height: 44px;
+        /* タッチターゲット */
+    }
+
+    .add-entry-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .date-display {
+        width: 100%;
+        justify-content: center;
+        height: 44px;
+    }
+
+    .arrow-button {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+
+    .today-button {
+        height: 44px;
+        padding: 8px 12px;
+        font-size: 16px;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .tab-header {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .today-button {
+        font-size: 14px;
+        padding: 6px 10px;
+        height: 40px;
+    }
+
+    .date-display {
+        font-size: 13px;
+        padding: 6px 8px;
+        height: 40px;
+    }
+
+    .view-tab {
+        font-size: 14px;
+        padding: 8px 6px;
+        min-height: 40px;
+    }
+
+    .arrow-button {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .main-tabs .tab-item {
+        min-width: 80px;
+        padding: 8px 10px;
+        font-size: 14px;
+        flex: 1;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .tab-header {
+        padding: 6px;
+        gap: 8px;
+    }
+
+    .today-button {
+        font-size: 13px;
+        padding: 5px 8px;
+        height: 38px;
+    }
+
+    .date-display {
+        font-size: 12px;
+        padding: 5px 6px;
+        height: 38px;
+    }
+
+    .view-tab {
+        font-size: 13px;
+        padding: 6px 4px;
+        min-height: 38px;
+    }
+
+    .arrow-button {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .main-tabs .tab-item {
+        min-width: 70px;
+        padding: 6px 8px;
+        font-size: 13px;
+        flex: 1;
+    }
+}

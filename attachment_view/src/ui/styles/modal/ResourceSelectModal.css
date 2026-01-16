@@ -1,0 +1,272 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+    --main-light: rgba(0, 137, 186, 0.08);
+    --white: #fff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+}
+
+/* =============================
+   モーダル本体
+============================= */
+.resource-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 20px;
+    background: #f9f9f9;
+    box-sizing: border-box;
+    color: var(--main-color);
+    height: 100%;
+    overflow: hidden;
+}
+
+/* =============================
+   ラジオボタン群（安定版）
+============================= */
+.resource-radios {
+    display: flex;
+    /* gap: 16px; */
+}
+
+.resource-radios label {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--main-color);
+    cursor: pointer;
+}
+
+/* ✅ 再描画に強い：各ブラウザ対応 */
+.resource-radios input[type="radio"] {
+    -webkit-appearance: none;
+    /* Safari対応 */
+    -moz-appearance: none;
+    /* Firefox対応 */
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--main-color);
+    border-radius: 50%;
+    background-color: var(--white);
+    margin: 0;
+    margin-right: 8px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 1px 2px var(--shadow-light);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* hover時に軽い強調 */
+.resource-radios input[type="radio"]:hover {
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+/* ✅ checked時も背景を白に固定してチラつき防止 */
+.resource-radios input[type="radio"]:checked {
+    border-color: var(--main-color);
+    background-color: var(--white);
+}
+
+/* ✅ 中央の青ドット（安定アニメーション） */
+.resource-radios input[type="radio"]::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--main-color);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.resource-radios input[type="radio"]:checked::after {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+#radio-number {
+    margin-left: 20px;
+}
+
+/* =============================
+   入力欄
+============================= */
+.resource-input {
+    width: 100%;
+}
+
+/* =============================
+   ソートボタン
+============================= */
+.resource-sort-row {
+    display: flex;
+    gap: 12px;
+}
+
+.resource-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+.resource-sort-btn:hover {
+    background: var(--main-light);
+}
+
+.resource-sort-icon {
+    font-size: 1rem;
+}
+
+/* =============================
+   自分・一覧アイテム共通
+============================= */
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+.resource-item:hover {
+    background: var(--main-light);
+}
+
+/* ✅ チェックボックス */
+.resource-checkbox {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    min-width: 22px;
+    min-height: 22px;
+    border-radius: 6px;
+    background-color: var(--white);
+    border: 2px solid var(--main-color);
+    cursor: pointer;
+    box-shadow: 0 1px 2px var(--shadow-light);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.resource-checkbox:checked {
+    background-color: var(--main-color);
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+.resource-checkbox:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(45deg);
+}
+
+/* =============================
+   テキスト
+============================= */
+.resource-text {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    line-height: 1.5;
+    gap: 10px;
+}
+
+.resource-number {
+    font-size: 0.85rem;
+    color: var(--main-color);
+    opacity: 0.9;
+}
+
+.resource-name {
+    font-size: 0.95rem;
+    color: var(--main-color);
+    font-weight: 600;
+}
+
+/* =============================
+   リスト
+============================= */
+.resource-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 250px;
+    padding-right: 6px;
+}
+
+/* ✅ スクロールバー非表示 */
+.resource-list::-webkit-scrollbar {
+    display: none;
+}
+
+.resource-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* =============================
+   モーダルサイズ
+============================= */
+.modal-content.medium {
+    width: 400px;
+    height: 500px;
+    background: #f9f9f9;
+    /* padding: 20px;
+    padding-bottom: 0; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.resource-modal-button {
+    margin-left: 10px;
+}
+
+/* =============================
+   レスポンシブ
+============================= */
+@media (max-width: 768px) {
+    .modal-content.medium {
+        width: 90%;
+        height: auto;
+        padding: 16px;
+    }
+
+    .resource-item {
+        padding: 6px 8px;
+        gap: 10px;
+    }
+
+    .resource-name {
+        font-size: 0.9rem;
+    }
+
+    .resource-modal-button {
+        margin-left: 0;
+    }
+}

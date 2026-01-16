@@ -1,0 +1,161 @@
+/* =============================
+   ヘッダー全体
+============================= */
+
+/* メインCSS変数をインポート */
+@import '../variables.css';
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+    flex-shrink: 0;
+    padding: 0 var(--spacing-md);
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+/* =============================
+   タイトル部分
+============================= */
+.header-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--main-color);
+    margin: 0;
+    white-space: nowrap;
+    line-height: var(--line-height-tight);
+}
+
+/* =============================
+   右側グループ
+============================= */
+.header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-direction: row;
+}
+
+/* =============================
+   ラベル
+============================= */
+.header-label {
+    font-size: 0.875rem;
+    color: var(--main-color);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    .app-header {
+        padding: 0 8px;
+    }
+
+    .header-title {
+        font-size: 1.375rem;
+    }
+
+    .header-right {
+        gap: 10px;
+    }
+}
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        padding: 10px 0;
+        gap: 10px;
+    }
+
+    .header-title {
+        font-size: 1.25rem;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .header-right .select-wrapper {
+        width: 100%;
+    }
+
+    .header-label {
+        font-size: 0.85rem;
+    }
+
+    .wo-select,
+    .header-right button,
+    .header-right .select-display {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .app-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        padding: 8px 0;
+    }
+
+    .header-title {
+        font-size: 1.125rem;
+        text-align: center;
+    }
+
+    .header-right {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .header-label {
+        font-size: 0.8rem;
+    }
+
+    .wo-select,
+    .header-right button,
+    .header-right .select-display {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .app-header {
+        padding: 6px 0;
+        gap: 6px;
+    }
+
+    .header-title {
+        font-size: 1rem;
+    }
+
+    .header-right {
+        gap: 4px;
+    }
+
+    .header-label {
+        font-size: 0.75rem;
+    }
+}
