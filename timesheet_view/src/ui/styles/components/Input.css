@@ -15,6 +15,16 @@
 }
 
 /* =============================
+   ラベル
+============================= */
+.input-label {
+    font-size: var(--font-size-xs);
+    color: var(--main-color);
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family);
+}
+
+/* =============================
    入力フィールド
 ============================= */
 .input-field {

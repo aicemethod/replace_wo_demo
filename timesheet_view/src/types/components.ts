@@ -97,6 +97,8 @@ export type InputProps = {
     className?: string;
     width?: string;
     suffix?: React.ReactNode;
+    min?: string | number;
+    max?: string | number;
 };
 
 export type SelectProps = {

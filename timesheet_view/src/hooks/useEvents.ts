@@ -148,13 +148,26 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
     });
 
     /** 選択中の WorkOrder に対応するイベントを強調 */
-    const events = allEvents.map((e) => ({
-        ...e,
-        extendedProps: {
-            ...e.extendedProps,
-            isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
-        },
-    }));
+    const events = allEvents.map((e) => {
+        // 休憩時間のイベントは薄いグレーで表示
+        const isBreakTime = 
+            e.title === "休憩" || 
+            e.title === "休憩1" || 
+            e.title === "休憩2" ||
+            e.extendedProps?.comment === "休憩" ||
+            e.extendedProps?.comment === "休憩1" ||
+            e.extendedProps?.comment === "休憩2";
+        return {
+            ...e,
+            backgroundColor: isBreakTime ? "#e0e0e0" : undefined,
+            borderColor: isBreakTime ? "#d0d0d0" : undefined,
+            textColor: isBreakTime ? "#666" : undefined,
+            extendedProps: {
+                ...e.extendedProps,
+                isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
+            },
+        };
+    });
 
     /** 登録・更新処理 */
     const mutation = useMutation({

@@ -10,6 +10,7 @@ import './styles/variables.css';
 export { Button } from './components/Button';
 export { Input } from './components/Input';
 export { Select } from './components/Select';
+export { Spinner } from './components/Spinner';
 export { Tabs } from './components/Tabs';
 export { Textarea } from './components/Textarea';
 
@@ -17,6 +18,7 @@ export { Textarea } from './components/Textarea';
 export { Header } from './layout/Header';
 export { Sidebar } from './layout/Sidebar';
 export { ContentHeader } from './layout/ContentHeader';
+export { WorkTimeInfo } from './layout/WorkTimeInfo';
 export { Footer } from './layout/Footer';
 export { CalendarView } from './layout/CalendarView';
 

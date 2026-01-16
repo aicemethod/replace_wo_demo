@@ -20,6 +20,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className = "",
             width = "100%",
             suffix,
+            min,
+            max,
         },
         ref
     ) => {
@@ -49,6 +51,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         placeholder={placeholder}
                         disabled={disabled}
                         className={inputClass}
+                        min={min}
+                        max={max}
                     />
                     {suffix && <span className="input-suffix">{suffix}</span>}
                 </div>
