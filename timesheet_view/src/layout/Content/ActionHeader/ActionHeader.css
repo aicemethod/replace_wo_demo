@@ -1,0 +1,28 @@
+.action-header {
+  flex-shrink: 0;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.action-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.action-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .action-header {
+    border-color: #444;
+  }
+}
+

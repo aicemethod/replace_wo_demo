@@ -1,0 +1,44 @@
+.main {
+  flex: 1;
+  display: flex;
+  padding: 1rem 2rem;
+  padding-top: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.content-card {
+  width: 100%;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .content-body {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .content-card {
+    background: #1a1a1a;
+    border-color: #444;
+    color: rgba(255, 255, 255, 0.87);
+  }
+}
+
+

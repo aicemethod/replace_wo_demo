@@ -1,0 +1,65 @@
+.tab-button-group {
+  display: inline-flex;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tab-button-item {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-right: 1px solid #e0e0e0;
+  background: white;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  border-radius: 0;
+}
+
+.tab-button-item:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.tab-button-item:last-child {
+  border-right: none;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.tab-button-item:hover {
+  background-color: #f5f5f5;
+}
+
+.tab-button-item.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-button-group {
+    border-color: #444;
+  }
+
+  .tab-button-item {
+    background: #2a2a2a;
+    color: var(--color-primary);
+    border-right: 1px solid #444;
+  }
+
+  .tab-button-item:last-child {
+    border-right: none;
+  }
+
+  .tab-button-item:hover {
+    background-color: #3a3a3a;
+  }
+
+  .tab-button-item.active {
+    background-color: var(--color-primary);
+    color: white;
+  }
+}
+

@@ -1,0 +1,95 @@
+/* 共通モーダルベーススタイル */
+.modal,
+.time-entry-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal.open,
+.time-entry-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-backdrop,
+.time-entry-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 18, 29, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.modal.open .modal-backdrop,
+.time-entry-modal.open .time-entry-modal-backdrop {
+  opacity: 1;
+}
+
+.modal-panel,
+.time-entry-modal-panel {
+  position: relative;
+  width: min(1040px, calc(100% - 2rem));
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.modal.open .modal-panel,
+.time-entry-modal.open .time-entry-modal-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.modal-header,
+.modal-footer,
+.time-entry-modal-header,
+.time-entry-modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #eff1f6;
+  flex-shrink: 0;
+}
+
+.modal-footer,
+.time-entry-modal-footer {
+  border-top: 1px solid #eff1f6;
+  border-bottom: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-header h2,
+.time-entry-modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #181c2a;
+}
+
+.modal-body,
+.time-entry-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
