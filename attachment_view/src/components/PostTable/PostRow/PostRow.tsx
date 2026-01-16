@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { FiImage } from 'react-icons/fi'
 import { StepidDropdown } from './StepidDropdown'
 import { FileAttachmentEditor } from './FileAttachmentEditor'
@@ -35,6 +36,12 @@ export const PostRow = ({
   onDownloadAttachment,
   onEditHasReportOutputChange
 }: PostRowProps) => {
+  const [localHasReportOutput, setLocalHasReportOutput] = useState(post.hasReportOutput || false)
+
+  useEffect(() => {
+    setLocalHasReportOutput(post.hasReportOutput || false)
+  }, [post.hasReportOutput])
+
   return (
     <tr
       className={`posttable-row ${isDeleting ? 'posttable-row-deleting' : ''} ${isNew ? 'posttable-row-new' : ''}`}
@@ -90,8 +97,8 @@ export const PostRow = ({
             />
           ) : (
             <ReportOutputToggle
-              checked={post.hasReportOutput || false}
-              onChange={() => onToggleReportOutput(post.id)}
+              checked={localHasReportOutput}
+              onChange={(checked) => setLocalHasReportOutput(checked)}
             />
           )}
         </td>

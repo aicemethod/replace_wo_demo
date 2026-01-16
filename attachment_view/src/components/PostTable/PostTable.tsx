@@ -159,8 +159,6 @@ export const PostTable = ({
     handleDropdownClose()
   }, [handleDropdownClose])
 
-  const handleToggleReportOutput = useCallback(() => {
-  }, [])
 
   const handleDownloadAttachment = useCallback(async (attachmentName: string, postId: string) => {
     if (typeof (window.parent as any).Xrm !== 'undefined' && (window.parent as any).Xrm?.WebApi) {
@@ -297,7 +295,7 @@ export const PostTable = ({
                 onStepidChange={handleStepidChange}
                 onDropdownToggle={handleDropdownToggle}
                 onDropdownClose={handleDropdownClose}
-                onToggleReportOutput={handleToggleReportOutput}
+                onToggleReportOutput={() => { }}
                 onDownloadAttachment={handleDownloadAttachment}
                 onEditHasReportOutputChange={setEditHasReportOutput}
               />
