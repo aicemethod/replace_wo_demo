@@ -50,7 +50,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
     const [gapTimeInsert, setGapTimeInsert] = useState<string>("");
     const [fixedTimeInsert, setFixedTimeInsert] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
 
     /** 隙間時間挿入オプション */
     const gapTimeOptions: Option[] = [
