@@ -1,0 +1,73 @@
+.container {
+  display: flex;
+  gap: 16px;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  color: #242424;
+}
+
+.area-wrapper {
+  position: relative;
+}
+
+.area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.area:hover {
+  color: #115EA3;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  color: #115EA3;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.toast {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #115EA3;
+  background: #f0f7ff;
+  border-radius: 4px;
+  white-space: nowrap;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.toast.fade-out {
+  animation: fadeOut 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
