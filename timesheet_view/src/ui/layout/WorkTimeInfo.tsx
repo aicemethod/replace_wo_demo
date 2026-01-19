@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Select } from "../components/Select";
 import { Input } from "../components/Input";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import "../styles/layout/WorkTimeInfo.css";
 import type { Option } from "../../types";
 import type { EventInput } from "@fullcalendar/core";
@@ -40,6 +41,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
     const [gapTimeInsert, setGapTimeInsert] = useState<string>("");
     const [fixedTimeInsert, setFixedTimeInsert] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     /** 隙間時間挿入オプション */
     const gapTimeOptions: Option[] = [
@@ -221,87 +223,105 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
     }, [events, viewRange]);
 
     return (
-        <div className="work-time-info">
-            <div className="work-time-info-left">
-                <div className="time-item">
-                    <Input
-                        label="開始時間"
-                        type="time"
-                        value={startTime}
-                        onChange={setStartTime}
-                        width="120px"
-                    />
-                </div>
-                <div className="time-item">
-                    <Input
-                        label="終了時間"
-                        type="time"
-                        value={endTime}
-                        onChange={setEndTime}
-                        width="120px"
-                    />
-                </div>
-                <div className="time-item break-time-item">
-                    <span className="time-label">休憩時間1</span>
-                    <div className="break-time-inputs">
-                        <Input
-                            type="time"
-                            value={breakTime1Start}
-                            onChange={setBreakTime1Start}
-                            width="110px"
-                        />
-                        <span className="time-separator">~</span>
-                        <Input
-                            type="time"
-                            value={breakTime1End}
-                            onChange={setBreakTime1End}
-                            width="110px"
-                        />
-                    </div>
-                </div>
-                <div className="time-item break-time-item">
-                    <span className="time-label">休憩時間2</span>
-                    <div className="break-time-inputs">
-                        <Input
-                            type="time"
-                            value={breakTime2Start}
-                            onChange={setBreakTime2Start}
-                            width="110px"
-                        />
-                        <span className="time-separator">~</span>
-                        <Input
-                            type="time"
-                            value={breakTime2End}
-                            onChange={setBreakTime2End}
-                            width="110px"
-                        />
-                    </div>
-                </div>
-                <div className="time-item">
+        <div className={`work-time-info ${isCollapsed ? "collapsed" : ""}`}>
+            <div className="work-time-info-header">
+                <div className="work-time-info-header-left">
                     <span className="time-label">工数合計</span>
                     <span className="time-value">
                         {totalTime.hours}時{totalTime.minutes}分
                     </span>
                 </div>
+                <button
+                    className="work-time-info-toggle"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    aria-label={isCollapsed ? "展開" : "折りたたみ"}
+                    aria-expanded={!isCollapsed}
+                >
+                    {isCollapsed ? <FaChevronDown /> : <FaChevronUp />}
+                </button>
             </div>
-            <div className="work-time-info-divider"></div>
-            <div className="work-time-info-right">
-                <div className="select-group">
-                    <Select
-                        options={gapTimeOptions}
-                        value={gapTimeInsert}
-                        onChange={setGapTimeInsert}
-                        placeholder="隙間時間挿入"
-                    />
+            <div className={`work-time-info-content ${isCollapsed ? "collapsed" : ""}`}>
+                <div className="work-time-info-left">
+                    <div className="time-item">
+                        <Input
+                            label="開始時間"
+                            type="time"
+                            value={startTime}
+                            onChange={setStartTime}
+                            width="100px"
+                        />
+                    </div>
+                    <div className="time-item">
+                        <Input
+                            label="終了時間"
+                            type="time"
+                            value={endTime}
+                            onChange={setEndTime}
+                            width="100px"
+                        />
+                    </div>
+                    <div className="time-item break-time-item">
+                        <span className="time-label">休憩時間1</span>
+                        <div className="break-time-inputs">
+                            <Input
+                                type="time"
+                                value={breakTime1Start}
+                                onChange={setBreakTime1Start}
+                                width="95px"
+                            />
+                            <span className="time-separator">~</span>
+                            <Input
+                                type="time"
+                                value={breakTime1End}
+                                onChange={setBreakTime1End}
+                                width="95px"
+                            />
+                        </div>
+                    </div>
+                    <div className="time-item break-time-item">
+                        <span className="time-label">休憩時間2</span>
+                        <div className="break-time-inputs">
+                            <Input
+                                type="time"
+                                value={breakTime2Start}
+                                onChange={setBreakTime2Start}
+                                width="95px"
+                            />
+                            <span className="time-separator">~</span>
+                            <Input
+                                type="time"
+                                value={breakTime2End}
+                                onChange={setBreakTime2End}
+                                width="95px"
+                            />
+                        </div>
+                    </div>
+                    <div className="time-item">
+                        <span className="time-label">工数合計</span>
+                        <span className="time-value">
+                            {totalTime.hours}時{totalTime.minutes}分
+                        </span>
+                    </div>
                 </div>
-                <div className="select-group">
-                    <Select
-                        options={fixedTimeOptions}
-                        value={fixedTimeInsert}
-                        onChange={handleFixedTimeInsertChange}
-                        placeholder="固定時間挿入"
-                        disabled={isLoading}
-                    />
+                <div className="work-time-info-divider"></div>
+                <div className="work-time-info-right">
+                    <div className="select-group">
+                        <Select
+                            options={gapTimeOptions}
+                            value={gapTimeInsert}
+                            onChange={setGapTimeInsert}
+                            placeholder="隙間時間挿入"
+                        />
+                    </div>
+                    <div className="select-group">
+                        <Select
+                            options={fixedTimeOptions}
+                            value={fixedTimeInsert}
+                            onChange={handleFixedTimeInsertChange}
+                            placeholder="固定時間挿入"
+                            disabled={isLoading}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

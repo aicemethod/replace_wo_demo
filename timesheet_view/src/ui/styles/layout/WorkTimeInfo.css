@@ -1,73 +1,148 @@
 .work-time-info {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
     background-color: #f8f9fa;
     border-bottom: 1px solid #e0e0e0;
-    gap: 16px;
     font-family: var(--font-family);
+    transition: all 0.3s ease;
 }
 
-.work-time-info-left {
+.work-time-info-header {
     display: flex;
     align-items: center;
-    gap: 24px;
-    flex: 1;
+    justify-content: space-between;
+    padding: 6px 12px;
+    user-select: none;
+    min-height: 36px;
 }
 
-.work-time-info-divider {
-    width: 1px;
-    height: 32px;
-    background-color: #e0e0e0;
-}
-
-.work-time-info-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.select-group {
-    min-width: 150px;
-}
-
-.time-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.time-label {
-    font-size: 12px;
-    color: var(--main-color);
-    font-weight: 500;
-    font-family: var(--font-family);
-}
-
-.time-value {
-    font-size: 14px;
-    color: #333;
-    font-weight: 600;
-    padding: 8px 0;
-    font-family: var(--font-family);
-}
-
-.break-time-item {
-    min-width: 260px;
-}
-
-.break-time-inputs {
+.work-time-info-header-left {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
+.work-time-info-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background-color: transparent;
+    color: var(--main-color);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.work-time-info-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.work-time-info-toggle:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.work-time-info-toggle svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.3s ease;
+}
+
+.work-time-info-content {
+    display: flex;
+    align-items: center;
+    padding: 0 12px 8px 12px;
+    gap: 12px;
+    max-height: 1000px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+.work-time-info-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 12px;
+}
+
+.work-time-info-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.work-time-info-divider {
+    width: 1px;
+    height: 28px;
+    background-color: #e0e0e0;
+    flex-shrink: 0;
+}
+
+.work-time-info-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.select-group {
+    min-width: 140px;
+}
+
+.time-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.time-label {
+    font-size: 11px;
+    color: var(--main-color);
+    font-weight: 500;
+    font-family: var(--font-family);
+    line-height: 1.2;
+}
+
+.time-value {
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+    padding: 4px 0;
+    font-family: var(--font-family);
+    line-height: 1.2;
+}
+
+.break-time-item {
+    min-width: 220px;
+}
+
+.break-time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .time-separator {
-    font-size: 14px;
+    font-size: 12px;
     color: #666;
     font-weight: 500;
     white-space: nowrap;
-    margin: 0 4px;
+    margin: 0 2px;
+}
+
+/* WorkTimeInfo内のInputコンポーネントをコンパクトに */
+.work-time-info .input-label {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.work-time-info .input-field {
+    padding: 4px 8px;
+    font-size: 13px;
+    height: 28px;
 }
 
 .select-with-spinner {
@@ -90,34 +165,17 @@
 
 /* ▼ PC（1615px以下） */
 @media (max-width: 1615px) {
-    .work-time-info {
-        padding: 10px 12px;
-        gap: 12px;
+    .work-time-info-header {
+        padding: 6px 10px;
     }
 
-    .work-time-info-left {
-        gap: 16px;
-        flex-wrap: wrap;
+    .work-time-info-content {
+        padding: 0 10px 6px 10px;
+        gap: 10px;
     }
 
-    .break-time-item {
-        min-width: 240px;
-    }
-
-    .select-group {
-        min-width: 140px;
-    }
-
-    .time-item {
-        min-width: 0;
-    }
-}
-
-/* ▼ タブレット（1024px以下） */
-@media (max-width: 1024px) {
-    .work-time-info {
-        padding: 10px 12px;
-        gap: 12px;
+    .work-time-info-content.collapsed {
+        padding: 0 10px;
     }
 
     .work-time-info-left {
@@ -132,21 +190,62 @@
     .select-group {
         min-width: 130px;
     }
+
+    .time-item {
+        min-width: 0;
+    }
+}
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    .work-time-info-header {
+        padding: 6px 10px;
+    }
+
+    .work-time-info-content {
+        padding: 0 10px 6px 10px;
+        gap: 10px;
+    }
+
+    .work-time-info-content.collapsed {
+        padding: 0 10px;
+    }
+
+    .work-time-info-left {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .break-time-item {
+        min-width: 200px;
+    }
+
+    .select-group {
+        min-width: 120px;
+    }
 }
 
 /* ▼ タブレット（768px以下） */
 @media (max-width: 768px) {
-    .work-time-info {
+    .work-time-info-header {
+        padding: 6px 10px;
+    }
+
+    .work-time-info-content {
         flex-direction: column;
         align-items: stretch;
-        padding: 12px;
-        gap: 12px;
+        padding: 0 10px 6px 10px;
+        gap: 8px;
+    }
+
+    .work-time-info-content.collapsed {
+        padding: 0 10px;
     }
 
     .work-time-info-left {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
+        gap: 8px;
         width: 100%;
     }
 
@@ -157,7 +256,7 @@
     .work-time-info-right {
         width: 100%;
         justify-content: space-between;
-        gap: 8px;
+        gap: 6px;
     }
 
     .time-item {
@@ -179,24 +278,47 @@
     }
 
     .time-value {
-        padding: 6px 0;
+        padding: 4px 0;
     }
 }
 
 /* ▼ スマホ（480px以下） */
 @media (max-width: 480px) {
-    .work-time-info {
-        padding: 10px;
-        gap: 10px;
+    .work-time-info-header {
+        padding: 5px 8px;
+        min-height: 32px;
+    }
+
+    .work-time-info-header-left {
+        gap: 6px;
+    }
+
+    .work-time-info-toggle {
+        width: 22px;
+        height: 22px;
+    }
+
+    .work-time-info-toggle svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .work-time-info-content {
+        padding: 0 8px 6px 8px;
+        gap: 8px;
+    }
+
+    .work-time-info-content.collapsed {
+        padding: 0 8px;
     }
 
     .work-time-info-left {
-        gap: 10px;
+        gap: 8px;
     }
 
     .work-time-info-right {
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
     }
 
     .select-group {
@@ -205,11 +327,20 @@
 
     .break-time-inputs {
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 4px;
     }
 
     .time-separator {
-        font-size: 12px;
+        font-size: 11px;
         margin: 0 2px;
+    }
+
+    .time-label {
+        font-size: 10px;
+    }
+
+    .time-value {
+        font-size: 12px;
+        padding: 3px 0;
     }
 }

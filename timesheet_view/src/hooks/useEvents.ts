@@ -174,11 +174,24 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
         // 休憩時間または隙間時間の場合はグレーで表示
         const isSpecialTime = isBreakTime || isGapTime;
 
+        // 既存のbackgroundColorを保持（APIから取得したイベントに既に色が設定されている場合）
+        // EventData型にはbackgroundColor等が定義されていないため、anyとして扱う
+        const eventWithColors = e as any;
+        const backgroundColor = isSpecialTime
+            ? "#e0e0e0"
+            : (eventWithColors.backgroundColor || undefined);
+        const borderColor = isSpecialTime
+            ? "#d0d0d0"
+            : (eventWithColors.borderColor || undefined);
+        const textColor = isSpecialTime
+            ? "#666"
+            : (eventWithColors.textColor || undefined);
+
         return {
             ...e,
-            backgroundColor: isSpecialTime ? "#e0e0e0" : undefined,
-            borderColor: isSpecialTime ? "#d0d0d0" : undefined,
-            textColor: isSpecialTime ? "#666" : undefined,
+            backgroundColor,
+            borderColor,
+            textColor,
             extendedProps: {
                 ...e.extendedProps,
                 isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
