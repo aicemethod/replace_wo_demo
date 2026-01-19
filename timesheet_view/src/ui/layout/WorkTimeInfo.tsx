@@ -187,6 +187,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                     backgroundColor: "#e0e0e0",
                     borderColor: "#d0d0d0",
                     textColor: "#666",
+                    classNames: ["break-time-event"],
                     extendedProps: {
                         isBreakTime: true,
                     },
