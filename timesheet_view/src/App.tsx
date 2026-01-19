@@ -1,6 +1,6 @@
 // src/App.tsx
 import { useState, useMemo } from "react";
-import { Header, Sidebar, Footer, ContentHeader, WorkTimeInfo, CalendarView, FavoriteTaskModal, TimeEntryModal, UserListModal, Spinner } from "./ui";
+import { Header, Sidebar, ContentHeader, WorkTimeInfo, CalendarView, FavoriteTaskModal, TimeEntryModal, UserListModal, Spinner } from "./ui";
 import { useAppController } from "./hooks/useAppController";
 import { UserListProvider } from "./context/UserListContext";
 import { FavoriteTaskProvider } from "./context/FavoriteTaskContext";
@@ -154,6 +154,8 @@ function TimesheetApp() {
           viewMode={viewMode}
           onInsertBreakTime={handleInsertBreakTime}
           onLoadingChange={setIsBreakTimeLoading}
+          onOpenUserList={() => setIsUserListModalOpen(true)}
+          onOpenFavoriteTask={() => setIsFavoriteTaskModalOpen(true)}
         />
 
         {/* 中央：サイドバー＋カレンダー */}
@@ -183,11 +185,6 @@ function TimesheetApp() {
           </div>
         </div>
 
-        {/* フッター */}
-        <Footer
-          onOpenUserList={() => setIsUserListModalOpen(true)}
-          onOpenFavoriteTask={() => setIsFavoriteTaskModalOpen(true)}
-        />
       </section>
 
       {/* モーダル群 */}

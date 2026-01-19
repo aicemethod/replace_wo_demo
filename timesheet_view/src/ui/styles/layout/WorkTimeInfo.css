@@ -52,13 +52,20 @@
 
 .work-time-info-content {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     padding: 0 12px 8px 12px;
-    gap: 12px;
+    gap: 10px;
     max-height: 1000px;
     opacity: 1;
     overflow: hidden;
     transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+.work-time-info-content-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
 }
 
 .work-time-info-content.collapsed {
@@ -143,6 +150,26 @@
     padding: 4px 8px;
     font-size: 13px;
     height: 28px;
+}
+
+/* Footerボタンエリア */
+.work-time-info-footer-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+}
+
+.work-time-info-footer-button {
+    flex-shrink: 0;
+}
+
+.work-time-info-footer-button .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    height: 32px;
 }
 
 .select-with-spinner {
@@ -232,14 +259,18 @@
     }
 
     .work-time-info-content {
-        flex-direction: column;
-        align-items: stretch;
         padding: 0 10px 6px 10px;
         gap: 8px;
     }
 
     .work-time-info-content.collapsed {
         padding: 0 10px;
+    }
+
+    .work-time-info-content-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
     }
 
     .work-time-info-left {
@@ -280,6 +311,20 @@
     .time-value {
         padding: 4px 0;
     }
+
+    .work-time-info-footer-buttons {
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    .work-time-info-footer-button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .work-time-info-footer-button .btn {
+        width: 100%;
+    }
 }
 
 /* ▼ スマホ（480px以下） */
@@ -312,6 +357,10 @@
         padding: 0 8px;
     }
 
+    .work-time-info-content-row {
+        gap: 6px;
+    }
+
     .work-time-info-left {
         gap: 8px;
     }
@@ -342,5 +391,21 @@
     .time-value {
         font-size: 12px;
         padding: 3px 0;
+    }
+
+    .work-time-info-footer-buttons {
+        flex-direction: column;
+        gap: 6px;
+        padding-top: 8px;
+    }
+
+    .work-time-info-footer-button {
+        width: 100%;
+    }
+
+    .work-time-info-footer-button .btn {
+        width: 100%;
+        height: 36px;
+        font-size: 14px;
     }
 }
