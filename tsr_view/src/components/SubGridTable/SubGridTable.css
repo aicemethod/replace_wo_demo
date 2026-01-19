@@ -1,0 +1,378 @@
+.subgrid-container {
+  width: 100%;
+}
+
+.subgrid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.subgrid-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subgrid-label {
+  font-weight: 600;
+  color: #00445C;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .subgrid-label {
+    font-size: 1rem;
+  }
+}
+
+.subgrid-add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background-color: white;
+  border: 1px solid #0089BA;
+  color: #0089BA;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.subgrid-add-button:hover {
+  background-color: #f0f9ff;
+}
+
+.subgrid-extra-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subgrid-extra-button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+  color: #0089BA;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .subgrid-extra-button {
+    font-size: 1rem;
+  }
+}
+
+.subgrid-extra-button:hover {
+  opacity: 0.7;
+}
+
+.subgrid-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.subgrid-table-header {
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0;
+  border: 1px solid #e5e7eb;
+  min-width: max-content;
+}
+
+.subgrid-table-header-row {
+  display: flex;
+}
+
+.subgrid-header-cell {
+  flex-shrink: 0;
+  min-width: 120px;
+  padding: 0.5rem 0.75rem;
+  width: auto;
+  max-width: none;
+}
+
+.subgrid-header-cell-border {
+  border-right: 1px solid #e5e7eb;
+}
+
+.subgrid-header-cell-sortable {
+  cursor: pointer;
+}
+
+.subgrid-header-cell-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.subgrid-sort-icon-wrapper {
+  flex-shrink: 0;
+}
+
+.subgrid-sort-icon {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.subgrid-sort-icon-active {
+  color: #0089BA;
+  font-size: 0.75rem;
+}
+
+.subgrid-header-label {
+  font-weight: 600;
+  color: #00445C;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .subgrid-header-label {
+    font-size: 1rem;
+  }
+}
+
+.subgrid-table-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.subgrid-row {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s;
+  min-width: max-content;
+}
+
+.subgrid-row-clickable {
+  cursor: pointer;
+}
+
+.subgrid-row-clickable:hover {
+  border-color: #0089BA;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.subgrid-row-content {
+  display: flex;
+}
+
+.subgrid-cell {
+  flex-shrink: 0;
+  min-width: 120px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .subgrid-cell {
+    font-size: 1rem;
+  }
+}
+
+.subgrid-cell-with-delete {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.subgrid-delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.subgrid-delete-button:hover {
+  opacity: 0.7;
+}
+
+.subgrid-delete-button svg {
+  font-size: 1rem;
+  color: #0077a3;
+}
+
+.subgrid-cell-text {
+  word-break: break-word;
+  display: block;
+  width: 100%;
+}
+
+.subgrid-cell-text-clickable {
+  color: #00445C;
+}
+
+.subgrid-empty {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .subgrid-empty {
+    font-size: 1rem;
+  }
+}
+
+.subgrid-footer {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #F9F9F9;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+@media (min-width: 640px) {
+  .subgrid-footer {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+}
+
+.subgrid-footer-info {
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+@media (min-width: 640px) {
+  .subgrid-footer-info {
+    font-size: 0.875rem;
+  }
+}
+
+.subgrid-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .subgrid-pagination {
+    gap: 0.5rem;
+  }
+}
+
+.subgrid-pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+  background-color: white;
+  border: 1px solid #0077a3;
+  color: #0077a3;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .subgrid-pagination-button {
+    padding: 0.5rem;
+  }
+}
+
+.subgrid-pagination-button:hover:not(.subgrid-pagination-button-disabled) {
+  background-color: #f0f9ff;
+}
+
+.subgrid-pagination-button-disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+.subgrid-pagination-button svg {
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .subgrid-pagination-button svg {
+    font-size: 0.875rem;
+  }
+}
+
+.subgrid-pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .subgrid-pagination-numbers {
+    gap: 0.25rem;
+  }
+}
+
+.subgrid-pagination-ellipsis {
+  padding: 0.25rem 0.5rem;
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .subgrid-pagination-ellipsis {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+  }
+}
+
+.subgrid-pagination-number {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .subgrid-pagination-number {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+.subgrid-pagination-number:hover {
+  background-color: #f9fafb;
+}
+
+.subgrid-pagination-number-active {
+  background-color: #0089BA;
+  color: white;
+  border-color: #0089BA;
+}
