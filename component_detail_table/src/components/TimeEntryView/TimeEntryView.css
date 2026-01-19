@@ -1,0 +1,260 @@
+.detail-section {
+  width: 100%;
+}
+
+.detail-header {
+  margin-bottom: 0.5rem;
+}
+
+.detail-title {
+  color: #00445C;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .detail-title {
+    font-size: 1rem;
+  }
+}
+
+.count-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .count-badge {
+    font-size: 1rem;
+  }
+}
+
+.table-container {
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  position: relative;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-height: 200px;
+  min-width: 800px;
+}
+
+.detail-table thead th {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  color: white;
+  background: #00445C;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .detail-table thead th {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+.detail-table tbody td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (max-width: 640px) {
+  .detail-table tbody td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+.total-row td {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.detail-controls {
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .detail-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.date-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .date-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.date-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem;
+  background: transparent;
+  color: #0089BA;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: none;
+  white-space: nowrap;
+}
+
+.date-btn:hover {
+  opacity: 0.7;
+}
+
+.date-btn:active {
+  opacity: 0.5;
+}
+
+.date-btn span {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .date-btn span {
+    font-size: 1rem;
+  }
+}
+
+.date-btn svg {
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .date-btn svg {
+    font-size: 0.875rem;
+  }
+}
+
+.date-picker-wrapper {
+  position: relative;
+  width: 10rem;
+  min-width: 10rem;
+}
+
+@media (max-width: 640px) {
+  .date-picker-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.date-picker {
+  width: 100%;
+}
+
+.date-picker-input {
+  width: 100%;
+  padding: 0.375rem 2.5rem 0.375rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  background: white;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .date-picker-input {
+    font-size: 1rem;
+  }
+}
+
+.date-picker-input:focus {
+  outline: none;
+  border-color: #0089BA;
+  box-shadow: 0 0 0 2px rgba(0, 137, 186, 0.2);
+}
+
+.calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1rem;
+  color: #0089BA;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .checkbox-label {
+    margin-left: 0;
+  }
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #0089BA;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  accent-color: #0089BA;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.checkbox-label span {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  .checkbox-label span {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .count-badge {
+    width: 100%;
+    text-align: center;
+  }
+}
