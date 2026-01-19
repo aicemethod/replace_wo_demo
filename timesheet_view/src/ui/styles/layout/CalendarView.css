@@ -83,12 +83,12 @@
 
 /* 対象WOのイベントを強調 */
 .highlight-event {
-    background-color: var(--main-color) !important;
+    background-color: var(--main-color);
 }
 
 /* サブグリッドの場合、すべてのイベントを濃く表示 */
 .calendar-wrapper.is-subgrid .fc .fc-event {
-    background-color: var(--main-color) !important;
+    background-color: var(--main-color);
 }
 
 /* サブグリッドの場合、高さを適切に調整 */
