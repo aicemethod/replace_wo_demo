@@ -103,56 +103,97 @@ export default function FileTable() {
               opacity: isRefreshing ? 0.6 : 1
             }}
           >
-            <FiRefreshCw 
-              size={16} 
-              style={{ 
+            <FiRefreshCw
+              size={16}
+              style={{
                 animation: isRefreshing ? 'spin 0.8s ease-in-out infinite' : 'none'
-              }} 
+              }}
             />
             <span>更新</span>
           </button>
         </div>
       </div>
-      <table className="file-table">
-        <thead>
-          <tr>
-            <th className="col-select">選択</th>
-            <th className="col-filename">ファイル名</th>
-            <th className="col-type">ファイル種別</th>
-            <th className="col-created">保存日時</th>
-            <th className="col-sync">連携実行日</th>
-          </tr>
-        </thead>
-        <tbody>
-          {files.length === 0 ? (
+      {/* デスクトップ用テーブル表示 */}
+      <div className="file-table-wrapper">
+        <table className="file-table">
+          <thead>
             <tr>
-              <td colSpan={5} className="no-data">
-                データがありません
-              </td>
+              <th className="col-select">選択</th>
+              <th className="col-filename">ファイル名</th>
+              <th className="col-type">ファイル種別</th>
+              <th className="col-created">保存日時</th>
+              <th className="col-sync">連携実行日</th>
             </tr>
-          ) : (
-            files.map((file) => (
-              <tr key={file.id}>
-                <td className="col-select">
-                  <label className="toggle-switch">
-                    <input
-                      type="checkbox"
-                      checked={file.selected}
-                      onChange={() => handleToggleSelect(file.id)}
-                      aria-label={file.selected ? '選択解除' : '選択'}
-                    />
-                    <span className="toggle-slider"></span>
-                  </label>
+          </thead>
+          <tbody>
+            {files.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="no-data">
+                  データがありません
                 </td>
-                <td className="col-filename">{file.filename}</td>
-                <td className="col-type">{file.Mimetype}</td>
-                <td className="col-created">{formatDate(file.createdon)}</td>
-                <td className="col-sync">-</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              files.map((file) => (
+                <tr key={file.id}>
+                  <td className="col-select">
+                    <label className="toggle-switch">
+                      <input
+                        type="checkbox"
+                        checked={file.selected}
+                        onChange={() => handleToggleSelect(file.id)}
+                        aria-label={file.selected ? '選択解除' : '選択'}
+                      />
+                      <span className="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td className="col-filename">{file.filename}</td>
+                  <td className="col-type">{file.Mimetype}</td>
+                  <td className="col-created">{formatDate(file.createdon)}</td>
+                  <td className="col-sync">-</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* モバイル用カード表示 */}
+      <div className="file-cards">
+        {files.length === 0 ? (
+          <div className="no-data">データがありません</div>
+        ) : (
+          files.map((file) => (
+            <div key={file.id} className={`file-card ${file.selected ? 'selected' : ''}`}>
+              <div className="file-card-header">
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={file.selected}
+                    onChange={() => handleToggleSelect(file.id)}
+                    aria-label={file.selected ? '選択解除' : '選択'}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+                <div className="file-card-filename">{file.filename}</div>
+              </div>
+              <div className="file-card-body">
+                <div className="file-card-row">
+                  <span className="file-card-label">ファイル種別:</span>
+                  <span className="file-card-value">{file.Mimetype}</span>
+                </div>
+                <div className="file-card-row">
+                  <span className="file-card-label">保存日時:</span>
+                  <span className="file-card-value">{formatDate(file.createdon)}</span>
+                </div>
+                <div className="file-card-row">
+                  <span className="file-card-label">連携実行日:</span>
+                  <span className="file-card-value">-</span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

@@ -6,6 +6,11 @@
   flex-direction: column;
 }
 
+.file-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .file-table-header {
   display: flex;
   justify-content: flex-end;
@@ -163,3 +168,155 @@
   color: #666;
 }
 
+/* モバイル用カード表示 */
+.file-cards {
+  display: none;
+}
+
+.file-card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.file-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-card.selected {
+  border-color: #115ea3;
+  background-color: #f0f7ff;
+}
+
+.file-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.file-card-filename {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  word-break: break-word;
+}
+
+.file-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-card-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-card-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.file-card-value {
+  font-size: 14px;
+  color: #333;
+  word-break: break-word;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .file-table-wrapper {
+    display: none;
+  }
+
+  .file-cards {
+    display: block;
+    padding: 0 12px;
+  }
+
+  .file-table-header {
+    padding: 12px;
+  }
+
+  .file-table-actions {
+    gap: 16px;
+  }
+
+  .action-button {
+    font-size: 13px;
+  }
+
+  .action-button span {
+    display: none;
+  }
+
+  .action-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .file-table-header {
+    padding: 10px;
+  }
+
+  .file-table-actions {
+    gap: 12px;
+  }
+
+  .file-card {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .file-card-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .file-card-filename {
+    font-size: 14px;
+  }
+
+  .file-card-value {
+    font-size: 13px;
+  }
+}
+
+/* タブレット用の調整 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .file-table {
+    font-size: 13px;
+  }
+
+  .file-table th,
+  .file-table td {
+    padding: 10px 8px;
+  }
+
+  .col-filename {
+    width: 30%;
+  }
+
+  .col-type {
+    width: 20%;
+  }
+
+  .col-created {
+    width: 25%;
+  }
+
+  .col-sync {
+    width: 15%;
+  }
+}
