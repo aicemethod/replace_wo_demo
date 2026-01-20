@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getXrm } from "../utils/xrmUtils";
 import { dataverseClient } from "../api/dataverseClient";
+import type { TimeEntryInput } from "../api/dataverseClient/timeEntryClient";
 
 /** イベントデータ型 */
 export type EventData = {
@@ -81,11 +82,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
         `),` +
-        `proto_enduser(` +
-        `$select=accountid,name` +
-        `),` +
         `proto_devicesearch(` +
-        `$select=proto_devicesearchid,proto_name` +
+        `$select=proto_name` +
         `)` +
         `)`;
 
@@ -228,22 +226,40 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
             // 複製の場合は常に新規作成として扱う
             const isUpdate = !!data.id && data.id !== "" && !data.isDuplicate;
 
+            // TimeEntryClient 用入力データに正規化
+            const input: TimeEntryInput = {
+                title: data.task || data.comment || undefined,
+                wo: data.wo,
+                start: data.start,
+                end: data.end,
+                // オプションセット
+                mainCategory: data.mainCategory ?? null,
+                timeCategory: data.timeCategory ?? null,
+                paymentType: data.paymentType ?? null,
+                timezone: data.timezone ?? null,
+                paymentMainCategory: data.paymentMainCategory ?? null,
+                // Lookup（ID）
+                subcategory: data.subcategory || null,
+                endUser: data.endUser || null,
+                deviceSn: data.deviceSn || null,
+            };
+
             // Dataverse 環境
             if (xrm) {
                 return isUpdate
-                    ? dataverseClient.updateTimeEntry(data.id, data)
-                    : dataverseClient.createTimeEntry(data);
+                    ? dataverseClient.updateTimeEntry(data.id, input)
+                    : dataverseClient.createTimeEntry(input);
             }
 
-            // ローカルモード
+            // ローカルモード（モック保存用に、元データ + 正規化データを保持）
             const current = JSON.parse(localStorage.getItem("mockEvents") || "[]");
             if (isUpdate) {
                 const updated = current.map((e: any) =>
-                    e.id === data.id ? { ...e, ...data } : e
+                    e.id === data.id ? { ...e, ...data, ...input } : e
                 );
                 localStorage.setItem("mockEvents", JSON.stringify(updated));
             } else {
-                const newItem = { ...data, id: String(Date.now()) };
+                const newItem = { ...data, ...input, id: String(Date.now()) };
                 localStorage.setItem("mockEvents", JSON.stringify([...current, newItem]));
             }
             return true;
