@@ -10,7 +10,7 @@ import { ResourceSelectModal } from "./ResourceSelectModal";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import "../styles/modal/TimeEntryModal.css";
 import { useTranslation } from "react-i18next";
-import { getWorkOrderFormValues } from "../../utils/xrmUtils";
+import { getWorkOrderFormValues, logWorkOrderFormFields } from "../../utils/xrmUtils";
 
 /* =========================================================
    型定義
@@ -160,6 +160,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     ------------------------------- */
     useEffect(() => {
         if (!isOpen) return;
+
+        // proto_workorder フォームのフィールド値を取得してログ出力
+        logWorkOrderFormFields();
 
         if (selectedEvent) {
             // 複製フラグをチェック
