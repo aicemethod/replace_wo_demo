@@ -217,42 +217,26 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWo(isSubgrid && selectedWO ? selectedWO : "");
             setTimezone("235");
 
-            // まずは空で初期化
-            setEndUser("");
-            setDeviceSn("");
-            setPaymentType("");
-            setMainCategory("");
-            setSubcategory("");
-
-            // 現在開いている proto_workorder から値を取得して TimeEntryModal の項目にセット
+            // 現在開いている proto_workorder から値を取得して反映
             const protoFields = getWorkOrderProtoFields();
             if (protoFields) {
-                // proto_enduser -> EndUser セレクト（ID を value としてセット）
-                if (protoFields.proto_enduser) {
-                    setEndUser(protoFields.proto_enduser.id);
-                }
-                // proto_devicesearch.id -> 装置S/N セレクト
-                if (protoFields.proto_devicesearch) {
-                    setDeviceSn(protoFields.proto_devicesearch.id);
-                }
-                // proto_paymenttype -> PaymentType セレクト
-                if (
-                    protoFields.proto_paymenttype !== undefined &&
-                    protoFields.proto_paymenttype !== null
-                ) {
-                    setPaymentType(String(protoFields.proto_paymenttype));
-                }
-                // proto_maincategory -> メインカテゴリ / MainCategory セレクト
-                if (
-                    protoFields.proto_maincategory !== undefined &&
-                    protoFields.proto_maincategory !== null
-                ) {
-                    setMainCategory(String(protoFields.proto_maincategory));
-                }
-                // proto_subcategory -> サブカテゴリ セレクト（ID を value としてセット）
-                if (protoFields.proto_subcategory) {
-                    setSubcategory(protoFields.proto_subcategory.id);
-                }
+                // proto_enduser -> EndUser
+                setEndUser(protoFields.proto_enduser?.id || "");
+                // proto_devicesearch.id -> 装置S/N
+                setDeviceSn(protoFields.proto_devicesearch?.id || "");
+                // proto_paymenttype -> PaymentType
+                setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
+                // proto_maincategory -> メインカテゴリ
+                setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
+                // proto_subcategory -> サブカテゴリ
+                setSubcategory(protoFields.proto_subcategory?.id || "");
+            } else {
+                // 取得できない場合は空で初期化
+                setEndUser("");
+                setDeviceSn("");
+                setPaymentType("");
+                setMainCategory("");
+                setSubcategory("");
             }
 
             // 間接タスクが選択されている場合の処理
