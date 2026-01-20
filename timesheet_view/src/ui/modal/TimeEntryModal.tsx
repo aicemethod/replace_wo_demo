@@ -578,7 +578,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )} */}
 
-                            <label className="modal-label">t("timeEntryModal.mainCategory")</label>
+                            <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
                             <Select
                                 options={paymentMainCategoryOptions}
                                 value={paymentMainCategory || ""}
