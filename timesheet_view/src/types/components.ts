@@ -26,6 +26,7 @@ export type ContentHeaderProps = {
     selectOptions?: Option[];
     selectValue?: string;
     onSelectChange?: (value: string) => void;
+    isSelectLoading?: boolean;
 };
 
 /** Sidebar Props */

@@ -28,6 +28,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     selectOptions = [],
     selectValue,
     onSelectChange,
+    isSelectLoading = false,
 }) => {
     const { t } = useTranslation();
 
@@ -101,60 +102,58 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                     className="add-entry-button new-create-button"
                     onClick={onCreateNew}
                 />
-                {selectOptions.length > 0 && (
-                    <div ref={selectWrapperRef} className={`header-select-wrapper ${selectOpen ? "open" : ""}`}>
-                        {/* 表示部分 */}
-                        <div
-                            className="header-select-display"
-                            onClick={() => setSelectOpen((prev) => !prev)}
-                            role="button"
-                            aria-expanded={selectOpen}
-                        >
-                            <span className={`header-select-text ${!selectedLabel ? "placeholder" : ""}`}>
-                                {selectedLabel || "選択してください"}
-                            </span>
-                            <span className="header-select-icon">
-                                <FaIcons.FaChevronDown />
-                            </span>
-                        </div>
-
-                        {/* ドロップダウンリスト */}
-                        {selectOpen && (
-                            <div className="header-select-dropdown">
-                                {/* 検索欄 */}
-                                <div className="header-select-search">
-                                    <FaIcons.FaSearch className="search-icon" />
-                                    <input
-                                        type="text"
-                                        className="search-input"
-                                        placeholder="検索..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        onClick={(e) => e.stopPropagation()}
-                                        autoFocus
-                                    />
-                                </div>
-
-                                {/* オプションリスト */}
-                                <div className="header-select-options">
-                                    {filteredOptions.length > 0 ? (
-                                        filteredOptions.map((opt) => (
-                                            <div
-                                                key={opt.value}
-                                                className={`header-select-option ${opt.value === selectValue ? "selected" : ""}`}
-                                                onClick={() => handleSelect(opt.value)}
-                                            >
-                                                {opt.label}
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="header-select-option empty">該当する項目がありません</div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                <div ref={selectWrapperRef} className={`header-select-wrapper ${selectOpen ? "open" : ""} ${isSelectLoading ? "loading" : ""}`}>
+                    {/* 表示部分 */}
+                    <div
+                        className="header-select-display"
+                        onClick={() => !isSelectLoading && setSelectOpen((prev) => !prev)}
+                        role="button"
+                        aria-expanded={selectOpen}
+                    >
+                        <span className={`header-select-text ${!selectedLabel ? "placeholder" : ""}`}>
+                            {isSelectLoading ? "取得中..." : (selectedLabel || "選択してください")}
+                        </span>
+                        <span className="header-select-icon">
+                            <FaIcons.FaChevronDown />
+                        </span>
                     </div>
-                )}
+
+                    {/* ドロップダウンリスト */}
+                    {selectOpen && !isSelectLoading && (
+                        <div className="header-select-dropdown">
+                            {/* 検索欄 */}
+                            <div className="header-select-search">
+                                <FaIcons.FaSearch className="search-icon" />
+                                <input
+                                    type="text"
+                                    className="search-input"
+                                    placeholder="検索..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    autoFocus
+                                />
+                            </div>
+
+                            {/* オプションリスト */}
+                            <div className="header-select-options">
+                                {filteredOptions.length > 0 ? (
+                                    filteredOptions.map((opt) => (
+                                        <div
+                                            key={opt.value}
+                                            className={`header-select-option ${opt.value === selectValue ? "selected" : ""}`}
+                                            onClick={() => handleSelect(opt.value)}
+                                        >
+                                            {opt.label}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="header-select-option empty">該当する項目がありません</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* =============================

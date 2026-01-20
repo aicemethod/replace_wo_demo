@@ -73,12 +73,18 @@ function TimesheetApp() {
   const [headerSelectValue, setHeaderSelectValue] = useState<string>("");
   /** ヘッダーセレクトのオプション */
   const [headerSelectOptions, setHeaderSelectOptions] = useState<Option[]>([]);
+  /** ヘッダーセレクトのローディング状態 */
+  const [isHeaderSelectLoading, setIsHeaderSelectLoading] = useState(true);
 
   /** ユーザーオプションを取得 */
   useEffect(() => {
     const loadUsers = async () => {
+      setIsHeaderSelectLoading(true);
       const xrm = getXrm();
-      if (!xrm?.WebApi) return;
+      if (!xrm?.WebApi) {
+        setIsHeaderSelectLoading(false);
+        return;
+      }
 
       try {
         // ログインユーザーIDを取得
@@ -121,6 +127,8 @@ function TimesheetApp() {
         }
       } catch (err) {
         console.error("ユーザー取得エラー:", err);
+      } finally {
+        setIsHeaderSelectLoading(false);
       }
     };
 
@@ -207,6 +215,7 @@ function TimesheetApp() {
           selectOptions={headerSelectOptions}
           selectValue={headerSelectValue}
           onSelectChange={setHeaderSelectValue}
+          isSelectLoading={isHeaderSelectLoading}
         />
 
         {/* 作業時間情報 */}
