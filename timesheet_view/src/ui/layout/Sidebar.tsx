@@ -13,7 +13,7 @@ import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
 /**
  * Sidebar コンポーネント
  */
-export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = "", onTaskSelect }) => {
     const { t } = useTranslation();
     const { favoriteTasks } = useFavoriteTasks(); // ✅ Contextからお気に入りタスク取得
 
@@ -21,7 +21,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
     const [searchType, setSearchType] = useState<SearchType>("name");
     const [keyword, setKeyword] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
-    const [selectedTask, setSelectedTask] = useState<string>("");
 
     /** 並び替え設定 */
     const [isUserSortOpen, setIsUserSortOpen] = useState(false);
@@ -248,7 +247,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                                         name="sidebarTaskType"
                                         value={task.id}
                                         checked={selectedTask === task.id}
-                                        onChange={() => setSelectedTask(task.id)}
+                                        onChange={() => onTaskSelect?.(task.id)}
                                     />
                                     <div className="sidebar-task-lines">
                                         <span className="sidebar-task-category">{task.subcategoryName}</span>

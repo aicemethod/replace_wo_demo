@@ -29,6 +29,7 @@ export interface TimeEntryModalProps {
     timezoneOptions: Option[];
     isSubgrid?: boolean;
     selectedWO?: string;
+    selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
 }
 
 /* =========================================================
@@ -49,6 +50,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     timezoneOptions,
     isSubgrid = false,
     selectedWO = "",
+    selectedIndirectTask = null,
 }) => {
     const { t } = useTranslation();
 
@@ -65,6 +67,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
+    const [subcategory, setSubcategory] = useState("");
     const [resource, setResource] = useState("");
 
     const [startDate, setStartDate] = useState("");
@@ -180,14 +183,28 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWo(isSubgrid && selectedWO ? selectedWO : "");
             setEndUser("");
             setTimezone("235");
-            setTimeCategory("");
+            
+            // 間接タスクが選択されている場合の処理
+            if (selectedIndirectTask) {
+                // タイムカテゴリを「間接工数」にセット（値は931440002を想定、実際の値に合わせて調整）
+                const indirectTimeCategory = timecategoryOptions.find(opt => 
+                    opt.label.includes("間接") || opt.value === "931440002"
+                );
+                setTimeCategory(indirectTimeCategory?.value || "");
+                setSubcategory(selectedIndirectTask.subcategoryName);
+                setTask(selectedIndirectTask.taskName);
+            } else {
+                setTimeCategory("");
+                setSubcategory("");
+                setTask("");
+            }
+            
             setMainCategory("");
             setPaymentType("");
-            setTask("");
             setComment("");
             setResource("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO]);
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions]);
 
     /* -------------------------------
        💾 保存処理
@@ -429,12 +446,19 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                         <div>
                             <label className="modal-label">{t("timeEntryModal.timeCategory")}</label>
-                            <Select
-                                options={timecategoryOptions}
-                                value={timeCategory}
-                                onChange={setTimeCategory}
-                                placeholder={t("timeEntryModal.placeholders.selectTimeCategory")}
-                            />
+                            {selectedIndirectTask ? (
+                                <Input 
+                                    value={timecategoryOptions.find(opt => opt.value === timeCategory)?.label || ""} 
+                                    disabled 
+                                />
+                            ) : (
+                                <Select
+                                    options={timecategoryOptions}
+                                    value={timeCategory}
+                                    onChange={setTimeCategory}
+                                    placeholder={t("timeEntryModal.placeholders.selectTimeCategory")}
+                                />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
                             <Select
@@ -453,15 +477,23 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
-                            <Input value={t("timeEntryModal.auto")} disabled />
+                            {selectedIndirectTask ? (
+                                <Input value={subcategory} disabled />
+                            ) : (
+                                <Input value={t("timeEntryModal.auto")} disabled />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.task")}</label>
-                            <Select
-                                options={taskOptions}
-                                value={task}
-                                onChange={setTask}
-                                placeholder={t("timeEntryModal.placeholders.selectTask")}
-                            />
+                            {selectedIndirectTask ? (
+                                <Input value={task} disabled />
+                            ) : (
+                                <Select
+                                    options={taskOptions}
+                                    value={task}
+                                    onChange={setTask}
+                                    placeholder={t("timeEntryModal.placeholders.selectTask")}
+                                />
+                            )}
 
                             <Textarea
                                 label={t("timeEntryModal.comment")}

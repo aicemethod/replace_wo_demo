@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Header, Sidebar, ContentHeader, WorkTimeInfo, CalendarView, FavoriteTaskModal, TimeEntryModal, UserListModal, Spinner } from "./ui";
 import { useAppController } from "./hooks/useAppController";
 import { UserListProvider } from "./context/UserListContext";
-import { FavoriteTaskProvider } from "./context/FavoriteTaskContext";
+import { FavoriteTaskProvider, useFavoriteTasks } from "./context/FavoriteTaskContext";
 import { formatToday } from "./utils/dateFormatter";
 import { convertWorkOrdersToOptions } from "./utils/modalHelpers";
 import { getXrm } from "./utils/xrmUtils";
@@ -75,6 +75,15 @@ function TimesheetApp() {
   const [headerSelectOptions, setHeaderSelectOptions] = useState<Option[]>([]);
   /** ヘッダーセレクトのローディング状態 */
   const [isHeaderSelectLoading, setIsHeaderSelectLoading] = useState(true);
+  /** サイドバーで選択されているタスク */
+  const [selectedSidebarTask, setSelectedSidebarTask] = useState<string>("");
+
+  /** 選択されているタスク情報を取得 */
+  const { favoriteTasks } = useFavoriteTasks();
+  const selectedIndirectTask = useMemo(() => {
+    if (!selectedSidebarTask || mainTab !== "indirect") return null;
+    return favoriteTasks.find(task => task.id === selectedSidebarTask) || null;
+  }, [selectedSidebarTask, favoriteTasks, mainTab]);
 
   /** ユーザーオプションを取得 */
   useEffect(() => {
@@ -237,7 +246,11 @@ function TimesheetApp() {
             </div>
           )}
           {/* Sidebar が Context からお気に入りタスクを取得 */}
-          <Sidebar mainTab={mainTab} />
+          <Sidebar
+            mainTab={mainTab}
+            selectedTask={selectedSidebarTask}
+            onTaskSelect={setSelectedSidebarTask}
+          />
 
           <div className="content-main">
             <CalendarView
@@ -274,6 +287,7 @@ function TimesheetApp() {
         timezoneOptions={optionSets?.timezone ?? []}
         isSubgrid={isSubgrid}
         selectedWO={selectedWO}
+        selectedIndirectTask={selectedIndirectTask}
       />
 
       <FavoriteTaskModal
