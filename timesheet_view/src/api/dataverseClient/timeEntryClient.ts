@@ -108,7 +108,8 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
             }
             if (data.endUser) {
-                payload['proto_enduser@odata.bind'] = `/proto_endusers(${data.endUser})`;
+                // EndUser は account エンティティへの Lookup
+                payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
             }
             if (data.deviceSn) {
                 payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
@@ -166,7 +167,8 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             }
             if (data.endUser !== undefined) {
                 if (data.endUser) {
-                    payload['proto_enduser@odata.bind'] = `/proto_endusers(${data.endUser})`;
+                    // EndUser は account エンティティへの Lookup
+                    payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
                 } else {
                     payload['proto_enduser@odata.bind'] = null;
                 }

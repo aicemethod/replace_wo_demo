@@ -149,7 +149,7 @@ function TimesheetApp() {
     loadUsers();
   }, []);
 
-  /** Lookupデータを取得（proto_enduser、proto_devicesearch、proto_subcategory） */
+  /** Lookupデータを取得（EndUser: account、proto_devicesearch、proto_subcategory） */
   useEffect(() => {
     const loadLookupData = async () => {
       const xrm = getXrm();
@@ -158,14 +158,14 @@ function TimesheetApp() {
       }
 
       try {
-        // proto_enduserを取得
+        // EndUser（account）を取得
         const endUserResult = await xrm.WebApi.retrieveMultipleRecords(
-          "proto_enduser",
-          "?$select=proto_enduserid,proto_name&$orderby=proto_name"
+          "account",
+          "?$select=accountid,name&$orderby=name"
         );
         const endUserOpts: Option[] = endUserResult.entities.map((item: any) => ({
-          value: item.proto_enduserid?.replace(/[{}]/g, "") || "",
-          label: item.proto_name || "",
+          value: item.accountid?.replace(/[{}]/g, "") || "",
+          label: item.name || "",
         }));
         setEndUserOptions(endUserOpts);
 
