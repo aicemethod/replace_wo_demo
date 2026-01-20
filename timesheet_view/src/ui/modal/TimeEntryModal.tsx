@@ -182,8 +182,16 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setTimeCategory(String(selectedEvent.timecategory ?? ""));
             setPaymentType(String(selectedEvent.paymenttype ?? ""));
             setComment(selectedEvent.comment ?? "");
-            // LookupフィールドはIDとして取得（値があればセット、なければ空文字列）
-            setEndUser(selectedEvent.endUser || "");
+            // LookupフィールドはIDまたはnameとして取得
+            // endUserNameがあればそれを使用、なければIDからoptionsでラベルを取得
+            if ((selectedEvent as any).endUserName) {
+                setEndUser((selectedEvent as any).endUserName);
+            } else if (selectedEvent.endUser) {
+                const endUserOption = endUserOptions.find(opt => opt.value === selectedEvent.endUser);
+                setEndUser(endUserOption?.label || selectedEvent.endUser);
+            } else {
+                setEndUser("");
+            }
             setDeviceSn(selectedEvent.deviceSn || "");
             // サブカテゴリはIDとして取得（subcategoryNameがある場合はIDを探す）
             if (selectedEvent.subcategory) {

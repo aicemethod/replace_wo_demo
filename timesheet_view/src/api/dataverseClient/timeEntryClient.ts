@@ -107,10 +107,11 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.subcategory && data.subcategory !== "" && data.subcategory !== null) {
                 payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
             }
-            if (data.endUser && data.endUser !== "" && data.endUser !== null) {
-                // EndUser は account エンティティへの Lookup
-                payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
-            }
+            // EndUser は一時的に登録対象から除外（エラー回避のため）
+            // if (data.endUser && data.endUser !== "" && data.endUser !== null) {
+            //     // EndUser は account エンティティへの Lookup
+            //     payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
+            // }
             if (data.deviceSn && data.deviceSn !== "" && data.deviceSn !== null) {
                 // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
                 payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
@@ -173,10 +174,11 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.subcategory !== undefined && data.subcategory !== null && data.subcategory !== "") {
                 payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
             }
-            if (data.endUser !== undefined && data.endUser !== null && data.endUser !== "") {
-                // EndUser は account エンティティへの Lookup
-                payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
-            }
+            // EndUser は一時的に更新対象から除外（エラー回避のため）
+            // if (data.endUser !== undefined && data.endUser !== null && data.endUser !== "") {
+            //     // EndUser は account エンティティへの Lookup
+            //     payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
+            // }
             if (data.deviceSn !== undefined && data.deviceSn !== null && data.deviceSn !== "") {
                 // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
                 payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
