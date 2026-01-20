@@ -27,6 +27,10 @@ export interface TimeEntryModalProps {
     paymenttypeOptions: Option[];
     timecategoryOptions: Option[];
     timezoneOptions: Option[];
+    endUserOptions: Option[];
+    deviceSnOptions: Option[];
+    subcategoryOptions: Option[];
+    paymentMainCategoryOptions: Option[];
     isSubgrid?: boolean;
     selectedWO?: string;
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
@@ -48,6 +52,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     paymenttypeOptions,
     timecategoryOptions,
     timezoneOptions,
+    endUserOptions,
+    deviceSnOptions,
+    subcategoryOptions,
+    paymentMainCategoryOptions,
     isSubgrid = false,
     selectedWO = "",
     selectedIndirectTask = null,
@@ -123,12 +131,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         [t]
     );
 
-    const endUserOptions: Option[] = [
-        { value: "abc", label: t("timeEntryModal.sampleEndUser1") },
-        { value: "xyz", label: t("timeEntryModal.sampleEndUser2") },
-        { value: "sample", label: t("timeEntryModal.sampleEndUser3") },
-    ];
-
     // 新しく追加した項目用のサンプル選択肢（必要に応じて実データに差し替え）
     const wisdomBuOptions: Option[] = [
         { value: "wisdom_bu_1", label: "WISDOM BU 1" },
@@ -140,18 +142,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         { value: "sap_bu_1", label: "SAP BU 1" },
         { value: "sap_bu_2", label: "SAP BU 2" },
         { value: "sap_bu_3", label: "SAP BU 3" },
-    ];
-
-    const deviceSnOptions: Option[] = [
-        { value: "device_sn_1", label: "装置S/N 1" },
-        { value: "device_sn_2", label: "装置S/N 2" },
-        { value: "device_sn_3", label: "装置S/N 3" },
-    ];
-
-    const paymentMainCategoryOptions: Option[] = [
-        { value: "payment_main_1", label: "メインカテゴリ 1" },
-        { value: "payment_main_2", label: "メインカテゴリ 2" },
-        { value: "payment_main_3", label: "メインカテゴリ 3" },
     ];
 
     const taskOptions: Option[] = [
@@ -201,14 +191,16 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setTimeCategory(String(selectedEvent.timecategory ?? ""));
             setPaymentType(String(selectedEvent.paymenttype ?? ""));
             setComment(selectedEvent.comment ?? "");
+            // LookupフィールドはIDとして取得
             setEndUser(selectedEvent.endUser ?? "");
+            setDeviceSn(selectedEvent.deviceSn ?? "");
+            setSubcategory(selectedEvent.subcategory || selectedEvent.subcategoryName || "");
             setTask(selectedEvent.task ?? "");
             setWorkStatus(String(selectedEvent.workStatus ?? ""));
             setTimezone(String(selectedEvent.timezone ?? ""));
             setResource(selectedEvent.resource ?? "");
             setWisdomBu(selectedEvent.wisdomBu ?? "");
             setSapBu(selectedEvent.sapBu ?? "");
-            setDeviceSn(selectedEvent.deviceSn ?? "");
             setPaymentMainCategory(selectedEvent.paymentMainCategory ?? "");
         } else if (selectedDateTime) {
             setMode("create");
@@ -275,6 +267,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             paymentType,
             deviceSn,
             paymentMainCategory,
+            subcategory,
             task,
             workStatus,
             comment,
@@ -567,7 +560,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {selectedIndirectTask ? (
                                 <div className="readonly-text">
-                                    {subcategory || "-"}
+                                    {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
                             ) : (
                                 <div className="readonly-text">

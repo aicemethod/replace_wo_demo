@@ -85,6 +85,11 @@ function TimesheetApp() {
     return favoriteTasks.find(task => task.id === selectedSidebarTask[0]) || null;
   }, [selectedSidebarTask, favoriteTasks, mainTab]);
 
+  /** Lookupデータの状態 */
+  const [endUserOptions, setEndUserOptions] = useState<Option[]>([]);
+  const [deviceSnOptions, setDeviceSnOptions] = useState<Option[]>([]);
+  const [subcategoryOptions, setSubcategoryOptions] = useState<Option[]>([]);
+
   /** ユーザーオプションを取得 */
   useEffect(() => {
     const loadUsers = async () => {
@@ -142,6 +147,55 @@ function TimesheetApp() {
     };
 
     loadUsers();
+  }, []);
+
+  /** Lookupデータを取得（proto_enduser、proto_devicesearch、proto_subcategory） */
+  useEffect(() => {
+    const loadLookupData = async () => {
+      const xrm = getXrm();
+      if (!xrm?.WebApi) {
+        return;
+      }
+
+      try {
+        // proto_enduserを取得
+        const endUserResult = await xrm.WebApi.retrieveMultipleRecords(
+          "proto_enduser",
+          "?$select=proto_enduserid,proto_name&$orderby=proto_name"
+        );
+        const endUserOpts: Option[] = endUserResult.entities.map((item: any) => ({
+          value: item.proto_enduserid?.replace(/[{}]/g, "") || "",
+          label: item.proto_name || "",
+        }));
+        setEndUserOptions(endUserOpts);
+
+        // proto_devicesearchを取得
+        const deviceSnResult = await xrm.WebApi.retrieveMultipleRecords(
+          "proto_devicesearch",
+          "?$select=proto_devicesearchid,proto_name&$orderby=proto_name"
+        );
+        const deviceSnOpts: Option[] = deviceSnResult.entities.map((item: any) => ({
+          value: item.proto_devicesearchid?.replace(/[{}]/g, "") || "",
+          label: item.proto_name || "",
+        }));
+        setDeviceSnOptions(deviceSnOpts);
+
+        // proto_subcategoryを取得
+        const subcategoryResult = await xrm.WebApi.retrieveMultipleRecords(
+          "proto_subcategory",
+          "?$select=proto_subcategoryid,proto_name&$orderby=proto_name"
+        );
+        const subcategoryOpts: Option[] = subcategoryResult.entities.map((item: any) => ({
+          value: item.proto_subcategoryid?.replace(/[{}]/g, "") || "",
+          label: item.proto_name || "",
+        }));
+        setSubcategoryOptions(subcategoryOpts);
+      } catch (err) {
+        console.error("Lookupデータ取得エラー:", err);
+      }
+    };
+
+    loadLookupData();
   }, []);
 
   /** 休憩時間挿入ハンドラ（クライアント側のみ） */
@@ -285,6 +339,10 @@ function TimesheetApp() {
         timecategoryOptions={optionSets?.timecategory ?? []}
         paymenttypeOptions={optionSets?.paymenttype ?? []}
         timezoneOptions={optionSets?.timezone ?? []}
+        endUserOptions={endUserOptions}
+        deviceSnOptions={deviceSnOptions}
+        subcategoryOptions={subcategoryOptions}
+        paymentMainCategoryOptions={optionSets?.maincategory ?? []}
         isSubgrid={isSubgrid}
         selectedWO={selectedWO}
         selectedIndirectTask={selectedIndirectTask}

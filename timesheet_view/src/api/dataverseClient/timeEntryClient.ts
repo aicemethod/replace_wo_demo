@@ -15,12 +15,15 @@ export interface TimeEntryInput {
     title?: string;
     mainCategory?: string | number | null;
     timeCategory?: string | number | null;
-    subcategory?: string | number | null;
+    subcategory?: string | null; // Lookup ID
     paymentType?: string | number | null;
     timezone?: string | number | null;
     start?: Date;
     end?: Date;
     wo?: string; // WorkOrder ID
+    endUser?: string | null; // Lookup ID
+    deviceSn?: string | null; // Lookup ID
+    paymentMainCategory?: string | number | null;
 }
 
 /** Dataverse 登録・更新後の返却型 */
@@ -94,12 +97,25 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 proto_name: data.title || 'Onsite Work',
                 proto_maincategory: DataTransformer.toOptionSetNumber(data.mainCategory),
                 proto_timecategory: DataTransformer.toOptionSetNumber(data.timeCategory),
-                proto_subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
                 proto_paymenttype: DataTransformer.toOptionSetNumber(data.paymentType),
                 proto_timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 proto_startdatetime: DataTransformer.toIsoString(data.start),
                 proto_enddatetime: DataTransformer.toIsoString(data.end)
             };
+
+            // Lookupフィールドの処理
+            if (data.subcategory) {
+                payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
+            }
+            if (data.endUser) {
+                payload['proto_enduser@odata.bind'] = `/proto_endusers(${data.endUser})`;
+            }
+            if (data.deviceSn) {
+                payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
+            }
+            if (data.paymentMainCategory !== undefined) {
+                payload.proto_paymentmaincategory = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
+            }
 
             if (data.wo) {
                 payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
@@ -135,11 +151,37 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.title !== undefined) payload.proto_name = data.title;
             if (data.mainCategory !== undefined) payload.proto_maincategory = DataTransformer.toOptionSetNumber(data.mainCategory);
             if (data.timeCategory !== undefined) payload.proto_timecategory = DataTransformer.toOptionSetNumber(data.timeCategory);
-            if (data.subcategory !== undefined) payload.proto_subcategory = DataTransformer.toOptionSetNumber(data.subcategory);
             if (data.paymentType !== undefined) payload.proto_paymenttype = DataTransformer.toOptionSetNumber(data.paymentType);
             if (data.timezone !== undefined) payload.proto_timezone = DataTransformer.toOptionSetNumber(data.timezone);
             if (data.start !== undefined) payload.proto_startdatetime = DataTransformer.toIsoString(data.start);
             if (data.end !== undefined) payload.proto_enddatetime = DataTransformer.toIsoString(data.end);
+            
+            // Lookupフィールドの処理
+            if (data.subcategory !== undefined) {
+                if (data.subcategory) {
+                    payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
+                } else {
+                    payload['proto_subcategory@odata.bind'] = null;
+                }
+            }
+            if (data.endUser !== undefined) {
+                if (data.endUser) {
+                    payload['proto_enduser@odata.bind'] = `/proto_endusers(${data.endUser})`;
+                } else {
+                    payload['proto_enduser@odata.bind'] = null;
+                }
+            }
+            if (data.deviceSn !== undefined) {
+                if (data.deviceSn) {
+                    payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
+                } else {
+                    payload['proto_devicesearch@odata.bind'] = null;
+                }
+            }
+            if (data.paymentMainCategory !== undefined) {
+                payload.proto_paymentmaincategory = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
+            }
+            
             if (data.wo !== undefined) {
                 if (data.wo) {
                     payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
