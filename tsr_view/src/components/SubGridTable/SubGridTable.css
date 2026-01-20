@@ -74,7 +74,10 @@
 
 .subgrid-table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .subgrid-table-header {
@@ -84,18 +87,24 @@
   padding: 0.5rem 0;
   border: 1px solid #e5e7eb;
   min-width: max-content;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  width: 100%;
 }
 
 .subgrid-table-header-row {
   display: flex;
+  width: max-content;
 }
 
 .subgrid-header-cell {
   flex-shrink: 0;
   min-width: 120px;
   padding: 0.5rem 0.75rem;
-  width: auto;
-  max-width: none;
 }
 
 .subgrid-header-cell-border {
@@ -144,6 +153,17 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  height: calc(5 * (4rem + 2px) + 4 * 0.5rem);
+  overflow-y: auto;
+  overflow-x: auto;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  width: 100%;
+}
+
+.subgrid-row-empty {
+  pointer-events: none;
 }
 
 .subgrid-row {
@@ -375,4 +395,140 @@
   background-color: #0089BA;
   color: white;
   border-color: #0089BA;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .subgrid-container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .subgrid-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .subgrid-header-left {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .subgrid-extra-buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .subgrid-extra-button span {
+    display: none;
+  }
+
+  .subgrid-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .subgrid-table-header {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .subgrid-table-body {
+    height: calc(5 * (3.5rem + 2px) + 4 * 0.5rem);
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .subgrid-cell {
+    min-width: 100px;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .subgrid-header-cell {
+    min-width: 100px;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .subgrid-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .subgrid-footer-info {
+    text-align: center;
+  }
+
+  .subgrid-pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .subgrid-table-body {
+    height: calc(5 * (3rem + 2px) + 4 * 0.5rem);
+  }
+
+  .subgrid-cell {
+    min-width: 80px;
+    padding: 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .subgrid-header-cell {
+    min-width: 80px;
+    padding: 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .subgrid-pagination-numbers {
+    gap: 0.125rem;
+  }
+
+  .subgrid-pagination-number {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .subgrid-pagination-button {
+    padding: 0.25rem 0.375rem;
+  }
+}
+
+/* タブレット用の調整 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .subgrid-table-body {
+    height: calc(5 * (3.75rem + 2px) + 4 * 0.5rem);
+  }
+
+  .subgrid-cell {
+    min-width: 110px;
+  }
+
+  .subgrid-header-cell {
+    min-width: 110px;
+  }
+}
+
+/* デスクトップでの横スクロール対応 */
+@media (min-width: 1025px) {
+  .subgrid-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .subgrid-table-header {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .subgrid-table-body {
+    width: max-content;
+    min-width: 100%;
+  }
 }
