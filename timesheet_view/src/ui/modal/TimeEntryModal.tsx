@@ -68,6 +68,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
     const [subcategory, setSubcategory] = useState("");
+    const [workStatus, setWorkStatus] = useState("");
     const [resource, setResource] = useState("");
 
     const [startDate, setStartDate] = useState("");
@@ -130,6 +131,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         { value: "test", label: t("timeEntryModal.task_list.test") },
     ];
 
+    const workStatusOptions: Option[] = [
+        { value: "1", label: "進行中" },
+        { value: "2", label: "完了" },
+        { value: "3", label: "保留" },
+        { value: "4", label: "キャンセル" },
+    ];
+
     /* -------------------------------
        📅 日付フォーマット関数
     ------------------------------- */
@@ -166,6 +174,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setComment(selectedEvent.comment ?? "");
             setEndUser(selectedEvent.endUser ?? "");
             setTask(selectedEvent.task ?? "");
+            setWorkStatus(String(selectedEvent.workStatus ?? ""));
             setTimezone(String(selectedEvent.timezone ?? ""));
             setResource(selectedEvent.resource ?? "");
         } else if (selectedDateTime) {
@@ -183,11 +192,11 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWo(isSubgrid && selectedWO ? selectedWO : "");
             setEndUser("");
             setTimezone("235");
-            
+
             // 間接タスクが選択されている場合の処理
             if (selectedIndirectTask) {
                 // タイムカテゴリを「間接工数」にセット（値は931440002を想定、実際の値に合わせて調整）
-                const indirectTimeCategory = timecategoryOptions.find(opt => 
+                const indirectTimeCategory = timecategoryOptions.find(opt =>
                     opt.label.includes("間接") || opt.value === "931440002"
                 );
                 setTimeCategory(indirectTimeCategory?.value || "");
@@ -198,7 +207,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 setSubcategory("");
                 setTask("");
             }
-            
+
+            setWorkStatus("");
             setMainCategory("");
             setPaymentType("");
             setComment("");
@@ -225,6 +235,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             mainCategory,
             paymentType,
             task,
+            workStatus,
             comment,
         });
         onClose();
@@ -266,6 +277,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             mainCategory,
             paymentType,
             task,
+            workStatus,
             comment,
         };
 
@@ -447,9 +459,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                         <div>
                             <label className="modal-label">{t("timeEntryModal.timeCategory")}</label>
                             {selectedIndirectTask ? (
-                                <Input 
-                                    value={timecategoryOptions.find(opt => opt.value === timeCategory)?.label || ""} 
-                                    disabled 
+                                <Input
+                                    value={timecategoryOptions.find(opt => opt.value === timeCategory)?.label || ""}
+                                    disabled
                                 />
                             ) : (
                                 <Select
@@ -482,6 +494,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             ) : (
                                 <Input value={t("timeEntryModal.auto")} disabled />
                             )}
+
+                            <label className="modal-label">作業ステータス</label>
+                            <Select
+                                options={workStatusOptions}
+                                value={workStatus}
+                                onChange={setWorkStatus}
+                                placeholder="作業ステータスを選択"
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.task")}</label>
                             {selectedIndirectTask ? (
