@@ -122,20 +122,28 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
             }
 
-            const result = await this.getXrm().WebApi.createRecord(this.entityName, payload);
-            return {
-                id: result.id,
-                name: data.title || 'Onsite Work',
-                title: data.title || 'Onsite Work',
-                mainCategory: DataTransformer.toOptionSetNumber(data.mainCategory),
-                timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
-                subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
-                paymentType: DataTransformer.toOptionSetNumber(data.paymentType),
-                timezone: DataTransformer.toOptionSetNumber(data.timezone),
-                start: DataTransformer.toIsoString(data.start),
-                end: DataTransformer.toIsoString(data.end),
-                wo: data.wo
-            };
+            console.log('TimeEntry作成ペイロード:', JSON.stringify(payload, null, 2));
+
+            try {
+                const result = await this.getXrm().WebApi.createRecord(this.entityName, payload);
+                return {
+                    id: result.id,
+                    name: data.title || 'Onsite Work',
+                    title: data.title || 'Onsite Work',
+                    mainCategory: DataTransformer.toOptionSetNumber(data.mainCategory),
+                    timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
+                    subcategory: data.subcategory ? (typeof data.subcategory === 'string' ? null : Number(data.subcategory)) : null,
+                    paymentType: DataTransformer.toOptionSetNumber(data.paymentType),
+                    timezone: DataTransformer.toOptionSetNumber(data.timezone),
+                    start: DataTransformer.toIsoString(data.start),
+                    end: DataTransformer.toIsoString(data.end),
+                    wo: data.wo
+                };
+            } catch (error: any) {
+                console.error('TimeEntry作成エラー詳細:', error);
+                console.error('エラーメッセージ:', error?.message || error?.error?.message || error);
+                throw error;
+            }
         }, 'createEntity');
     }
 
