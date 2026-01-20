@@ -70,15 +70,29 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         filter = `proto_workorderid eq ${workOrderId}`;
     }
 
-    const query =
-        `?$select=proto_workorderid,proto_wonumber` +
+    const expandSelectFields = [
+        "proto_timeentryid",
+        "proto_name",
+        "proto_startdatetime",
+        "proto_enddatetime",
+        "proto_maincategory",
+        "proto_paymenttype",
+        "proto_timecategory",
+        "proto_timezone",
+        "_proto_subcategory_value",
+        "proto_subcategory/proto_subcategoryid",
+        "proto_subcategory/proto_name",
+        "_proto_enduser_value",
+        "proto_enduser/accountid",
+        "proto_enduser/name",
+        "_proto_devicesearch_value",
+        "proto_devicesearch/proto_devicesearchid",
+        "proto_devicesearch/proto_name",
+    ].join(",");
+
+    const query = `?$select=proto_workorderid,proto_wonumber` +
         `&$filter=${filter}` +
-        `&$expand=${navigationName}(` +
-        `$select=proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
-        `_proto_subcategory_value,proto_subcategory/proto_subcategoryid,proto_subcategory/proto_name,` +
-        `_proto_enduser_value,proto_enduser/accountid,proto_enduser/name,` +
-        `_proto_devicesearch_value,proto_devicesearch/proto_devicesearchid,proto_devicesearch/proto_name)`;
+        `&$expand=${navigationName}($select=${expandSelectFields})`;
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
