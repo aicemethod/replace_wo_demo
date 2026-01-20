@@ -91,24 +91,34 @@ function TimesheetApp() {
           "?$select=systemuserid,fullname,businessunitid"
         );
 
-        const businessUnitId = currentUser.businessunitid?.replace(/[{}]/g, "");
+        const businessUnitId = currentUser.businessunitid;
         if (!businessUnitId) return;
+
+        // businessunitidをGUID形式に変換（波括弧付き）
+        const businessUnitGuid = businessUnitId.replace(/[{}]/g, "");
 
         // 同じ部署のユーザーを取得
         const users = await xrm.WebApi.retrieveMultipleRecords(
           "systemuser",
-          `?$filter=businessunitid eq ${businessUnitId}&$select=systemuserid,fullname&$orderby=fullname`
+          `?$filter=businessunitid eq ${businessUnitGuid}&$select=systemuserid,fullname&$orderby=fullname`
         );
 
-        // オプションに変換
+        // オプションに変換（systemuseridも波括弧を除去）
         const options: Option[] = users.entities.map((user: any) => ({
-          value: user.systemuserid,
+          value: user.systemuserid?.replace(/[{}]/g, "") || "",
           label: user.fullname || "",
         }));
 
         setHeaderSelectOptions(options);
-        // デフォルトでログインユーザーをセット
-        setHeaderSelectValue(userId);
+
+        // デフォルトでログインユーザーをセット（オプションに存在することを確認）
+        const userExists = options.some(opt => opt.value === userId);
+        if (userExists) {
+          setHeaderSelectValue(userId);
+        } else if (options.length > 0) {
+          // ログインユーザーがオプションにない場合は最初のユーザーをセット
+          setHeaderSelectValue(options[0].value);
+        }
       } catch (err) {
         console.error("ユーザー取得エラー:", err);
       }
