@@ -97,6 +97,21 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             number: `${displaySelf.number}${t("resource.selfTag")}`,
             name: displaySelf.fullName,
         },
+        {
+            id: "general-resource-1",
+            number: "General resource1",
+            name: "",
+        },
+        {
+            id: "general-resource-2",
+            number: "General resource2",
+            name: "",
+        },
+        {
+            id: "general-resource-3",
+            number: "General resource3",
+            name: "",
+        },
         ...filteredUsers,
     ];
 

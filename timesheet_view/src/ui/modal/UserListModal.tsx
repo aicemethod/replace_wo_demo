@@ -48,6 +48,15 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     const [isLeftHeaderChecked, setIsLeftHeaderChecked] = useState(false);
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
+    /* ---------------------------
+       General resource1~3（固定リソース）
+    --------------------------- */
+    const generalResources: Resource[] = [
+        { id: "general-resource-1", name: "General resource1", number: "GR1" },
+        { id: "general-resource-2", name: "General resource2", number: "GR2" },
+        { id: "general-resource-3", name: "General resource3", number: "GR3" },
+    ];
+
     /* =========================================================
        検索処理（空検索で全件ヒット）
     ========================================================= */
@@ -98,6 +107,29 @@ export const UserListModal: React.FC<UserListModalProps> = ({
         setCheckedResults(newState ? available.map((r) => r.id) : []);
     }, [isLeftHeaderChecked, searchResults, selectedUsers]);
 
+    /* =========================================================
+       モーダルオープン時にGeneral resource1~3を初期化
+    ========================================================= */
+    useEffect(() => {
+        if (isOpen) {
+            // General resource1~3を常に選択済みに追加（まだ追加されていない場合のみ）
+            setSelectedUsers((prev) => {
+                const generalIds = generalResources.map((r) => r.id);
+                const hasAllGeneral = generalIds.every((id) =>
+                    prev.some((u) => u.id === id)
+                );
+                if (!hasAllGeneral) {
+                    const existingIds = prev.map((u) => u.id);
+                    const toAdd = generalResources.filter(
+                        (r) => !existingIds.includes(r.id)
+                    );
+                    return [...prev, ...toAdd];
+                }
+                return prev;
+            });
+        }
+    }, [isOpen]);
+
     const toggleRightHeaderCheck = useCallback(() => {
         const newState = checkedSelected.length < selectedUsers.length;
         setCheckedSelected(newState ? selectedUsers.map((r) => r.id) : []);
@@ -130,11 +162,22 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     }, [searchResults, checkedResults, selectedUsers, checkedSelected]);
 
     const removeCheckedSelected = useCallback(() => {
-        setSelectedUsers((prev) => prev.filter((r) => !checkedSelected.includes(r.id)));
+        // General resource1~3は削除不可
+        const generalIds = generalResources.map((r) => r.id);
+        setSelectedUsers((prev) =>
+            prev.filter(
+                (r) => !checkedSelected.includes(r.id) || generalIds.includes(r.id)
+            )
+        );
         setCheckedSelected([]);
     }, [checkedSelected]);
 
     const removeUser = useCallback((id: string) => {
+        // General resource1~3は削除不可
+        const generalIds = generalResources.map((r) => r.id);
+        if (generalIds.includes(id)) {
+            return;
+        }
         setSelectedUsers((prev) => prev.filter((r) => r.id !== id));
         setCheckedSelected((prev) => prev.filter((u) => u !== id));
     }, []);
@@ -339,29 +382,36 @@ export const UserListModal: React.FC<UserListModalProps> = ({
 
                             <div className="list-box">
                                 {
-                                    selectedUsers.map((r) => (
-                                        <div key={r.id} className="list-item-favorite">
-                                            <div className="list-item-favorite-left">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={checkedSelected.includes(r.id)}
-                                                    onChange={() => toggleSelectedCheck(r.id)}
-                                                />
-                                                <div className="list-text">
-                                                    <div className="category-name">{r.number ?? "-"}</div>
-                                                    <div className="task-name">{r.name ?? t("userList.noName")}</div>
+                                    selectedUsers.map((r) => {
+                                        const isGeneralResource = generalResources.some(
+                                            (gr) => gr.id === r.id
+                                        );
+                                        return (
+                                            <div key={r.id} className="list-item-favorite">
+                                                <div className="list-item-favorite-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={checkedSelected.includes(r.id)}
+                                                        onChange={() => toggleSelectedCheck(r.id)}
+                                                    />
+                                                    <div className="list-text">
+                                                        <div className="category-name">{r.number ?? "-"}</div>
+                                                        <div className="task-name">{r.name ?? t("userList.noName")}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="list-item-favorite-right">
+                                                    {!isGeneralResource && (
+                                                        <Button
+                                                            label=""
+                                                            icon={<FaIcons.FaTimes />}
+                                                            onClick={() => removeUser(r.id)}
+                                                            className="delete-list-button"
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
-                                            <div className="list-item-favorite-right">
-                                                <Button
-                                                    label=""
-                                                    icon={<FaIcons.FaTimes />}
-                                                    onClick={() => removeUser(r.id)}
-                                                    className="delete-list-button"
-                                                />
-                                            </div>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 }
                             </div>
                         </div>
