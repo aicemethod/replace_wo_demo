@@ -7,9 +7,9 @@ import { Select } from "../components/Select";
 import { Input } from "../components/Input";
 import "../styles/modal/FavoriteTaskModal.css";
 import { useTranslation } from "react-i18next";
-import { useSubcategories } from "../../hooks/useSubcategories";
-import { useTasks } from "../../hooks/useTasks";
 import { useFavoriteTasks } from "../../context/FavoriteTaskContext";
+import { getXrm } from "../../utils/xrmUtils";
+import type { Option } from "../../types";
 
 /* =========================================================
    型定義
@@ -34,8 +34,9 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     /* ---------------------------
        Dataverseから取得
     --------------------------- */
-    const { subcategories, isLoading: subLoading } = useSubcategories();
-    const { tasks, isLoading: taskLoading } = useTasks();
+    const [subcategories, setSubcategories] = useState<Option[]>([]);
+    const [tasks, setTasks] = useState<{ id: string; name: string }[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     /* ---------------------------
        状態管理
@@ -57,20 +58,66 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
     /* =========================================================
+       Dataverseからデータ取得
+    ========================================================= */
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const loadData = async () => {
+            setIsLoading(true);
+            const xrm = getXrm();
+            if (!xrm?.WebApi) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                // proto_subcategoryを取得
+                const subcategoryResult = await xrm.WebApi.retrieveMultipleRecords(
+                    "proto_subcategory",
+                    "?$select=proto_subcategoryid,proto_name&$orderby=proto_name"
+                );
+                const subcategoryOptions: Option[] = subcategoryResult.entities.map((item: any) => ({
+                    value: item.proto_name || "",
+                    label: item.proto_name || "",
+                }));
+                setSubcategories(subcategoryOptions);
+
+                // proto_wo_task2を取得
+                const taskResult = await xrm.WebApi.retrieveMultipleRecords(
+                    "proto_wo_task2",
+                    "?$select=proto_wo_task2id,proto_name&$orderby=proto_name"
+                );
+                const taskList = taskResult.entities.map((item: any) => ({
+                    id: item.proto_wo_task2id?.replace(/[{}]/g, "") || "",
+                    name: item.proto_name || "",
+                }));
+                setTasks(taskList);
+            } catch (err) {
+                console.error("データ取得エラー:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, [isOpen]);
+
+    /* =========================================================
        初期データ生成（サブカテゴリ × タスク）
     ========================================================= */
     useEffect(() => {
-        if (!subcategories || !tasks) return;
+        if (subcategories.length === 0 || tasks.length === 0) return;
         const combined = subcategories.flatMap((sc) =>
             tasks.map((task) => ({
-                id: `${sc.id}_${task.id}`,
-                subcategoryName: sc.name ?? t("favoriteTask.unknownCategory"),
-                taskName: task.name ?? "-",
+                id: `${sc.value}_${task.id}`,
+                subcategoryName: sc.label || "",
+                taskName: task.name || "-",
             }))
         );
         setAllCombinations(combined);
         setSearchResults([]); // 初期は空
-    }, [subcategories, tasks, t]);
+    }, [subcategories, tasks]);
 
     /* =========================================================
        🔍 検索処理（空検索で全件ヒット）
@@ -212,7 +259,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     /* =========================================================
        JSX
     ========================================================= */
-    if (subLoading || taskLoading) {
+    if (isLoading) {
         return (
             <BaseModal
                 isOpen={isOpen}
@@ -256,10 +303,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                     <div className="grid-left">
                         <label className="modal-label">{t("favoriteTask.subCategory")}</label>
                         <Select
-                            options={subcategories.map((s) => ({
-                                value: s.name,
-                                label: s.name,
-                            }))}
+                            options={subcategories}
                             value={selectedCategory}
                             onChange={setSelectedCategory}
                             placeholder={t("favoriteTask.selectSubCategory")}

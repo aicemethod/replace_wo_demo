@@ -4,7 +4,7 @@
  */
 
 /** メインタブ種別 */
-export type MainTab = "user" | "indirect";
+export type MainTab = "user" | "direct" | "indirect";
 
 /** 表示モード種別 */
 export type ViewMode = "稼働日" | "週";

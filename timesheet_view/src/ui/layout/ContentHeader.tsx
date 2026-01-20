@@ -32,10 +32,11 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    /** メインタブ設定（多言語対応） */
+    /** メインタブ設定 */
     const mainTabOptions: Option[] = [
-        { value: "user", label: t("contentHeader.userTab") },
-        { value: "indirect", label: t("contentHeader.indirectTab") },
+        { value: "user", label: "ユーザー一覧" },
+        { value: "direct", label: "直接タスク" },
+        { value: "indirect", label: "間接タスク" },
     ];
 
     /** 表示モードボタン（多言語対応） */
