@@ -220,16 +220,16 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             // 現在開いている proto_workorder から値を取得して反映
             const protoFields = getWorkOrderProtoFields();
             if (protoFields) {
-                // proto_enduser -> EndUser
-                setEndUser(protoFields.proto_enduser?.id || "");
-                // proto_devicesearch.id -> 装置S/N
-                setDeviceSn(protoFields.proto_devicesearch?.id || "");
+                // proto_enduser -> EndUser (nameを使用)
+                setEndUser(protoFields.proto_enduser?.name || "");
+                // proto_devicesearch -> 装置S/N (nameを使用)
+                setDeviceSn(protoFields.proto_devicesearch?.name || "");
                 // proto_paymenttype -> PaymentType
                 setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
                 // proto_maincategory -> メインカテゴリ
                 setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
-                // proto_subcategory -> サブカテゴリ
-                setSubcategory(protoFields.proto_subcategory?.id || "");
+                // proto_subcategory -> サブカテゴリ (nameを使用)
+                setSubcategory(protoFields.proto_subcategory?.name || "");
             } else {
                 // 取得できない場合は空で初期化
                 setEndUser("");
@@ -482,9 +482,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
 
                             <label className="modal-label">EndUser</label>
-                            {selectedIndirectTask ? (
+                            {endUser ? (
                                 <div className="readonly-text">
-                                    {endUserOptions.find(opt => opt.value === endUser)?.label || endUser || "-"}
+                                    {endUser}
                                 </div>
                             ) : (
                                 <Select
@@ -551,9 +551,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">装置S/N</label>
-                            {selectedIndirectTask ? (
+                            {deviceSn ? (
                                 <div className="readonly-text">
-                                    {deviceSnOptions.find(opt => opt.value === deviceSn)?.label || deviceSn || "-"}
+                                    {deviceSn}
                                 </div>
                             ) : (
                                 <Select
@@ -565,9 +565,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
-                            {selectedIndirectTask ? (
+                            {mainCategory ? (
                                 <div className="readonly-text">
-                                    {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory || "-"}
+                                    {mainCategory}
                                 </div>
                             ) : (
                                 <Select
@@ -579,9 +579,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
-                            {selectedIndirectTask ? (
+                            {paymentType ? (
                                 <div className="readonly-text">
-                                    {paymenttypeOptions.find(opt => opt.value === paymentType)?.label || paymentType || "-"}
+                                    {paymentType}
                                 </div>
                             ) : (
                                 <Select
@@ -601,9 +601,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
-                            {selectedIndirectTask ? (
+                            {subcategory ? (
                                 <div className="readonly-text">
-                                    {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
+                                    {subcategory}
                                 </div>
                             ) : (
                                 <Select
