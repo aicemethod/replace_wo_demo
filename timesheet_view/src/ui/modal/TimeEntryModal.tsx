@@ -131,19 +131,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         [t]
     );
 
-    // 新しく追加した項目用のサンプル選択肢（必要に応じて実データに差し替え）
-    const wisdomBuOptions: Option[] = [
-        { value: "wisdom_bu_1", label: "WISDOM BU 1" },
-        { value: "wisdom_bu_2", label: "WISDOM BU 2" },
-        { value: "wisdom_bu_3", label: "WISDOM BU 3" },
-    ];
-
-    const sapBuOptions: Option[] = [
-        { value: "sap_bu_1", label: "SAP BU 1" },
-        { value: "sap_bu_2", label: "SAP BU 2" },
-        { value: "sap_bu_3", label: "SAP BU 3" },
-    ];
-
     const taskOptions: Option[] = [
         { value: "doc", label: t("timeEntryModal.task_list.document") },
         { value: "code", label: t("timeEntryModal.task_list.coding") },
@@ -191,10 +178,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setTimeCategory(String(selectedEvent.timecategory ?? ""));
             setPaymentType(String(selectedEvent.paymenttype ?? ""));
             setComment(selectedEvent.comment ?? "");
-            // LookupフィールドはIDとして取得
-            setEndUser(selectedEvent.endUser ?? "");
-            setDeviceSn(selectedEvent.deviceSn ?? "");
-            setSubcategory(selectedEvent.subcategory || selectedEvent.subcategoryName || "");
+            // LookupフィールドはIDとして取得（値があればセット、なければ空文字列）
+            setEndUser(selectedEvent.endUser || "");
+            setDeviceSn(selectedEvent.deviceSn || "");
+            setSubcategory(selectedEvent.subcategory || "");
             setTask(selectedEvent.task ?? "");
             setWorkStatus(String(selectedEvent.workStatus ?? ""));
             setTimezone(String(selectedEvent.timezone ?? ""));
@@ -415,7 +402,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.woNumber")}</label>
                             <Select
                                 options={filteredWoOptions}
-                                value={wo}
+                                value={wo || ""}
                                 onChange={setWo}
                                 placeholder={t("timeEntryModal.placeholders.selectWO")}
                             />
@@ -465,7 +452,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">EndUser</label>
                             <Select
                                 options={endUserOptions}
-                                value={endUser}
+                                value={endUser || ""}
                                 onChange={setEndUser}
                                 placeholder={t("timeEntryModal.placeholders.selectEndUser")}
                             />
@@ -473,7 +460,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.location")}</label>
                             <Select
                                 options={timezoneOptions}
-                                value={timezone}
+                                value={timezone || ""}
                                 onChange={setTimezone}
                                 placeholder={t("timeEntryModal.placeholders.selectLocation")}
                             />
@@ -495,16 +482,16 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                             <label className="modal-label">WISDOM BU</label>
                             <Select
-                                options={wisdomBuOptions}
-                                value={wisdomBu}
+                                options={[]}
+                                value={wisdomBu || ""}
                                 onChange={setWisdomBu}
                                 placeholder="WISDOM BU を選択"
                             />
 
                             <label className="modal-label">SAP BU</label>
                             <Select
-                                options={sapBuOptions}
-                                value={sapBu}
+                                options={[]}
+                                value={sapBu || ""}
                                 onChange={setSapBu}
                                 placeholder="SAP BU を選択"
                             />
@@ -519,7 +506,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             ) : (
                                 <Select
                                     options={timecategoryOptions}
-                                    value={timeCategory}
+                                    value={timeCategory || ""}
                                     onChange={setTimeCategory}
                                     placeholder={t("timeEntryModal.placeholders.selectTimeCategory")}
                                 />
@@ -528,7 +515,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">装置S/N</label>
                             <Select
                                 options={deviceSnOptions}
-                                value={deviceSn}
+                                value={deviceSn || ""}
                                 onChange={setDeviceSn}
                                 placeholder="装置S/N を選択"
                             />
@@ -536,7 +523,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
                             <Select
                                 options={maincategoryOptions}
-                                value={mainCategory}
+                                value={mainCategory || ""}
                                 onChange={setMainCategory}
                                 placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
                             />
@@ -544,7 +531,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
                             <Select
                                 options={paymenttypeOptions}
-                                value={paymentType}
+                                value={paymentType || ""}
                                 onChange={setPaymentType}
                                 placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
                             />
@@ -552,7 +539,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">メインカテゴリ</label>
                             <Select
                                 options={paymentMainCategoryOptions}
-                                value={paymentMainCategory}
+                                value={paymentMainCategory || ""}
                                 onChange={setPaymentMainCategory}
                                 placeholder="メインカテゴリを選択"
                             />
@@ -563,15 +550,18 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
                             ) : (
-                                <div className="readonly-text">
-                                    {"-"}
-                                </div>
+                                <Select
+                                    options={subcategoryOptions}
+                                    value={subcategory || ""}
+                                    onChange={setSubcategory}
+                                    placeholder={t("timeEntryModal.placeholders.selectSubCategory") || "サブカテゴリを選択"}
+                                />
                             )}
 
                             <label className="modal-label">作業ステータス</label>
                             <Select
                                 options={workStatusOptions}
-                                value={workStatus}
+                                value={workStatus || ""}
                                 onChange={setWorkStatus}
                                 placeholder="作業ステータスを選択"
                             />
@@ -584,7 +574,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             ) : (
                                 <Select
                                     options={taskOptions}
-                                    value={task}
+                                    value={task || ""}
                                     onChange={setTask}
                                     placeholder={t("timeEntryModal.placeholders.selectTask")}
                                 />
