@@ -38,7 +38,7 @@
     display: grid;
     grid-template-columns: 50% 50%;
     /* grid-template-columns: 1fr 1fr; */
-    /* ✅ 2グリッド */
+    /*  2グリッド */
     gap: 24px;
     margin-top: 16px;
     width: 100%;
@@ -309,7 +309,7 @@ textarea[disabled],
 @media (max-width: 768px) {
     .modal-grid {
         grid-template-columns: 1fr;
-        /* ✅ スマホ時は1カラム */
+        /*  スマホ時は1カラム */
         gap: 16px;
     }
 

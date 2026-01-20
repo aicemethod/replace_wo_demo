@@ -107,7 +107,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         if (isInternalUpdateRef.current) {
             return;
         }
-        
+
         const newDate = info.start;
         if (
             onDateChange &&
@@ -157,7 +157,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     timeGridThreeDay: {
                         type: "timeGrid",
                         duration: { days: 3 },
-                        // ✅ i18n連動：FullCalendar内部ボタンも翻訳
+                        //  i18n連動：FullCalendar内部ボタンも翻訳
                         buttonText: i18n.language.startsWith("ja") ? "3日" : "3 Days",
                     },
                 }}

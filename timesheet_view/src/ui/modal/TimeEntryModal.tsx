@@ -626,14 +626,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 </div>
             </BaseModal>
 
-            {/* ✅ 削除確認モーダル */}
+            {/*  削除確認モーダル */}
             <ConfirmDeleteModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={confirmDelete}
             />
 
-            {/* ✅ リソース選択モーダル */}
+            {/*  リソース選択モーダル */}
             <ResourceSelectModal
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}

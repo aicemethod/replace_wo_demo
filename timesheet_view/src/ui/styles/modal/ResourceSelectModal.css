@@ -37,7 +37,7 @@
     cursor: pointer;
 }
 
-/* ✅ 再描画に強い：各ブラウザ対応 */
+/*  再描画に強い：各ブラウザ対応 */
 .resource-radios input[type="radio"] {
     -webkit-appearance: none;
     /* Safari対応 */
@@ -62,13 +62,13 @@
     box-shadow: 0 0 0 3px var(--main-light);
 }
 
-/* ✅ checked時も背景を白に固定してチラつき防止 */
+/*  checked時も背景を白に固定してチラつき防止 */
 .resource-radios input[type="radio"]:checked {
     border-color: var(--main-color);
     background-color: var(--white);
 }
 
-/* ✅ 中央の青ドット（安定アニメーション） */
+/*  中央の青ドット（安定アニメーション） */
 .resource-radios input[type="radio"]::after {
     content: "";
     position: absolute;
@@ -147,7 +147,7 @@
     background: var(--main-light);
 }
 
-/* ✅ チェックボックス */
+/*  チェックボックス */
 .resource-checkbox {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -217,7 +217,7 @@
     padding-right: 6px;
 }
 
-/* ✅ スクロールバー非表示 */
+/*  スクロールバー非表示 */
 .resource-list::-webkit-scrollbar {
     display: none;
 }

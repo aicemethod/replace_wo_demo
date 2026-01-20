@@ -51,7 +51,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     const { resources, isLoading: isResourcesLoading } = useResources();
     const { allowedUsers } = useAllowedUsers();
 
-    // ✅ 許可されたユーザーのみ抽出
+    //  許可されたユーザーのみ抽出
     const visibleResources = useMemo(() => {
         if (isResourcesLoading) return [];
         return resources.filter((r) => allowedUsers.includes(r.id));
@@ -138,7 +138,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                 label: `${u.number ?? t("resource.unknownId")} ${u.name ?? t("resource.noName")}`,
             }));
 
-        console.log("✅ 選択されたリソース:", selectedResources);
+        console.log(" 選択されたリソース:", selectedResources);
 
         onSave?.(selectedResources);
         onClose();

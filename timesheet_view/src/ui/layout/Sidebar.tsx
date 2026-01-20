@@ -5,7 +5,7 @@ import "../styles/layout/Sidebar.css";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useResources } from "../../hooks/useResources";
 import { useAllowedUsers } from "../../context/UserListContext";
-import { useFavoriteTasks } from "../../context/FavoriteTaskContext"; // ✅ 追加
+import { useFavoriteTasks } from "../../context/FavoriteTaskContext"; //  追加
 import { useTranslation } from "react-i18next";
 import type { SidebarProps } from "../../types/components";
 import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
@@ -15,7 +15,7 @@ import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
  */
 export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = [], onTaskSelect }) => {
     const { t } = useTranslation();
-    const { favoriteTasks } = useFavoriteTasks(); // ✅ Contextからお気に入りタスク取得
+    const { favoriteTasks } = useFavoriteTasks(); //  Contextからお気に入りタスク取得
 
     /** 検索・選択状態 */
     const [searchType, setSearchType] = useState<SearchType>("name");
@@ -73,7 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = [], on
         return [...list].sort(sortBy[userSortOption]);
     }, [keyword, searchType, visibleUsers, userSortOption]);
 
-    /** ✅ お気に入りタスクのソート処理 */
+    /**  お気に入りタスクのソート処理 */
     const sortedFavoriteTasks = useMemo(() => {
         const sortBy: Record<TaskSortKey, (a: any, b: any) => number> = {
             categoryAsc: (a, b) => a.subcategoryName.localeCompare(b.subcategoryName),
@@ -237,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = [], on
                         </div>
                     )}
 
-                    {/* ✅ お気に入りタスクのみ表示 */}
+                    {/*  お気に入りタスクのみ表示 */}
                     <div className="sidebar-task-list">
                         {
                             sortedFavoriteTasks.map((task) => (

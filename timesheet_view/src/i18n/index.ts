@@ -12,7 +12,7 @@ import en from "./locales/en/translation.json";
  */
 const getLanguageFromXrm = (): string => {
     try {
-        // ✅ Xrmを安全に取得（親フレーム優先）
+        //  Xrmを安全に取得（親フレーム優先）
         const xrm =
             (window as any).parent?.Xrm ||
             (window as any).Xrm ||
@@ -23,7 +23,7 @@ const getLanguageFromXrm = (): string => {
             return navigator.language.startsWith("ja") ? "ja" : "en";
         }
 
-        // ✅ getGlobalContextが関数か確認
+        //  getGlobalContextが関数か確認
         if (typeof xrm.Utility?.getGlobalContext === "function") {
             const context = xrm.Utility.getGlobalContext();
             const langId = context.userSettings?.languageId;

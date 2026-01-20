@@ -13,7 +13,7 @@ export const fromUtcToJst = (datetimeString: string): string => {
     if (!datetimeString) return "";
     const date = new Date(datetimeString);
 
-    // ✅ UTC → JST補正（UTC-9h → JST）
+    //  UTC → JST補正（UTC-9h → JST）
     const corrected = new Date(date.getTime() - 9 * 60 * 60 * 1000);
 
     return corrected.toISOString();
@@ -33,7 +33,7 @@ export const fromJstToUtc = (jstString: string): string => {
     if (!jstString) return "";
     const date = new Date(jstString);
 
-    // ✅ JST → UTC補正 (+9h)
+    //  JST → UTC補正 (+9h)
     const corrected = new Date(date.getTime() + 9 * 60 * 60 * 1000);
 
     return corrected.toISOString();
