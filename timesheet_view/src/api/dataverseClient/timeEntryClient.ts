@@ -112,7 +112,8 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
             }
             if (data.deviceSn) {
-                payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
+                // 装置S/N は proto_nonyudevice エンティティへの Lookup
+                payload['proto_nonyudevice@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
             }
             if (data.paymentMainCategory !== undefined) {
                 payload.proto_paymentmaincategory = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
@@ -175,9 +176,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             }
             if (data.deviceSn !== undefined) {
                 if (data.deviceSn) {
-                    payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
+                    // 装置S/N は proto_nonyudevice エンティティへの Lookup
+                    payload['proto_nonyudevice@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
                 } else {
-                    payload['proto_devicesearch@odata.bind'] = null;
+                    payload['proto_nonyudevice@odata.bind'] = null;
                 }
             }
             if (data.paymentMainCategory !== undefined) {

@@ -149,7 +149,7 @@ function TimesheetApp() {
     loadUsers();
   }, []);
 
-  /** Lookupデータを取得（EndUser: account、proto_devicesearch、proto_subcategory） */
+  /** Lookupデータを取得（EndUser: account、proto_nonyudevice、proto_subcategory） */
   useEffect(() => {
     const loadLookupData = async () => {
       const xrm = getXrm();
@@ -169,13 +169,13 @@ function TimesheetApp() {
         }));
         setEndUserOptions(endUserOpts);
 
-        // proto_devicesearchを取得
+        // 装置S/N（proto_nonyudevice）を取得
         const deviceSnResult = await xrm.WebApi.retrieveMultipleRecords(
-          "proto_devicesearch",
-          "?$select=proto_devicesearchid,proto_name&$orderby=proto_name"
+          "proto_nonyudevice",
+          "?$select=proto_nonyudeviceid,proto_name&$orderby=proto_name"
         );
         const deviceSnOpts: Option[] = deviceSnResult.entities.map((item: any) => ({
-          value: item.proto_devicesearchid?.replace(/[{}]/g, "") || "",
+          value: item.proto_nonyudeviceid?.replace(/[{}]/g, "") || "",
           label: item.proto_name || "",
         }));
         setDeviceSnOptions(deviceSnOpts);

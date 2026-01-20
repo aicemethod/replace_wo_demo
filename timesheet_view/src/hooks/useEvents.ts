@@ -78,7 +78,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
         `_proto_subcategory_value,proto_subcategory/proto_subcategoryid,proto_subcategory/proto_name,` +
         `_proto_enduser_value,proto_enduser/accountid,proto_enduser/name,` +
-        `_proto_devicesearch_value,proto_devicesearch/proto_devicesearchid,proto_devicesearch/proto_name)`;
+        `_proto_nonyudevice_value,proto_nonyudevice/proto_nonyudeviceid,proto_nonyudevice/proto_name)`;
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
@@ -98,8 +98,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             subcategoryName: t.proto_subcategory?.proto_name || null,
             endUser: t._proto_enduser_value?.replace(/[{}]/g, "") || t.proto_enduser?.accountid?.replace(/[{}]/g, "") || null,
             endUserName: t.proto_enduser?.name || null,
-            deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
-            deviceSnName: t.proto_devicesearch?.proto_name || null,
+            deviceSn: t._proto_nonyudevice_value?.replace(/[{}]/g, "") || t.proto_nonyudevice?.proto_nonyudeviceid?.replace(/[{}]/g, "") || null,
+            deviceSnName: t.proto_nonyudevice?.proto_name || null,
             paymenttype: t.proto_paymenttype,
             timezone: t.proto_timezone ?? null,
             extendedProps: {
