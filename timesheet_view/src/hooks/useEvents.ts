@@ -78,7 +78,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
         `_proto_subcategory_value,proto_subcategory/proto_subcategoryid,proto_subcategory/proto_name,` +
         `_proto_enduser_value,proto_enduser/accountid,proto_enduser/name,` +
-        `_proto_devicesearch_value,proto_nonyudevice/proto_nonyudeviceid,proto_nonyudevice/proto_name)`;
+        `_proto_devicesearch_value,proto_devicesearch/proto_devicesearchid,proto_devicesearch/proto_name)`;
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
