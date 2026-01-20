@@ -564,7 +564,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
+                            {/* <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
                             {mainCategory ? (
                                 <div className="readonly-text">
                                     {mainCategory}
@@ -576,12 +576,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     onChange={setMainCategory}
                                     placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
                                 />
-                            )}
+                            )} */}
+
+                            <label className="modal-label">t("timeEntryModal.mainCategory")</label>
+                            <Select
+                                options={paymentMainCategoryOptions}
+                                value={paymentMainCategory || ""}
+                                onChange={setPaymentMainCategory}
+                                placeholder="カテゴリを選択"
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
                             {paymentType ? (
                                 <div className="readonly-text">
-                                    {paymentType}
+                                    {paymenttypeOptions.find(opt => opt.value === paymentType)?.label || paymentType}
                                 </div>
                             ) : (
                                 <Select
@@ -593,12 +601,26 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">メインカテゴリ</label>
+                            {mainCategory ? (
+                                <div className="readonly-text">
+                                    {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={maincategoryOptions}
+                                    value={mainCategory || ""}
+                                    onChange={setMainCategory}
+                                    placeholder={"メインカテゴリを選択"}
+                                />
+                            )}
+
+                            {/* <label className="modal-label">メインカテゴリ</label>
                             <Select
                                 options={paymentMainCategoryOptions}
                                 value={paymentMainCategory || ""}
                                 onChange={setPaymentMainCategory}
                                 placeholder="メインカテゴリを選択"
-                            />
+                            /> */}
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {subcategory ? (
