@@ -153,8 +153,8 @@ export const getWorkOrderFormValues = (): {
             }
         }
 
-        // 装置S/N（Lookup）: エンティティ proto_nonyudevice
-        const deviceSnAttr = getAttr("proto_nonyudevice");
+        // 装置S/N（Lookup）: フィールド proto_devicesearch
+        const deviceSnAttr = getAttr("proto_devicesearch");
         if (deviceSnAttr) {
             const deviceSnValue = deviceSnAttr.getValue();
             if (deviceSnValue && deviceSnValue.length > 0) {
@@ -166,8 +166,8 @@ export const getWorkOrderFormValues = (): {
             }
         }
 
-        // proto_payment (OptionSet)
-        const paymentAttr = getAttr("proto_payment");
+        // proto_paymenttype (OptionSet)
+        const paymentAttr = getAttr("proto_paymenttype");
         if (paymentAttr) {
             const paymentValue = paymentAttr.getValue();
             if (paymentValue !== null && paymentValue !== undefined) {
