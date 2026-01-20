@@ -13,7 +13,7 @@ import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
 /**
  * Sidebar コンポーネント
  */
-export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = "", onTaskSelect }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = [], onTaskSelect }) => {
     const { t } = useTranslation();
     const { favoriteTasks } = useFavoriteTasks(); // ✅ Contextからお気に入りタスク取得
 
@@ -241,13 +241,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = "", on
                     <div className="sidebar-task-list">
                         {
                             sortedFavoriteTasks.map((task) => (
-                                <label key={task.id} className="sidebar-task-radio">
+                                <label key={task.id} className="sidebar-task-radio clickable">
                                     <input
-                                        type="radio"
-                                        name="sidebarTaskType"
-                                        value={task.id}
-                                        checked={selectedTask === task.id}
-                                        onChange={() => onTaskSelect?.(task.id)}
+                                        type="checkbox"
+                                        className="sidebar-checkbox"
+                                        checked={selectedTask.includes(task.id)}
+                                        onChange={() => {
+                                            const newSelected = selectedTask.includes(task.id)
+                                                ? selectedTask.filter(id => id !== task.id)
+                                                : [...selectedTask, task.id];
+                                            onTaskSelect?.(newSelected);
+                                        }}
                                     />
                                     <div className="sidebar-task-lines">
                                         <span className="sidebar-task-category">{task.subcategoryName}</span>

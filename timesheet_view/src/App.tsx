@@ -76,13 +76,13 @@ function TimesheetApp() {
   /** ヘッダーセレクトのローディング状態 */
   const [isHeaderSelectLoading, setIsHeaderSelectLoading] = useState(true);
   /** サイドバーで選択されているタスク */
-  const [selectedSidebarTask, setSelectedSidebarTask] = useState<string>("");
+  const [selectedSidebarTask, setSelectedSidebarTask] = useState<string[]>([]);
 
-  /** 選択されているタスク情報を取得 */
+  /** 選択されているタスク情報を取得（最初の1つを使用） */
   const { favoriteTasks } = useFavoriteTasks();
   const selectedIndirectTask = useMemo(() => {
-    if (!selectedSidebarTask || mainTab !== "indirect") return null;
-    return favoriteTasks.find(task => task.id === selectedSidebarTask) || null;
+    if (selectedSidebarTask.length === 0 || mainTab !== "indirect") return null;
+    return favoriteTasks.find(task => task.id === selectedSidebarTask[0]) || null;
   }, [selectedSidebarTask, favoriteTasks, mainTab]);
 
   /** ユーザーオプションを取得 */

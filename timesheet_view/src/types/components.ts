@@ -32,8 +32,8 @@ export type ContentHeaderProps = {
 /** Sidebar Props */
 export type SidebarProps = {
     mainTab: MainTab;
-    selectedTask?: string;
-    onTaskSelect?: (taskId: string) => void;
+    selectedTask?: string[];
+    onTaskSelect?: (taskIds: string[]) => void;
 };
 
 /** CalendarView Props */
