@@ -1,12 +1,14 @@
 // src/App.tsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Header, Sidebar, ContentHeader, WorkTimeInfo, CalendarView, FavoriteTaskModal, TimeEntryModal, UserListModal, Spinner } from "./ui";
 import { useAppController } from "./hooks/useAppController";
 import { UserListProvider } from "./context/UserListContext";
 import { FavoriteTaskProvider } from "./context/FavoriteTaskContext";
 import { formatToday } from "./utils/dateFormatter";
 import { convertWorkOrdersToOptions } from "./utils/modalHelpers";
+import { getXrm } from "./utils/xrmUtils";
 import type { EventInput } from "@fullcalendar/core";
+import type { Option } from "./types";
 import "./App.css";
 
 /**
@@ -69,12 +71,51 @@ function TimesheetApp() {
   const [isBreakTimeLoading, setIsBreakTimeLoading] = useState(false);
   /** ヘッダーセレクトの状態 */
   const [headerSelectValue, setHeaderSelectValue] = useState<string>("");
-  /** ヘッダーセレクトのオプション（仮データ） */
-  const headerSelectOptions = useMemo(() => [
-    { value: "option1", label: "オプション1" },
-    { value: "option2", label: "オプション2" },
-    { value: "option3", label: "オプション3" },
-  ], []);
+  /** ヘッダーセレクトのオプション */
+  const [headerSelectOptions, setHeaderSelectOptions] = useState<Option[]>([]);
+
+  /** ユーザーオプションを取得 */
+  useEffect(() => {
+    const loadUsers = async () => {
+      const xrm = getXrm();
+      if (!xrm?.WebApi) return;
+
+      try {
+        // ログインユーザーIDを取得
+        const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
+
+        // ログインユーザーのbusinessunitidを取得
+        const currentUser = await xrm.WebApi.retrieveRecord(
+          "systemuser",
+          userId,
+          "?$select=systemuserid,fullname,businessunitid"
+        );
+
+        const businessUnitId = currentUser.businessunitid?.replace(/[{}]/g, "");
+        if (!businessUnitId) return;
+
+        // 同じ部署のユーザーを取得
+        const users = await xrm.WebApi.retrieveMultipleRecords(
+          "systemuser",
+          `?$filter=businessunitid eq ${businessUnitId}&$select=systemuserid,fullname&$orderby=fullname`
+        );
+
+        // オプションに変換
+        const options: Option[] = users.entities.map((user: any) => ({
+          value: user.systemuserid,
+          label: user.fullname || "",
+        }));
+
+        setHeaderSelectOptions(options);
+        // デフォルトでログインユーザーをセット
+        setHeaderSelectValue(userId);
+      } catch (err) {
+        console.error("ユーザー取得エラー:", err);
+      }
+    };
+
+    loadUsers();
+  }, []);
 
   /** 休憩時間挿入ハンドラ（クライアント側のみ） */
   const handleInsertBreakTime = (breakEvents: EventInput[]) => {
