@@ -91,3 +91,94 @@ export const getParentWorkOrderId = (): string | null => {
         return null;
     }
 };
+
+/**
+ * 現在開いているフォーム（proto_workorder）のフィールド値を取得する関数
+ * 
+ * 【戻り値】
+ * - フォームのフィールド値（取得成功時）
+ * - null（フォームが開いていない場合、または取得できなかった場合）
+ */
+export const getWorkOrderFormValues = (): {
+    endUser?: { id: string; name: string } | null;
+    deviceSn?: { id: string; name: string } | null;
+    payment?: number | null;
+    mainCategory?: number | null;
+    subcategory?: { id: string; name: string } | null;
+} | null => {
+    try {
+        const xrm = getXrm();
+        if (!xrm || !xrm.Page || !xrm.Page.data || !xrm.Page.data.entity) {
+            return null;
+        }
+
+        const entityName = xrm.Page.data.entity.getEntityName();
+        if (entityName !== "proto_workorder") {
+            return null;
+        }
+
+        const result: any = {};
+
+        // proto_enduser (Lookup)
+        const endUserAttr = xrm.Page.data.entity.getAttribute("proto_enduser");
+        if (endUserAttr) {
+            const endUserValue = endUserAttr.getValue();
+            if (endUserValue && endUserValue.length > 0) {
+                const value = Array.isArray(endUserValue) ? endUserValue[0] : endUserValue;
+                result.endUser = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
+            }
+        }
+
+        // proto_devicesearch (Lookup)
+        const deviceSnAttr = xrm.Page.data.entity.getAttribute("proto_devicesearch");
+        if (deviceSnAttr) {
+            const deviceSnValue = deviceSnAttr.getValue();
+            if (deviceSnValue && deviceSnValue.length > 0) {
+                const value = Array.isArray(deviceSnValue) ? deviceSnValue[0] : deviceSnValue;
+                result.deviceSn = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
+            }
+        }
+
+        // proto_payment (OptionSet)
+        const paymentAttr = xrm.Page.data.entity.getAttribute("proto_payment");
+        if (paymentAttr) {
+            const paymentValue = paymentAttr.getValue();
+            if (paymentValue !== null && paymentValue !== undefined) {
+                result.payment = paymentValue;
+            }
+        }
+
+        // proto_maincategory (OptionSet)
+        const mainCategoryAttr = xrm.Page.data.entity.getAttribute("proto_maincategory");
+        if (mainCategoryAttr) {
+            const mainCategoryValue = mainCategoryAttr.getValue();
+            if (mainCategoryValue !== null && mainCategoryValue !== undefined) {
+                result.mainCategory = mainCategoryValue;
+            }
+        }
+
+        // proto_subcategory (Lookup)
+        const subcategoryAttr = xrm.Page.data.entity.getAttribute("proto_subcategory");
+        if (subcategoryAttr) {
+            const subcategoryValue = subcategoryAttr.getValue();
+            if (subcategoryValue && subcategoryValue.length > 0) {
+                const value = Array.isArray(subcategoryValue) ? subcategoryValue[0] : subcategoryValue;
+                result.subcategory = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
+            }
+        }
+
+        return result;
+    } catch (err) {
+        console.error("フォーム値取得中にエラーが発生しました。：", err);
+        return null;
+    }
+};
