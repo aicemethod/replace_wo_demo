@@ -83,10 +83,10 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                 }));
                 setSubcategories(subcategoryOptions);
 
-                // proto_wo_task2を取得
+                // proto_wo_task2を取得（proto_nameが空でないもののみ）
                 const taskResult = await xrm.WebApi.retrieveMultipleRecords(
                     "proto_wo_task2",
-                    "?$select=proto_wo_task2id,proto_name&$orderby=proto_name"
+                    "?$select=proto_wo_task2id,proto_name&$filter=proto_name ne null and proto_name ne ''&$orderby=proto_name"
                 );
                 const taskList = taskResult.entities.map((item: any) => ({
                     id: item.proto_wo_task2id?.replace(/[{}]/g, "") || "",
