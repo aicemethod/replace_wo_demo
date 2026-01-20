@@ -56,7 +56,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     endUserOptions,
     deviceSnOptions,
     subcategoryOptions,
-    paymentMainCategoryOptions,
     isSubgrid = false,
     selectedWO = "",
     selectedIndirectTask = null,
