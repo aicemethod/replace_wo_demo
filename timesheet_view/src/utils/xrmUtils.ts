@@ -108,11 +108,32 @@ export const getWorkOrderFormValues = (): {
 } | null => {
     try {
         const xrm = getXrm();
-        if (!xrm || !xrm.Page || !xrm.Page.data || !xrm.Page.data.entity) {
+        if (!xrm || !xrm.Page) {
             return null;
         }
 
-        const entityName = xrm.Page.data.entity.getEntityName();
+        const page = xrm.Page;
+
+        // UCI / レガシー両対応の安全な getAttribute ラッパー
+        const getAttr = (name: string) => {
+            try {
+                if (typeof page.getAttribute === "function") {
+                    return page.getAttribute(name);
+                }
+                if (page.data && page.data.entity && typeof page.data.entity.getAttribute === "function") {
+                    return page.data.entity.getAttribute(name);
+                }
+            } catch {
+                // 取得失敗時は null 扱い
+            }
+            return null;
+        };
+
+        // エンティティ名を取得（data.entity がある場合のみ）
+        const entityName =
+            page.data && page.data.entity && typeof page.data.entity.getEntityName === "function"
+                ? page.data.entity.getEntityName()
+                : null;
         if (entityName !== "proto_workorder") {
             return null;
         }
@@ -120,7 +141,7 @@ export const getWorkOrderFormValues = (): {
         const result: any = {};
 
         // proto_enduser (Lookup)
-        const endUserAttr = xrm.Page.data.entity.getAttribute("proto_enduser");
+        const endUserAttr = getAttr("proto_enduser");
         if (endUserAttr) {
             const endUserValue = endUserAttr.getValue();
             if (endUserValue && endUserValue.length > 0) {
@@ -132,8 +153,8 @@ export const getWorkOrderFormValues = (): {
             }
         }
 
-        // proto_devicesearch (Lookup)
-        const deviceSnAttr = xrm.Page.data.entity.getAttribute("proto_devicesearch");
+        // 装置S/N（Lookup）: エンティティ proto_nonyudevice
+        const deviceSnAttr = getAttr("proto_nonyudevice");
         if (deviceSnAttr) {
             const deviceSnValue = deviceSnAttr.getValue();
             if (deviceSnValue && deviceSnValue.length > 0) {
@@ -146,7 +167,7 @@ export const getWorkOrderFormValues = (): {
         }
 
         // proto_payment (OptionSet)
-        const paymentAttr = xrm.Page.data.entity.getAttribute("proto_payment");
+        const paymentAttr = getAttr("proto_payment");
         if (paymentAttr) {
             const paymentValue = paymentAttr.getValue();
             if (paymentValue !== null && paymentValue !== undefined) {
@@ -155,7 +176,7 @@ export const getWorkOrderFormValues = (): {
         }
 
         // proto_maincategory (OptionSet)
-        const mainCategoryAttr = xrm.Page.data.entity.getAttribute("proto_maincategory");
+        const mainCategoryAttr = getAttr("proto_maincategory");
         if (mainCategoryAttr) {
             const mainCategoryValue = mainCategoryAttr.getValue();
             if (mainCategoryValue !== null && mainCategoryValue !== undefined) {
@@ -164,7 +185,7 @@ export const getWorkOrderFormValues = (): {
         }
 
         // proto_subcategory (Lookup)
-        const subcategoryAttr = xrm.Page.data.entity.getAttribute("proto_subcategory");
+        const subcategoryAttr = getAttr("proto_subcategory");
         if (subcategoryAttr) {
             const subcategoryValue = subcategoryAttr.getValue();
             if (subcategoryValue && subcategoryValue.length > 0) {

@@ -588,7 +588,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     options={subcategoryOptions}
                                     value={subcategory ?? ""}
                                     onChange={setSubcategory}
-                                    placeholder={t("timeEntryModal.placeholders.selectSubCategory") || "サブカテゴリを選択"}
+                                    placeholder={t("favoriteTask.selectSubCategory") || "サブカテゴリを選択"}
                                 />
                             )}
 
