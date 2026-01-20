@@ -70,6 +70,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [subcategory, setSubcategory] = useState("");
     const [workStatus, setWorkStatus] = useState("");
     const [resource, setResource] = useState("");
+    const [wisdomBu, setWisdomBu] = useState("");
+    const [sapBu, setSapBu] = useState("");
+    const [deviceSn, setDeviceSn] = useState("");
+    const [paymentMainCategory, setPaymentMainCategory] = useState("");
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -125,6 +129,31 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         { value: "sample", label: t("timeEntryModal.sampleEndUser3") },
     ];
 
+    // 新しく追加した項目用のサンプル選択肢（必要に応じて実データに差し替え）
+    const wisdomBuOptions: Option[] = [
+        { value: "wisdom_bu_1", label: "WISDOM BU 1" },
+        { value: "wisdom_bu_2", label: "WISDOM BU 2" },
+        { value: "wisdom_bu_3", label: "WISDOM BU 3" },
+    ];
+
+    const sapBuOptions: Option[] = [
+        { value: "sap_bu_1", label: "SAP BU 1" },
+        { value: "sap_bu_2", label: "SAP BU 2" },
+        { value: "sap_bu_3", label: "SAP BU 3" },
+    ];
+
+    const deviceSnOptions: Option[] = [
+        { value: "device_sn_1", label: "装置S/N 1" },
+        { value: "device_sn_2", label: "装置S/N 2" },
+        { value: "device_sn_3", label: "装置S/N 3" },
+    ];
+
+    const paymentMainCategoryOptions: Option[] = [
+        { value: "payment_main_1", label: "メインカテゴリ 1" },
+        { value: "payment_main_2", label: "メインカテゴリ 2" },
+        { value: "payment_main_3", label: "メインカテゴリ 3" },
+    ];
+
     const taskOptions: Option[] = [
         { value: "doc", label: t("timeEntryModal.task_list.document") },
         { value: "code", label: t("timeEntryModal.task_list.coding") },
@@ -177,6 +206,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWorkStatus(String(selectedEvent.workStatus ?? ""));
             setTimezone(String(selectedEvent.timezone ?? ""));
             setResource(selectedEvent.resource ?? "");
+            setWisdomBu(selectedEvent.wisdomBu ?? "");
+            setSapBu(selectedEvent.sapBu ?? "");
+            setDeviceSn(selectedEvent.deviceSn ?? "");
+            setPaymentMainCategory(selectedEvent.paymentMainCategory ?? "");
         } else if (selectedDateTime) {
             setMode("create");
             const { start, end } = selectedDateTime;
@@ -213,6 +246,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setPaymentType("");
             setComment("");
             setResource("");
+            setWisdomBu("");
+            setSapBu("");
+            setDeviceSn("");
+            setPaymentMainCategory("");
         }
     }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions]);
 
@@ -231,9 +268,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             endUser,
             timezone,
             resource,
+            wisdomBu,
+            sapBu,
             timeCategory,
             mainCategory,
             paymentType,
+            deviceSn,
+            paymentMainCategory,
             task,
             workStatus,
             comment,
@@ -273,9 +314,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             endUser,
             timezone,
             resource,
+            wisdomBu,
+            sapBu,
             timeCategory,
             mainCategory,
             paymentType,
+            deviceSn,
+            paymentMainCategory,
             task,
             workStatus,
             comment,
@@ -454,15 +499,30 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 rows={4}
                                 readOnly
                             />
+
+                            <label className="modal-label">WISDOM BU</label>
+                            <Select
+                                options={wisdomBuOptions}
+                                value={wisdomBu}
+                                onChange={setWisdomBu}
+                                placeholder="WISDOM BU を選択"
+                            />
+
+                            <label className="modal-label">SAP BU</label>
+                            <Select
+                                options={sapBuOptions}
+                                value={sapBu}
+                                onChange={setSapBu}
+                                placeholder="SAP BU を選択"
+                            />
                         </div>
 
                         <div>
                             <label className="modal-label">{t("timeEntryModal.timeCategory")}</label>
                             {selectedIndirectTask ? (
-                                <Input
-                                    value={timecategoryOptions.find(opt => opt.value === timeCategory)?.label || ""}
-                                    disabled
-                                />
+                                <div className="readonly-text">
+                                    {timecategoryOptions.find(opt => opt.value === timeCategory)?.label || "-"}
+                                </div>
                             ) : (
                                 <Select
                                     options={timecategoryOptions}
@@ -471,6 +531,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     placeholder={t("timeEntryModal.placeholders.selectTimeCategory")}
                                 />
                             )}
+
+                            <label className="modal-label">装置S/N</label>
+                            <Select
+                                options={deviceSnOptions}
+                                value={deviceSn}
+                                onChange={setDeviceSn}
+                                placeholder="装置S/N を選択"
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
                             <Select
@@ -488,11 +556,23 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
                             />
 
+                            <label className="modal-label">メインカテゴリ</label>
+                            <Select
+                                options={paymentMainCategoryOptions}
+                                value={paymentMainCategory}
+                                onChange={setPaymentMainCategory}
+                                placeholder="メインカテゴリを選択"
+                            />
+
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {selectedIndirectTask ? (
-                                <Input value={subcategory} disabled />
+                                <div className="readonly-text">
+                                    {subcategory || "-"}
+                                </div>
                             ) : (
-                                <Input value={t("timeEntryModal.auto")} disabled />
+                                <div className="readonly-text">
+                                    {"-"}
+                                </div>
                             )}
 
                             <label className="modal-label">作業ステータス</label>
@@ -505,7 +585,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                             <label className="modal-label">{t("timeEntryModal.task")}</label>
                             {selectedIndirectTask ? (
-                                <Input value={task} disabled />
+                                <div className="readonly-text">
+                                    {task || "-"}
+                                </div>
                             ) : (
                                 <Select
                                     options={taskOptions}
