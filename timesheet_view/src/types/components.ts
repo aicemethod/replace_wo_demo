@@ -23,6 +23,9 @@ export type ContentHeaderProps = {
     onNext: () => void;
     onToday: () => void;
     onCreateNew: () => void;
+    selectOptions?: Option[];
+    selectValue?: string;
+    onSelectChange?: (value: string) => void;
 };
 
 /** Sidebar Props */

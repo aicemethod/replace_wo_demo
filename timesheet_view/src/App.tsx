@@ -67,6 +67,14 @@ function TimesheetApp() {
   const [breakTimeEvents, setBreakTimeEvents] = useState<EventInput[]>([]);
   /** 固定時間挿入のローディング状態 */
   const [isBreakTimeLoading, setIsBreakTimeLoading] = useState(false);
+  /** ヘッダーセレクトの状態 */
+  const [headerSelectValue, setHeaderSelectValue] = useState<string>("");
+  /** ヘッダーセレクトのオプション（仮データ） */
+  const headerSelectOptions = useMemo(() => [
+    { value: "option1", label: "オプション1" },
+    { value: "option2", label: "オプション2" },
+    { value: "option3", label: "オプション3" },
+  ], []);
 
   /** 休憩時間挿入ハンドラ（クライアント側のみ） */
   const handleInsertBreakTime = (breakEvents: EventInput[]) => {
@@ -145,6 +153,9 @@ function TimesheetApp() {
           onNext={handleNext}
           onToday={handleToday}
           onCreateNew={openNewTimeEntry}
+          selectOptions={headerSelectOptions}
+          selectValue={headerSelectValue}
+          onSelectChange={setHeaderSelectValue}
         />
 
         {/* 作業時間情報 */}
