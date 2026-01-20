@@ -484,7 +484,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">EndUser</label>
                             {endUser ? (
                                 <div className="readonly-text">
-                                    {endUser}
+                                    {endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser}
                                 </div>
                             ) : (
                                 <Select
@@ -553,7 +553,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">装置S/N</label>
                             {deviceSn ? (
                                 <div className="readonly-text">
-                                    {deviceSn}
+                                    {deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn}
                                 </div>
                             ) : (
                                 <Select
@@ -625,7 +625,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {subcategory ? (
                                 <div className="readonly-text">
-                                    {subcategory}
+                                    {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory}
                                 </div>
                             ) : (
                                 <Select
