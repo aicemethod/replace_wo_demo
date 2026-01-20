@@ -26,9 +26,9 @@ export async function fetchFileData(): Promise<FileData[]> {
       return [];
     }
 
-    // proto_activitymimeattachmentレコードを取得（proto_wonumberでフィルタリング）
+    // proto_activitymimeattachmentレコードを取得（931440001と931440003のみ）
     const entityName = 'proto_activitymimeattachment';
-    const filterQuery = `_proto_wonumber_value eq ${currentRecordId}`;
+    const filterQuery = `_proto_wonumber_value eq ${currentRecordId} and (proto_attachmenttype eq 931440001 or proto_attachmenttype eq 931440003)`;
 
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
