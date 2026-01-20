@@ -482,12 +482,18 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
 
                             <label className="modal-label">EndUser</label>
-                            <Select
-                                options={endUserOptions}
-                                value={endUser || ""}
-                                onChange={setEndUser}
-                                placeholder={t("timeEntryModal.placeholders.selectEndUser")}
-                            />
+                            {selectedIndirectTask ? (
+                                <div className="readonly-text">
+                                    {endUserOptions.find(opt => opt.value === endUser)?.label || endUser || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={endUserOptions}
+                                    value={endUser || ""}
+                                    onChange={setEndUser}
+                                    placeholder={t("timeEntryModal.placeholders.selectEndUser")}
+                                />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.location")}</label>
                             <Select
@@ -545,28 +551,46 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">装置S/N</label>
-                            <Select
-                                options={deviceSnOptions}
-                                value={deviceSn || ""}
-                                onChange={setDeviceSn}
-                                placeholder="装置S/N を選択"
-                            />
+                            {selectedIndirectTask ? (
+                                <div className="readonly-text">
+                                    {deviceSnOptions.find(opt => opt.value === deviceSn)?.label || deviceSn || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={deviceSnOptions}
+                                    value={deviceSn || ""}
+                                    onChange={setDeviceSn}
+                                    placeholder="装置S/N を選択"
+                                />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
-                            <Select
-                                options={maincategoryOptions}
-                                value={mainCategory || ""}
-                                onChange={setMainCategory}
-                                placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
-                            />
+                            {selectedIndirectTask ? (
+                                <div className="readonly-text">
+                                    {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={maincategoryOptions}
+                                    value={mainCategory || ""}
+                                    onChange={setMainCategory}
+                                    placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
+                                />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
-                            <Select
-                                options={paymenttypeOptions}
-                                value={paymentType || ""}
-                                onChange={setPaymentType}
-                                placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
-                            />
+                            {selectedIndirectTask ? (
+                                <div className="readonly-text">
+                                    {paymenttypeOptions.find(opt => opt.value === paymentType)?.label || paymentType || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={paymenttypeOptions}
+                                    value={paymentType || ""}
+                                    onChange={setPaymentType}
+                                    placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
+                                />
+                            )}
 
                             <label className="modal-label">メインカテゴリ</label>
                             <Select
