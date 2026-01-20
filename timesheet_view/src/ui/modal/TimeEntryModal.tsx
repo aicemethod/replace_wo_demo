@@ -271,12 +271,31 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         const start = new Date(`${startDate}T${startHour}:${startMinute}`);
         const end = new Date(`${endDate}T${endHour}:${endMinute}`);
 
+        // nameの場合はoptionsからIDを取得
+        const getEndUserId = () => {
+            if (!endUser) return "";
+            const found = endUserOptions.find(opt => opt.value === endUser || opt.label === endUser);
+            return found?.value || endUser;
+        };
+
+        const getDeviceSnId = () => {
+            if (!deviceSn) return "";
+            const found = deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn);
+            return found?.value || deviceSn;
+        };
+
+        const getSubcategoryId = () => {
+            if (!subcategory) return "";
+            const found = subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory);
+            return found?.value || subcategory;
+        };
+
         onSubmit({
             id: selectedEvent?.id || "",
             wo,
             start,
             end,
-            endUser,
+            endUser: getEndUserId(),
             timezone,
             resource,
             wisdomBu,
@@ -284,9 +303,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             timeCategory,
             mainCategory,
             paymentType,
-            deviceSn,
+            deviceSn: getDeviceSnId(),
             paymentMainCategory,
-            subcategory,
+            subcategory: getSubcategoryId(),
             task,
             workStatus,
             comment,
