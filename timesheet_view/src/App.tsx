@@ -82,16 +82,16 @@ function TimesheetApp() {
 
       try {
         // ログインユーザーIDを取得
-        const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
+        const userId: string = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
         // ログインユーザーのbusinessunitidを取得
         const currentUser = await xrm.WebApi.retrieveRecord(
           "systemuser",
           userId,
-          "?$select=systemuserid,fullname,businessunitid"
+          "?$select=systemuserid,fullname,_businessunitid_value"
         );
 
-        const businessUnitId = currentUser.businessunitid;
+        const businessUnitId = currentUser._businessunitid_value;
         if (!businessUnitId) return;
 
         // businessunitidをGUID形式に変換（波括弧付き）
@@ -100,7 +100,7 @@ function TimesheetApp() {
         // 同じ部署のユーザーを取得
         const users = await xrm.WebApi.retrieveMultipleRecords(
           "systemuser",
-          `?$filter=businessunitid eq ${businessUnitGuid}&$select=systemuserid,fullname&$orderby=fullname`
+          `?$filter=_businessunitid_value eq ${businessUnitGuid}&$select=systemuserid,fullname&$orderby=fullname`
         );
 
         // オプションに変換（systemuseridも波括弧を除去）
@@ -112,9 +112,9 @@ function TimesheetApp() {
         setHeaderSelectOptions(options);
 
         // デフォルトでログインユーザーをセット（オプションに存在することを確認）
-        const userExists = options.some(opt => opt.value === userId);
+        const userExists = options.some(opt => opt.value === userId.toLowerCase());
         if (userExists) {
-          setHeaderSelectValue(userId);
+          setHeaderSelectValue(userId.toLowerCase());
         } else if (options.length > 0) {
           // ログインユーザーがオプションにない場合は最初のユーザーをセット
           setHeaderSelectValue(options[0].value);
