@@ -103,22 +103,26 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 proto_enddatetime: DataTransformer.toIsoString(data.end)
             };
 
-            // Lookupフィールドの処理
-            if (data.subcategory) {
+            // Lookupフィールドの処理（空文字列やnullの場合は設定しない）
+            if (data.subcategory && data.subcategory !== "" && data.subcategory !== null) {
                 payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
             }
-            if (data.endUser) {
+            if (data.endUser && data.endUser !== "" && data.endUser !== null) {
                 // EndUser は account エンティティへの Lookup
                 payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
             }
-            if (data.deviceSn) {
-                payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
+            if (data.deviceSn && data.deviceSn !== "" && data.deviceSn !== null) {
+                // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
+                payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
             }
-            if (data.paymentMainCategory !== undefined) {
-                payload.proto_paymentmaincategory = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
+            if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
+                const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
+                if (paymentMainCategoryValue !== null) {
+                    payload.proto_paymentmaincategory = paymentMainCategoryValue;
+                }
             }
 
-            if (data.wo) {
+            if (data.wo && data.wo !== "" && data.wo !== null) {
                 payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
             }
 
@@ -165,31 +169,23 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.start !== undefined) payload.proto_startdatetime = DataTransformer.toIsoString(data.start);
             if (data.end !== undefined) payload.proto_enddatetime = DataTransformer.toIsoString(data.end);
 
-            // Lookupフィールドの処理
-            if (data.subcategory !== undefined) {
-                if (data.subcategory) {
-                    payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
-                } else {
-                    payload['proto_subcategory@odata.bind'] = null;
-                }
+            // Lookupフィールドの処理（空文字列やnullの場合は設定しない）
+            if (data.subcategory !== undefined && data.subcategory !== null && data.subcategory !== "") {
+                payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
             }
-            if (data.endUser !== undefined) {
-                if (data.endUser) {
-                    // EndUser は account エンティティへの Lookup
-                    payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
-                } else {
-                    payload['proto_enduser@odata.bind'] = null;
-                }
+            if (data.endUser !== undefined && data.endUser !== null && data.endUser !== "") {
+                // EndUser は account エンティティへの Lookup
+                payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
             }
-            if (data.deviceSn !== undefined) {
-                if (data.deviceSn) {
-                    payload['proto_devicesearch@odata.bind'] = `/proto_devicesearches(${data.deviceSn})`;
-                } else {
-                    payload['proto_devicesearch@odata.bind'] = null;
-                }
+            if (data.deviceSn !== undefined && data.deviceSn !== null && data.deviceSn !== "") {
+                // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
+                payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
             }
-            if (data.paymentMainCategory !== undefined) {
-                payload.proto_paymentmaincategory = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
+            if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
+                const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
+                if (paymentMainCategoryValue !== null) {
+                    payload.proto_paymentmaincategory = paymentMainCategoryValue;
+                }
             }
 
             if (data.wo !== undefined) {
