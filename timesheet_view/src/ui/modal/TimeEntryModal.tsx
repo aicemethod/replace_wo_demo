@@ -156,28 +156,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     };
 
     /* -------------------------------
-       🪄 フォーム値取得（proto_workorderから）
-    ------------------------------- */
-    const [formValues, setFormValues] = useState<{
-        endUser?: { id: string; name: string } | null;
-        deviceSn?: { id: string; name: string } | null;
-        payment?: number | null;
-        mainCategory?: number | null;
-        subcategory?: { id: string; name: string } | null;
-    } | null>(null);
-
-    useEffect(() => {
-        if (!isOpen) {
-            setFormValues(null);
-            return;
-        }
-
-        // 現在開いているフォーム（proto_workorder）から値を取得
-        const values = getWorkOrderFormValues();
-        setFormValues(values);
-    }, [isOpen]);
-
-    /* -------------------------------
        🪄 初期化処理
     ------------------------------- */
     useEffect(() => {
@@ -236,44 +214,31 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWo(isSubgrid && selectedWO ? selectedWO : "");
             setTimezone("235");
 
-            // フォームから取得した値があればセット（読み取り専用として使用）
+            // まずは空で初期化
+            setEndUser("");
+            setDeviceSn("");
+            setPaymentType("");
+            setMainCategory("");
+            setSubcategory("");
+
+            // 現在開いている proto_workorder から値を取得して反映
+            const formValues = getWorkOrderFormValues();
             if (formValues) {
-                // EndUser
                 if (formValues.endUser) {
                     setEndUser(formValues.endUser.id);
-                } else {
-                    setEndUser("");
                 }
-                // 装置S/N
                 if (formValues.deviceSn) {
                     setDeviceSn(formValues.deviceSn.id);
-                } else {
-                    setDeviceSn("");
                 }
-                // ペイメントタイプ
                 if (formValues.payment !== undefined && formValues.payment !== null) {
                     setPaymentType(String(formValues.payment));
-                } else {
-                    setPaymentType("");
                 }
-                // メインカテゴリ
                 if (formValues.mainCategory !== undefined && formValues.mainCategory !== null) {
                     setMainCategory(String(formValues.mainCategory));
-                } else {
-                    setMainCategory("");
                 }
-                // サブカテゴリ
                 if (formValues.subcategory) {
                     setSubcategory(formValues.subcategory.id);
-                } else {
-                    setSubcategory("");
                 }
-            } else {
-                setEndUser("");
-                setDeviceSn("");
-                setPaymentType("");
-                setMainCategory("");
-                setSubcategory("");
             }
 
             // 間接タスクが選択されている場合の処理
@@ -283,16 +248,12 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     opt.label.includes("間接") || opt.value === "931440002"
                 );
                 setTimeCategory(indirectTimeCategory?.value || "");
-                // フォーム値がない場合のみ間接タスクの値をセット
-                if (!formValues?.subcategory) {
-                    setSubcategory(selectedIndirectTask.subcategoryName);
-                }
+                // 間接タスク選択時はサブカテゴリ・タスクを間接タスクで上書き
+                setSubcategory(selectedIndirectTask.subcategoryName);
                 setTask(selectedIndirectTask.taskName);
             } else {
                 setTimeCategory("");
-                if (!formValues?.subcategory) {
-                    setSubcategory("");
-                }
+                setSubcategory("");
                 setTask("");
             }
 
@@ -303,7 +264,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setSapBu("");
             setPaymentMainCategory("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, formValues]);
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions]);
 
     /* -------------------------------
        💾 保存処理
@@ -523,18 +484,12 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
 
                             <label className="modal-label">EndUser</label>
-                            {formValues?.endUser ? (
-                                <div className="readonly-text">
-                                    {formValues.endUser.name || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={endUserOptions}
-                                    value={endUser || ""}
-                                    onChange={setEndUser}
-                                    placeholder={t("timeEntryModal.placeholders.selectEndUser")}
-                                />
-                            )}
+                            <Select
+                                options={endUserOptions}
+                                value={endUser || ""}
+                                onChange={setEndUser}
+                                placeholder={t("timeEntryModal.placeholders.selectEndUser")}
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.location")}</label>
                             <Select
@@ -592,46 +547,28 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">装置S/N</label>
-                            {formValues?.deviceSn ? (
-                                <div className="readonly-text">
-                                    {formValues.deviceSn.name || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={deviceSnOptions}
-                                    value={deviceSn || ""}
-                                    onChange={setDeviceSn}
-                                    placeholder="装置S/N を選択"
-                                />
-                            )}
+                            <Select
+                                options={deviceSnOptions}
+                                value={deviceSn || ""}
+                                onChange={setDeviceSn}
+                                placeholder="装置S/N を選択"
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
-                            {formValues?.mainCategory !== undefined && formValues.mainCategory !== null ? (
-                                <div className="readonly-text">
-                                    {maincategoryOptions.find(opt => opt.value === String(formValues.mainCategory))?.label || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={maincategoryOptions}
-                                    value={mainCategory || ""}
-                                    onChange={setMainCategory}
-                                    placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
-                                />
-                            )}
+                            <Select
+                                options={maincategoryOptions}
+                                value={mainCategory || ""}
+                                onChange={setMainCategory}
+                                placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
-                            {formValues?.payment !== undefined && formValues.payment !== null ? (
-                                <div className="readonly-text">
-                                    {paymenttypeOptions.find(opt => opt.value === String(formValues.payment))?.label || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={paymenttypeOptions}
-                                    value={paymentType || ""}
-                                    onChange={setPaymentType}
-                                    placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
-                                />
-                            )}
+                            <Select
+                                options={paymenttypeOptions}
+                                value={paymentType || ""}
+                                onChange={setPaymentType}
+                                placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
+                            />
 
                             <label className="modal-label">メインカテゴリ</label>
                             <Select
@@ -642,11 +579,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
-                            {formValues?.subcategory ? (
-                                <div className="readonly-text">
-                                    {formValues.subcategory.name || "-"}
-                                </div>
-                            ) : selectedIndirectTask ? (
+                            {selectedIndirectTask ? (
                                 <div className="readonly-text">
                                     {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
