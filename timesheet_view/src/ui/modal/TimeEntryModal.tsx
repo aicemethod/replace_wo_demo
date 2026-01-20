@@ -599,7 +599,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
                             <Select
-                                options={paymentMainCategoryOptions}
+                                // options={paymentMainCategoryOptions}
+                                options={[]}
                                 value={paymentMainCategory || ""}
                                 onChange={setPaymentMainCategory}
                                 placeholder="カテゴリを選択"
