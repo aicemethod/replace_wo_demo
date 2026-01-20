@@ -153,8 +153,8 @@ export const getWorkOrderFormValues = (): {
             }
         }
 
-        // 装置S/N（Lookup）: フィールド proto_devicesearch
-        const deviceSnAttr = getAttr("proto_devicesearch");
+        // 装置S/N（Lookup）: エンティティ proto_nonyudevice
+        const deviceSnAttr = getAttr("proto_nonyudevice");
         if (deviceSnAttr) {
             const deviceSnValue = deviceSnAttr.getValue();
             if (deviceSnValue && deviceSnValue.length > 0) {
@@ -166,8 +166,8 @@ export const getWorkOrderFormValues = (): {
             }
         }
 
-        // proto_paymenttype (OptionSet)
-        const paymentAttr = getAttr("proto_paymenttype");
+        // proto_payment (OptionSet)
+        const paymentAttr = getAttr("proto_payment");
         if (paymentAttr) {
             const paymentValue = paymentAttr.getValue();
             if (paymentValue !== null && paymentValue !== undefined) {
@@ -205,14 +205,22 @@ export const getWorkOrderFormValues = (): {
 };
 
 /**
- * 現在開いているフォーム（proto_workorder）の proto_workorderid と指定フィールドを取得してログ出力する関数
+ * 現在開いているフォーム（proto_workorder）の
+ * proto_workorderid および指定フィールドを取得して返す関数
  */
-export const logWorkOrderFormFields = (): void => {
+export const getWorkOrderProtoFields = (): {
+    proto_workorderid: string | null;
+    proto_enduser?: { id: string; name: string } | null;
+    proto_devicesearch?: { id: string; name: string } | null;
+    proto_paymenttype?: number | null;
+    proto_maincategory?: number | null;
+    proto_subcategory?: { id: string; name: string } | null;
+} | null => {
     try {
         const xrm = getXrm();
         if (!xrm || !xrm.Page) {
             console.log("Xrm または Page が取得できませんでした");
-            return;
+            return null;
         }
 
         const page = xrm.Page;
@@ -224,7 +232,7 @@ export const logWorkOrderFormFields = (): void => {
                 : null;
         if (entityName !== "proto_workorder") {
             console.log("proto_workorder フォームが開かれていません");
-            return;
+            return null;
         }
 
         // proto_workorderid を取得
@@ -254,7 +262,14 @@ export const logWorkOrderFormFields = (): void => {
         };
 
         // 各フィールドを取得
-        const result: any = {
+        const result: {
+            proto_workorderid: string | null;
+            proto_enduser?: { id: string; name: string } | null;
+            proto_devicesearch?: { id: string; name: string } | null;
+            proto_paymenttype?: number | null;
+            proto_maincategory?: number | null;
+            proto_subcategory?: { id: string; name: string } | null;
+        } = {
             proto_workorderid: workOrderId,
         };
 
@@ -315,10 +330,20 @@ export const logWorkOrderFormFields = (): void => {
             }
         }
 
-        // ログ出力
-        console.log("=== proto_workorder フォームフィールド値 ===");
-        console.log(JSON.stringify(result, null, 2));
+        return result;
     } catch (err) {
-        console.error("フォームフィールド取得・ログ出力中にエラーが発生しました。：", err);
+        console.error("proto_workorder フォームフィールド取得中にエラーが発生しました。：", err);
+        return null;
     }
+};
+
+/**
+ * 現在開いているフォーム（proto_workorder）の proto_workorderid と指定フィールドを取得してログ出力する関数
+ */
+export const logWorkOrderFormFields = (): void => {
+    const fields = getWorkOrderProtoFields();
+    if (!fields) return;
+
+    console.log("=== proto_workorder フォームフィールド値 ===");
+    console.log(JSON.stringify(fields, null, 2));
 };

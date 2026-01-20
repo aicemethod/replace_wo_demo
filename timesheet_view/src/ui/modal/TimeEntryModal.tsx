@@ -10,7 +10,7 @@ import { ResourceSelectModal } from "./ResourceSelectModal";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import "../styles/modal/TimeEntryModal.css";
 import { useTranslation } from "react-i18next";
-import { getWorkOrderFormValues, logWorkOrderFormFields } from "../../utils/xrmUtils";
+import { getWorkOrderProtoFields, logWorkOrderFormFields } from "../../utils/xrmUtils";
 
 /* =========================================================
    型定義
@@ -224,23 +224,34 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setMainCategory("");
             setSubcategory("");
 
-            // 現在開いている proto_workorder から値を取得して反映
-            const formValues = getWorkOrderFormValues();
-            if (formValues) {
-                if (formValues.endUser) {
-                    setEndUser(formValues.endUser.id);
+            // 現在開いている proto_workorder から値を取得して TimeEntryModal の項目にセット
+            const protoFields = getWorkOrderProtoFields();
+            if (protoFields) {
+                // proto_enduser -> EndUser セレクト（ID を value としてセット）
+                if (protoFields.proto_enduser) {
+                    setEndUser(protoFields.proto_enduser.id);
                 }
-                if (formValues.deviceSn) {
-                    setDeviceSn(formValues.deviceSn.id);
+                // proto_devicesearch.id -> 装置S/N セレクト
+                if (protoFields.proto_devicesearch) {
+                    setDeviceSn(protoFields.proto_devicesearch.id);
                 }
-                if (formValues.payment !== undefined && formValues.payment !== null) {
-                    setPaymentType(String(formValues.payment));
+                // proto_paymenttype -> PaymentType セレクト
+                if (
+                    protoFields.proto_paymenttype !== undefined &&
+                    protoFields.proto_paymenttype !== null
+                ) {
+                    setPaymentType(String(protoFields.proto_paymenttype));
                 }
-                if (formValues.mainCategory !== undefined && formValues.mainCategory !== null) {
-                    setMainCategory(String(formValues.mainCategory));
+                // proto_maincategory -> メインカテゴリ / MainCategory セレクト
+                if (
+                    protoFields.proto_maincategory !== undefined &&
+                    protoFields.proto_maincategory !== null
+                ) {
+                    setMainCategory(String(protoFields.proto_maincategory));
                 }
-                if (formValues.subcategory) {
-                    setSubcategory(formValues.subcategory.id);
+                // proto_subcategory -> サブカテゴリ セレクト（ID を value としてセット）
+                if (protoFields.proto_subcategory) {
+                    setSubcategory(protoFields.proto_subcategory.id);
                 }
             }
 
