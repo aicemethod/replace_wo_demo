@@ -133,6 +133,22 @@
     transform: rotate(45deg);
 }
 
+/* ラジオ風チェックボックス（複数選択可） */
+.sidebar-checkbox.sidebar-checkbox-radio {
+    border-radius: 50%;
+}
+
+.sidebar-checkbox.sidebar-checkbox-radio:checked::after {
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--main-color);
+    transform: translate(-50%, -50%);
+}
+
 /* =============================
    自分情報
 ============================= */
