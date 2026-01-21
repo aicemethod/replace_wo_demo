@@ -220,9 +220,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             const protoFields = getWorkOrderProtoFields();
             if (protoFields) {
                 // proto_enduser -> EndUser (nameを使用)
-                setEndUser(protoFields.proto_enduser?.name || "");
+                const endUserName = protoFields.proto_enduser?.name || "";
+                console.log("proto_workorderから取得したEndUser:", endUserName);
+                setEndUser(endUserName);
                 // proto_devicesearch -> 装置S/N (nameを使用)
-                setDeviceSn(protoFields.proto_devicesearch?.name || "");
+                const deviceSnName = protoFields.proto_devicesearch?.name || "";
+                console.log("proto_workorderから取得した装置SN:", deviceSnName);
+                setDeviceSn(deviceSnName);
                 // proto_paymenttype -> PaymentType
                 setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
                 // proto_maincategory -> メインカテゴリ
