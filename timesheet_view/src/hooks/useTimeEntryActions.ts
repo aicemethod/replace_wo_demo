@@ -106,8 +106,8 @@ export const useTimeEntryActions = (
                 return;
             }
 
-            // 複製フラグを設定
-            const duplicateEvent = { ...detail, isDuplicate: true };
+            // 複製フラグを設定し、idを空文字列にして新規作成として扱う
+            const duplicateEvent = { ...detail, id: "", isDuplicate: true };
             setSelectedEvent(duplicateEvent);
             setSelectedDateTime(null);
             setIsTimeEntryModalOpen(true);
