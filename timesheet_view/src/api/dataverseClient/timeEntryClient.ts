@@ -118,7 +118,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
             }
             if (data.woType && data.woType !== "" && data.woType !== null) {
-                payload['proto_wotype@odata.bind'] = `/proto_wotypes(${data.woType})`;
+                payload['proto_wo_category@odata.bind'] = `/proto_workordertypes(${data.woType})`;
             }
             if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
                 const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
@@ -188,7 +188,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
             }
             if (data.woType !== undefined && data.woType !== null && data.woType !== "") {
-                payload['proto_wotype@odata.bind'] = `/proto_wotypes(${data.woType})`;
+                payload['proto_wo_category@odata.bind'] = `/proto_workordertypes(${data.woType})`;
             }
             if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
                 const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);

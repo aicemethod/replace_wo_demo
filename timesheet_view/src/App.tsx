@@ -195,13 +195,13 @@ function TimesheetApp() {
         }));
         setSubcategoryOptions(subcategoryOpts);
 
-        // proto_wotypeを取得
+        // proto_workordertypeを取得
         const woTypeResult = await xrm.WebApi.retrieveMultipleRecords(
-          "proto_wotype",
-          "?$select=proto_wotypeid,proto_name&$orderby=proto_name"
+          "proto_workordertype",
+          "?$select=proto_workordertypeid,proto_name&$orderby=proto_name"
         );
         const woTypeOpts: Option[] = woTypeResult.entities.map((item: any) => ({
-          value: item.proto_wotypeid?.replace(/[{}]/g, "") || "",
+          value: item.proto_workordertypeid?.replace(/[{}]/g, "") || "",
           label: item.proto_name || "",
         }));
         setWoTypeOptions(woTypeOpts);
