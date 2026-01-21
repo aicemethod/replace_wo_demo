@@ -800,7 +800,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">{t("timeEntryModal.comment")}</label>
+                            {/* <label className="modal-label">{t("timeEntryModal.comment")}</label> */}
                             {mode === "duplicate" ? (
                                 <div className="readonly-text">{comment || "-"}</div>
                             ) : (
