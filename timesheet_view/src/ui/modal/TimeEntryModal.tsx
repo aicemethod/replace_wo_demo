@@ -598,7 +598,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">EndUser</label>
                             {mode === "duplicate" || endUser ? (
                                 <div className="readonly-text">
-                                    {endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser || "-"}
+                                    {(selectedEvent as any)?.endUserName || endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -681,7 +681,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">装置S/N</label>
                             {mode === "duplicate" || deviceSn ? (
                                 <div className="readonly-text">
-                                    {deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
+                                    {(selectedEvent as any)?.deviceSnName || deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -758,7 +758,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {mode === "duplicate" || subcategory ? (
                                 <div className="readonly-text">
-                                    {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
+                                    {selectedEvent?.subcategoryName || subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
                             ) : (
                                 <Select
