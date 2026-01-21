@@ -1,11 +1,12 @@
 import React, { useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
-import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
+import type { EventInput, DateSelectArg, EventClickArg, EventContentArg } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import jaLocale from "@fullcalendar/core/locales/ja";
 import enLocale from "@fullcalendar/core/locales/en-gb";
+import { FaCopy } from "react-icons/fa";
 import "../styles/layout/CalendarView.css";
 import { useTranslation } from "react-i18next";
 
@@ -19,6 +20,13 @@ export type CalendarViewProps = {
     onDateChange?: (newDate: Date) => void;
     onDateClick?: (range: { start: Date; end: Date }) => void;
     onEventClick?: (eventData: {
+        id: string;
+        title: string;
+        start: Date;
+        end: Date;
+        extendedProps?: Record<string, any>;
+    }) => void;
+    onEventDuplicate?: (eventData: {
         id: string;
         title: string;
         start: Date;
@@ -41,6 +49,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     onDateChange,
     onDateClick,
     onEventClick,
+    onEventDuplicate,
     events,
     isSubgrid = false,
 }) => {
@@ -99,6 +108,32 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             end: end as Date,
             extendedProps,
         });
+    };
+
+    /** イベントコンテンツのカスタマイズ（コピーアイコン追加） */
+    const renderEventContent = (arg: EventContentArg) => {
+        return (
+            <div className="fc-event-content-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <span className="fc-event-title">{arg.event.title}</span>
+                {onEventDuplicate && (
+                    <FaCopy
+                        className="event-copy-icon"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const { id, title, start, end, extendedProps } = arg.event;
+                            onEventDuplicate({
+                                id: String(id),
+                                title: String(title),
+                                start: start as Date,
+                                end: end as Date,
+                                extendedProps,
+                            });
+                        }}
+                        style={{ marginLeft: '4px', cursor: 'pointer', flexShrink: 0 }}
+                    />
+                )}
+            </div>
+        );
     };
 
     /** 表示範囲変更時（日付が変わった時） */
@@ -164,6 +199,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 eventClassNames={(arg) =>
                     arg.event.extendedProps?.isTargetWO ? ["highlight-event"] : []
                 }
+                eventContent={renderEventContent}
                 datesSet={handleDatesSet}
             />
         </div>

@@ -91,6 +91,26 @@
     background-color: var(--main-color);
 }
 
+/* イベント内のコピーアイコン */
+.fc-event-content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.event-copy-icon {
+    margin-left: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.event-copy-icon:hover {
+    opacity: 1;
+}
+
 /* サブグリッドの場合、高さを適切に調整 */
 .calendar-wrapper.is-subgrid {
     min-height: 400px;

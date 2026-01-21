@@ -56,6 +56,7 @@ function TimesheetApp() {
     handleEventClick,
     handleDeleteTimeEntry,
     handleDuplicate,
+    handleEventDuplicate,
     openNewTimeEntry,
     handleSaveFavoriteTasks,
     handleSaveUserList,
@@ -317,6 +318,7 @@ function TimesheetApp() {
                 setIsTimeEntryModalOpen(true);
               }}
               onEventClick={handleEventClick}
+              onEventDuplicate={handleEventDuplicate}
               events={mergedEvents}
               isSubgrid={isSubgrid}
             />

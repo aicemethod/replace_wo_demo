@@ -97,6 +97,26 @@ export const useTimeEntryActions = (
         }, 100);
     };
 
+    /** イベントから直接複製処理 */
+    const handleEventDuplicate = async (event: Event) => {
+        try {
+            const detail = await fetchEventDetail(event.id);
+            if (!detail) {
+                console.warn("イベントが見つかりません:", event.id);
+                return;
+            }
+
+            // 複製フラグを設定
+            const duplicateEvent = { ...detail, isDuplicate: true };
+            setSelectedEvent(duplicateEvent);
+            setSelectedDateTime(null);
+            setIsTimeEntryModalOpen(true);
+        } catch (error) {
+            console.error("イベント複製エラー:", error);
+            alert("イベントの複製に失敗しました。");
+        }
+    };
+
     /** 新規タイムエントリ作成時の共通処理 */
     const openNewTimeEntry = () => {
         const timeRange = createDefaultTimeRange();
@@ -110,6 +130,7 @@ export const useTimeEntryActions = (
         handleEventClick,
         handleDeleteTimeEntry,
         handleDuplicate,
+        handleEventDuplicate,
         openNewTimeEntry,
         refetchEvents,
     };
