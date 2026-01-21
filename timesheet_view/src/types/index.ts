@@ -24,10 +24,16 @@ export type DateTimeRange = {
 /** イベント型 */
 export type Event = {
     id: string;
+    title?: string;
     start: Date;
     end: Date;
     workOrder?: string;
-    endUser?: string;
+    endUser?: string | null;
+    endUserName?: string | null;
+    deviceSn?: string | null;
+    deviceSnName?: string | null;
+    subcategory?: string | number | null;
+    subcategoryName?: string | null;
     timezone?: string;
     resource?: string;
     timecategory?: string;
