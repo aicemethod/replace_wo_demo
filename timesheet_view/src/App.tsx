@@ -363,7 +363,6 @@ function TimesheetApp() {
         deviceSnOptions={deviceSnOptions}
         subcategoryOptions={subcategoryOptions}
         woTypeOptions={woTypeOptions}
-        paymentMainCategoryOptions={optionSets?.maincategory ?? []}
         isSubgrid={isSubgrid}
         selectedWO={selectedWO}
         selectedIndirectTask={selectedIndirectTask}

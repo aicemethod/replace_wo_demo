@@ -252,7 +252,6 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
                 timeCategory: data.timeCategory ?? null,
                 paymentType: data.paymentType ?? null,
                 timezone: data.timezone ?? null,
-                paymentMainCategory: data.paymentMainCategory ?? null,
                 // Lookup（ID）
                 subcategory: data.subcategory || null,
                 endUser: data.endUser || null,

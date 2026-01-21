@@ -32,7 +32,6 @@ export interface TimeEntryModalProps {
     deviceSnOptions: Option[];
     subcategoryOptions: Option[];
     woTypeOptions: Option[];
-    paymentMainCategoryOptions: Option[];
     isSubgrid?: boolean;
     selectedWO?: string;
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
@@ -85,7 +84,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [wisdomBu, setWisdomBu] = useState("");
     const [sapBu, setSapBu] = useState("");
     const [deviceSn, setDeviceSn] = useState("");
-    const [paymentMainCategory, setPaymentMainCategory] = useState("");
     const [woType, setWoType] = useState("");
 
     const [startDate, setStartDate] = useState("");
@@ -248,7 +246,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setResource(selectedEvent.resource ?? "");
             setWisdomBu(selectedEvent.wisdomBu ?? "");
             setSapBu(selectedEvent.sapBu ?? "");
-            setPaymentMainCategory(selectedEvent.paymentMainCategory ?? "");
             setWoType((selectedEvent as any).woType ?? "");
         } else if (selectedDateTime) {
             setMode("create");
@@ -355,7 +352,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setResource("");
             setWisdomBu("");
             setSapBu("");
-            setPaymentMainCategory("");
             setWoType("");
         }
     }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions]);
@@ -412,7 +408,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             mainCategory,
             paymentType,
             deviceSn: getDeviceSnId(),
-            paymentMainCategory,
             woType: getWoTypeId(),
             subcategory: getSubcategoryId(),
             task,
@@ -463,7 +458,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             deviceSnName: deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || null,
             subcategory,
             subcategoryName: subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || null,
-            paymentMainCategory,
             woType,
             woTypeName: woTypeOptions.find(opt => opt.value === woType || opt.label === woType)?.label || null,
             task,
@@ -717,33 +711,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            {/* <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
-                            {mainCategory ? (
-                                <div className="readonly-text">
-                                    {mainCategory}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={maincategoryOptions}
-                                    value={mainCategory || ""}
-                                    onChange={setMainCategory}
-                                    placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
-                                />
-                            )} */}
-
-                            <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
-                            {mode === "duplicate" ? (
-                                <div className="readonly-text">{paymentMainCategory || "-"}</div>
-                            ) : (
-                                <Select
-                                    // options={paymentMainCategoryOptions}
-                                    options={[]}
-                                    value={paymentMainCategory || ""}
-                                    onChange={setPaymentMainCategory}
-                                    placeholder="カテゴリを選択"
-                                />
-                            )}
-
                             <label className="modal-label">{t("timeEntryModal.woType")}</label>
                             {mode === "duplicate" || woType ? (
                                 <div className="readonly-text">
@@ -785,14 +752,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     placeholder={"メインカテゴリを選択"}
                                 />
                             )}
-
-                            {/* <label className="modal-label">メインカテゴリ</label>
-                            <Select
-                                options={paymentMainCategoryOptions}
-                                value={paymentMainCategory || ""}
-                                onChange={setPaymentMainCategory}
-                                placeholder="メインカテゴリを選択"
-                            /> */}
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {mode === "duplicate" || subcategory ? (

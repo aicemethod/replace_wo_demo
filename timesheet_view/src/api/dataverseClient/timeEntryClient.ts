@@ -24,7 +24,6 @@ export interface TimeEntryInput {
     endUser?: string | null; // Lookup ID
     deviceSn?: string | null; // Lookup ID
     woType?: string | null; // Lookup ID
-    paymentMainCategory?: string | number | null;
 }
 
 /** Dataverse 登録・更新後の返却型 */
@@ -120,13 +119,6 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.woType && data.woType !== "" && data.woType !== null) {
                 payload['proto_wo_category@odata.bind'] = `/proto_workordertypes(${data.woType})`;
             }
-            if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
-                const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
-                if (paymentMainCategoryValue !== null) {
-                    payload.proto_paymentmaincategory = paymentMainCategoryValue;
-                }
-            }
-
             if (data.wo && data.wo !== "" && data.wo !== null) {
                 payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
             }
@@ -190,13 +182,6 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.woType !== undefined && data.woType !== null && data.woType !== "") {
                 payload['proto_wo_category@odata.bind'] = `/proto_workordertypes(${data.woType})`;
             }
-            if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
-                const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
-                if (paymentMainCategoryValue !== null) {
-                    payload.proto_paymentmaincategory = paymentMainCategoryValue;
-                }
-            }
-
             if (data.wo !== undefined) {
                 if (data.wo) {
                     payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
