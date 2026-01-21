@@ -758,7 +758,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             {mode === "duplicate" || subcategory ? (
                                 <div className="readonly-text">
-                                    {selectedEvent?.subcategoryName || subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
+                                    {(selectedEvent as any)?.subcategoryName || subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
                             ) : (
                                 <Select
