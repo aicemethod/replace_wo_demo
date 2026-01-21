@@ -186,7 +186,17 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setDeviceSn(selectedEvent.deviceSn || "");
             // サブカテゴリはIDとして取得（subcategoryNameがある場合はIDを探す）
             if (selectedEvent.subcategory) {
-                setSubcategory(selectedEvent.subcategory);
+                // IDがsubcategoryOptionsに存在するか確認
+                const foundById = subcategoryOptions.find(opt => opt.value === selectedEvent.subcategory);
+                if (foundById) {
+                    setSubcategory(selectedEvent.subcategory);
+                } else if (selectedEvent.subcategoryName) {
+                    // IDが見つからない場合、subcategoryNameからIDを探す
+                    const foundByName = subcategoryOptions.find(opt => opt.label === selectedEvent.subcategoryName);
+                    setSubcategory(foundByName?.value || selectedEvent.subcategory);
+                } else {
+                    setSubcategory(selectedEvent.subcategory);
+                }
             } else if (selectedEvent.subcategoryName) {
                 // subcategoryNameからIDを探す
                 const found = subcategoryOptions.find(opt => opt.label === selectedEvent.subcategoryName);
@@ -245,12 +255,29 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 // proto_maincategory -> メインカテゴリ
                 setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
 
-                // proto_subcategory -> サブカテゴリ (nameからIDを検索)
+                // proto_subcategory -> サブカテゴリ (IDまたはnameから検索)
+                const subcategoryId = protoFields.proto_subcategory?.id || "";
                 const subcategoryName = protoFields.proto_subcategory?.name || "";
-                console.log("proto_workorderから取得したサブカテゴリ:", subcategoryName);
-                if (subcategoryName) {
-                    const subcategoryOption = subcategoryOptions.find(opt => opt.label === subcategoryName || opt.value === subcategoryName);
-                    setSubcategory(subcategoryOption?.value || subcategoryName);
+                console.log("proto_workorderから取得したサブカテゴリ ID:", subcategoryId, "Name:", subcategoryName);
+
+                if (subcategoryId || subcategoryName) {
+                    // まずIDで検索、見つからない場合はnameで検索
+                    let subcategoryOption = subcategoryId
+                        ? subcategoryOptions.find(opt => opt.value === subcategoryId)
+                        : null;
+
+                    if (!subcategoryOption && subcategoryName) {
+                        subcategoryOption = subcategoryOptions.find(opt => opt.label === subcategoryName);
+                    }
+
+                    if (subcategoryOption) {
+                        setSubcategory(subcategoryOption.value);
+                    } else if (subcategoryId) {
+                        // IDが見つからない場合でも、IDをそのまま使用
+                        setSubcategory(subcategoryId);
+                    } else {
+                        setSubcategory("");
+                    }
                 } else {
                     setSubcategory("");
                 }
@@ -271,11 +298,16 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 );
                 setTimeCategory(indirectTimeCategory?.value || "");
                 // 間接タスク選択時はサブカテゴリ・タスクを間接タスクで上書き
-                setSubcategory(selectedIndirectTask.subcategoryName);
+                // subcategoryName（ラベル）からIDを検索
+                const indirectSubcategoryOption = subcategoryOptions.find(opt =>
+                    opt.label === selectedIndirectTask.subcategoryName || opt.value === selectedIndirectTask.subcategoryName
+                );
+                setSubcategory(indirectSubcategoryOption?.value || selectedIndirectTask.subcategoryName);
                 setTask(selectedIndirectTask.taskName);
             } else {
+                // selectedIndirectTaskがない場合、protoFieldsから取得した値は保持する
+                // （サブカテゴリは既に上で設定されているため、ここでは空にしない）
                 setTimeCategory("");
-                setSubcategory("");
                 setTask("");
             }
 
