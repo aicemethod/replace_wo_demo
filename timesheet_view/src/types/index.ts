@@ -32,6 +32,8 @@ export type Event = {
     endUserName?: string | null;
     deviceSn?: string | null;
     deviceSnName?: string | null;
+    woType?: string | null;
+    woTypeName?: string | null;
     subcategory?: string | number | null;
     subcategoryName?: string | null;
     timezone?: string;
@@ -105,6 +107,8 @@ export type TimeEntryData = {
     timeCategory: string;
     mainCategory: string;
     paymentType: string;
+    woType?: string;
+    woTypeName?: string | null;
     task: string;
     comment: string;
     id?: string;

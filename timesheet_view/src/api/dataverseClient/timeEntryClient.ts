@@ -23,6 +23,7 @@ export interface TimeEntryInput {
     wo?: string; // WorkOrder ID
     endUser?: string | null; // Lookup ID
     deviceSn?: string | null; // Lookup ID
+    woType?: string | null; // Lookup ID
     paymentMainCategory?: string | number | null;
 }
 
@@ -116,6 +117,9 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
                 payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
             }
+            if (data.woType && data.woType !== "" && data.woType !== null) {
+                payload['proto_wotype@odata.bind'] = `/proto_wotypes(${data.woType})`;
+            }
             if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
                 const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);
                 if (paymentMainCategoryValue !== null) {
@@ -182,6 +186,9 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.deviceSn !== undefined && data.deviceSn !== null && data.deviceSn !== "") {
                 // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
                 payload['proto_devicesearch@odata.bind'] = `/proto_nonyudevices(${data.deviceSn})`;
+            }
+            if (data.woType !== undefined && data.woType !== null && data.woType !== "") {
+                payload['proto_wotype@odata.bind'] = `/proto_wotypes(${data.woType})`;
             }
             if (data.paymentMainCategory !== undefined && data.paymentMainCategory !== null) {
                 const paymentMainCategoryValue = DataTransformer.toOptionSetNumber(data.paymentMainCategory);

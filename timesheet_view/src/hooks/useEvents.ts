@@ -18,6 +18,8 @@ export type EventData = {
     endUserName?: string | null;
     deviceSn?: string | null;
     deviceSnName?: string | null;
+    woType?: string | null;
+    woTypeName?: string | null;
     paymenttype?: number;
     timezone?: string;
     extendedProps?: Record<string, any>;
@@ -83,13 +85,16 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
-        `_proto_enduser_value;` +
+        `_proto_enduser_value,_proto_wotype_value;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
         `),` +
         `proto_devicesearch(` +
         `$select=proto_name` +
+        `),` +
+        `proto_wotype(` +
+        `$select=proto_wotypeid,proto_name` +
         `)` +
         `)`;
 
@@ -114,6 +119,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             endUserName: t['_proto_enduser_value@OData.Community.Display.V1.FormattedValue'] || null,
             deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
             deviceSnName: t.proto_devicesearch?.proto_name || null,
+            woType: t._proto_wotype_value?.replace(/[{}]/g, "") || t.proto_wotype?.proto_wotypeid?.replace(/[{}]/g, "") || null,
+            woTypeName: t.proto_wotype?.proto_name || t['_proto_wotype_value@OData.Community.Display.V1.FormattedValue'] || null,
             paymenttype: t.proto_paymenttype,
             timezone: t.proto_timezone ?? null,
             extendedProps: {
@@ -147,6 +154,8 @@ const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
         endUserName: event.endUserName || null,
         deviceSn: event.deviceSn || null,
         deviceSnName: event.deviceSnName || null,
+        woType: event.woType || null,
+        woTypeName: event.woTypeName || null,
         paymenttype: event.paymenttype?.toString(),
         timezone: event.timezone,
         workOrder: event.workOrderId,
@@ -248,6 +257,7 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
                 subcategory: data.subcategory || null,
                 endUser: data.endUser || null,
                 deviceSn: data.deviceSn || null,
+                woType: data.woType || null,
             };
 
             // Dataverse 環境

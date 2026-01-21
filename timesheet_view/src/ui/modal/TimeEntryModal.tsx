@@ -31,6 +31,7 @@ export interface TimeEntryModalProps {
     endUserOptions: Option[];
     deviceSnOptions: Option[];
     subcategoryOptions: Option[];
+    woTypeOptions: Option[];
     paymentMainCategoryOptions: Option[];
     isSubgrid?: boolean;
     selectedWO?: string;
@@ -57,6 +58,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     endUserOptions,
     deviceSnOptions,
     subcategoryOptions,
+    woTypeOptions,
     isSubgrid = false,
     selectedWO = "",
     selectedIndirectTask = null,
@@ -84,6 +86,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [sapBu, setSapBu] = useState("");
     const [deviceSn, setDeviceSn] = useState("");
     const [paymentMainCategory, setPaymentMainCategory] = useState("");
+    const [woType, setWoType] = useState("");
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -246,6 +249,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWisdomBu(selectedEvent.wisdomBu ?? "");
             setSapBu(selectedEvent.sapBu ?? "");
             setPaymentMainCategory(selectedEvent.paymentMainCategory ?? "");
+            setWoType((selectedEvent as any).woType ?? "");
         } else if (selectedDateTime) {
             setMode("create");
             const { start, end } = selectedDateTime;
@@ -352,6 +356,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWisdomBu("");
             setSapBu("");
             setPaymentMainCategory("");
+            setWoType("");
         }
     }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions]);
 
@@ -386,6 +391,12 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             const found = subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory);
             return found?.value || subcategory;
         };
+        
+        const getWoTypeId = () => {
+            if (!woType) return "";
+            const found = woTypeOptions.find(opt => opt.value === woType || opt.label === woType);
+            return found?.value || woType;
+        };
 
         onSubmit({
             id: selectedEvent?.id || "",
@@ -402,6 +413,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             paymentType,
             deviceSn: getDeviceSnId(),
             paymentMainCategory,
+            woType: getWoTypeId(),
             subcategory: getSubcategoryId(),
             task,
             workStatus,
@@ -452,6 +464,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             subcategory,
             subcategoryName: subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || null,
             paymentMainCategory,
+            woType,
+            woTypeName: woTypeOptions.find(opt => opt.value === woType || opt.label === woType)?.label || null,
             task,
             workStatus,
             comment,
@@ -727,6 +741,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     value={paymentMainCategory || ""}
                                     onChange={setPaymentMainCategory}
                                     placeholder="カテゴリを選択"
+                                />
+                            )}
+
+                            <label className="modal-label">{t("timeEntryModal.woType")}</label>
+                            {mode === "duplicate" || woType ? (
+                                <div className="readonly-text">
+                                    {(selectedEvent as any)?.woTypeName || woTypeOptions.find(opt => opt.value === woType || opt.label === woType)?.label || woType || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={woTypeOptions}
+                                    value={woType || ""}
+                                    onChange={setWoType}
+                                    placeholder={t("timeEntryModal.placeholders.selectWoType")}
                                 />
                             )}
 

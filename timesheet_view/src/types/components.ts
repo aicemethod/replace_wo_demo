@@ -63,6 +63,7 @@ export type TimeEntryModalProps = {
     timezoneOptions: Option[];
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
     selectedResourcesText?: string;
+    woTypeOptions: Option[];
 };
 
 /** FavoriteTaskModal Props */

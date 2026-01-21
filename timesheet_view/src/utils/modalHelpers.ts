@@ -28,6 +28,8 @@ export const createEventFromDuplicateData = (duplicateData: any): Event => {
         paymenttype: duplicateData.paymentType,
         deviceSn: duplicateData.deviceSn || null,
         deviceSnName: duplicateData.deviceSnName || null,
+        woType: duplicateData.woType || null,
+        woTypeName: duplicateData.woTypeName || null,
         subcategory: duplicateData.subcategory || null,
         subcategoryName: duplicateData.subcategoryName || null,
         task: duplicateData.task,

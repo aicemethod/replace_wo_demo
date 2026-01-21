@@ -92,6 +92,7 @@ function TimesheetApp() {
   const [endUserOptions, setEndUserOptions] = useState<Option[]>([]);
   const [deviceSnOptions, setDeviceSnOptions] = useState<Option[]>([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState<Option[]>([]);
+  const [woTypeOptions, setWoTypeOptions] = useState<Option[]>([]);
 
   /** ユーザーオプションを取得 */
   useEffect(() => {
@@ -193,6 +194,17 @@ function TimesheetApp() {
           label: item.proto_name || "",
         }));
         setSubcategoryOptions(subcategoryOpts);
+
+        // proto_wotypeを取得
+        const woTypeResult = await xrm.WebApi.retrieveMultipleRecords(
+          "proto_wotype",
+          "?$select=proto_wotypeid,proto_name&$orderby=proto_name"
+        );
+        const woTypeOpts: Option[] = woTypeResult.entities.map((item: any) => ({
+          value: item.proto_wotypeid?.replace(/[{}]/g, "") || "",
+          label: item.proto_name || "",
+        }));
+        setWoTypeOptions(woTypeOpts);
       } catch (err) {
         console.error("Lookupデータ取得エラー:", err);
       }
@@ -349,11 +361,12 @@ function TimesheetApp() {
         timezoneOptions={optionSets?.timezone ?? []}
         endUserOptions={endUserOptions}
         deviceSnOptions={deviceSnOptions}
-          subcategoryOptions={subcategoryOptions}
-          paymentMainCategoryOptions={optionSets?.maincategory ?? []}
-          isSubgrid={isSubgrid}
-          selectedWO={selectedWO}
-          selectedIndirectTask={selectedIndirectTask}
+        subcategoryOptions={subcategoryOptions}
+        woTypeOptions={woTypeOptions}
+        paymentMainCategoryOptions={optionSets?.maincategory ?? []}
+        isSubgrid={isSubgrid}
+        selectedWO={selectedWO}
+        selectedIndirectTask={selectedIndirectTask}
           selectedResourcesText={selectedSidebarResourcesText}
         />
 
