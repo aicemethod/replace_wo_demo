@@ -165,8 +165,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
         if (selectedEvent) {
             // 複製フラグをチェック
-            const isDuplicate = selectedEvent.isDuplicate;
-            setMode(isDuplicate ? "duplicate" : "edit");
+            setMode(selectedEvent.isDuplicate ? "duplicate" : "edit");
             const start = new Date(selectedEvent.start);
             const end = new Date(selectedEvent.end);
 
@@ -177,143 +176,67 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndHour(String(end.getHours()).padStart(2, "0"));
             setEndMinute(String(end.getMinutes()).padStart(2, "0"));
 
-            // proto_workorder フォームから値を取得（編集時は補完的に、複製時は上書き）
-            const protoFields = getWorkOrderProtoFields();
-
-            // WO番号
             setWo(selectedEvent.workOrder ?? "");
-
-            // メインカテゴリ（selectedEventの値がない場合、または複製時はproto_workorderの値を使用）
-            if (isDuplicate && protoFields?.proto_maincategory !== undefined && protoFields.proto_maincategory !== null) {
-                setMainCategory(String(protoFields.proto_maincategory));
-            } else {
-                setMainCategory(String(selectedEvent.maincategory ?? protoFields?.proto_maincategory ?? ""));
-            }
-
-            // タイムカテゴリ
+            setMainCategory(String(selectedEvent.maincategory ?? ""));
             setTimeCategory(String(selectedEvent.timecategory ?? ""));
-
-            // PaymentType（selectedEventの値がない場合、または複製時はproto_workorderの値を使用）
-            if (isDuplicate && protoFields?.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null) {
-                setPaymentType(String(protoFields.proto_paymenttype));
-            } else {
-                setPaymentType(String(selectedEvent.paymenttype ?? protoFields?.proto_paymenttype ?? ""));
-            }
-
+            setPaymentType(String(selectedEvent.paymenttype ?? ""));
             setComment(selectedEvent.comment ?? "");
-
-            // EndUser（selectedEventの値がない場合、または複製時はproto_workorderの値を使用）
-            if (isDuplicate && protoFields?.proto_enduser) {
-                const endUserName = protoFields.proto_enduser.name || "";
-                if (endUserName) {
-                    const endUserOption = endUserOptions.find(opt => opt.label === endUserName || opt.value === endUserName);
-                    setEndUser(endUserOption?.value || endUserName);
-                } else {
-                    setEndUser("");
-                }
-            } else {
-                if (selectedEvent.endUser) {
+            // EndUser（IDまたはnameから検索）
+            if (selectedEvent.endUser) {
+                const foundById = endUserOptions.find(opt => opt.value === selectedEvent.endUser);
+                if (foundById) {
                     setEndUser(selectedEvent.endUser);
-                } else if (protoFields?.proto_enduser) {
-                    const endUserName = protoFields.proto_enduser.name || "";
-                    if (endUserName) {
-                        const endUserOption = endUserOptions.find(opt => opt.label === endUserName || opt.value === endUserName);
-                        setEndUser(endUserOption?.value || endUserName);
-                    } else {
-                        setEndUser("");
-                    }
+                } else if ((selectedEvent as any).endUserName) {
+                    const foundByName = endUserOptions.find(opt => opt.label === (selectedEvent as any).endUserName);
+                    setEndUser(foundByName?.value || selectedEvent.endUser);
                 } else {
-                    setEndUser("");
+                    setEndUser(selectedEvent.endUser);
                 }
+            } else if ((selectedEvent as any).endUserName) {
+                const found = endUserOptions.find(opt => opt.label === (selectedEvent as any).endUserName);
+                setEndUser(found?.value || "");
+            } else {
+                setEndUser("");
             }
 
-            // DeviceSn（selectedEventの値がない場合、または複製時はproto_workorderの値を使用）
-            if (isDuplicate && protoFields?.proto_devicesearch) {
-                const deviceSnName = protoFields.proto_devicesearch.name || "";
-                if (deviceSnName) {
-                    const deviceSnOption = deviceSnOptions.find(opt => opt.label === deviceSnName || opt.value === deviceSnName);
-                    setDeviceSn(deviceSnOption?.value || deviceSnName);
-                } else {
-                    setDeviceSn("");
-                }
-            } else {
-                if (selectedEvent.deviceSn) {
+            // DeviceSn（IDまたはnameから検索）
+            if (selectedEvent.deviceSn) {
+                const foundById = deviceSnOptions.find(opt => opt.value === selectedEvent.deviceSn);
+                if (foundById) {
                     setDeviceSn(selectedEvent.deviceSn);
-                } else if (protoFields?.proto_devicesearch) {
-                    const deviceSnName = protoFields.proto_devicesearch.name || "";
-                    if (deviceSnName) {
-                        const deviceSnOption = deviceSnOptions.find(opt => opt.label === deviceSnName || opt.value === deviceSnName);
-                        setDeviceSn(deviceSnOption?.value || deviceSnName);
-                    } else {
-                        setDeviceSn("");
-                    }
+                } else if ((selectedEvent as any).deviceSnName) {
+                    const foundByName = deviceSnOptions.find(opt => opt.label === (selectedEvent as any).deviceSnName);
+                    setDeviceSn(foundByName?.value || selectedEvent.deviceSn);
                 } else {
-                    setDeviceSn("");
+                    setDeviceSn(selectedEvent.deviceSn);
                 }
-            }
-
-            // サブカテゴリ（selectedEventの値がない場合、または複製時はproto_workorderの値を使用）
-            if (isDuplicate && protoFields?.proto_subcategory) {
-                const subcategoryId = protoFields.proto_subcategory.id || "";
-                const subcategoryName = protoFields.proto_subcategory.name || "";
-                if (subcategoryId || subcategoryName) {
-                    let subcategoryOption = subcategoryId
-                        ? subcategoryOptions.find(opt => opt.value === subcategoryId)
-                        : null;
-                    if (!subcategoryOption && subcategoryName) {
-                        subcategoryOption = subcategoryOptions.find(opt => opt.label === subcategoryName);
-                    }
-                    if (subcategoryOption) {
-                        setSubcategory(subcategoryOption.value);
-                    } else if (subcategoryId) {
-                        setSubcategory(subcategoryId);
-                    } else {
-                        setSubcategory("");
-                    }
-                } else {
-                    setSubcategory("");
-                }
+            } else if ((selectedEvent as any).deviceSnName) {
+                const found = deviceSnOptions.find(opt => opt.label === (selectedEvent as any).deviceSnName);
+                setDeviceSn(found?.value || "");
             } else {
-                // 編集時：selectedEventの値を優先し、値がない場合はproto_workorderの値を使用
-                if (selectedEvent.subcategory) {
-                    const foundById = subcategoryOptions.find(opt => opt.value === selectedEvent.subcategory);
-                    if (foundById) {
-                        setSubcategory(selectedEvent.subcategory);
-                    } else if (selectedEvent.subcategoryName) {
-                        const foundByName = subcategoryOptions.find(opt => opt.label === selectedEvent.subcategoryName);
-                        setSubcategory(foundByName?.value || selectedEvent.subcategory);
-                    } else {
-                        setSubcategory(selectedEvent.subcategory);
-                    }
-                } else if (selectedEvent.subcategoryName) {
-                    const found = subcategoryOptions.find(opt => opt.label === selectedEvent.subcategoryName);
-                    setSubcategory(found?.value || "");
-                } else if (protoFields?.proto_subcategory) {
-                    // selectedEventに値がない場合、proto_workorderの値を使用
-                    const subcategoryId = protoFields.proto_subcategory.id || "";
-                    const subcategoryName = protoFields.proto_subcategory.name || "";
-                    if (subcategoryId || subcategoryName) {
-                        let subcategoryOption = subcategoryId
-                            ? subcategoryOptions.find(opt => opt.value === subcategoryId)
-                            : null;
-                        if (!subcategoryOption && subcategoryName) {
-                            subcategoryOption = subcategoryOptions.find(opt => opt.label === subcategoryName);
-                        }
-                        if (subcategoryOption) {
-                            setSubcategory(subcategoryOption.value);
-                        } else if (subcategoryId) {
-                            setSubcategory(subcategoryId);
-                        } else {
-                            setSubcategory("");
-                        }
-                    } else {
-                        setSubcategory("");
-                    }
-                } else {
-                    setSubcategory("");
-                }
+                setDeviceSn("");
             }
 
+            // サブカテゴリはIDとして取得（subcategoryNameがある場合はIDを探す）
+            if (selectedEvent.subcategory) {
+                // IDがsubcategoryOptionsに存在するか確認
+                const foundById = subcategoryOptions.find(opt => opt.value === selectedEvent.subcategory);
+                if (foundById) {
+                    setSubcategory(selectedEvent.subcategory);
+                } else if (selectedEvent.subcategoryName) {
+                    // IDが見つからない場合、subcategoryNameからIDを探す
+                    const foundByName = subcategoryOptions.find(opt => opt.label === selectedEvent.subcategoryName);
+                    setSubcategory(foundByName?.value || selectedEvent.subcategory);
+                } else {
+                    setSubcategory(selectedEvent.subcategory);
+                }
+            } else if (selectedEvent.subcategoryName) {
+                // subcategoryNameからIDを探す
+                const found = subcategoryOptions.find(opt => opt.label === selectedEvent.subcategoryName);
+                setSubcategory(found?.value || "");
+            } else {
+                setSubcategory("");
+            }
             setTask(selectedEvent.task ?? "");
             setWorkStatus(String(selectedEvent.workStatus ?? ""));
             setTimezone(String(selectedEvent.timezone ?? ""));
