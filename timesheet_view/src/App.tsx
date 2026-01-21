@@ -78,6 +78,8 @@ function TimesheetApp() {
   const [isHeaderSelectLoading, setIsHeaderSelectLoading] = useState(true);
   /** サイドバーで選択されているタスク */
   const [selectedSidebarTask, setSelectedSidebarTask] = useState<string[]>([]);
+  /** サイドバーで選択されているリソース（表示用文字列） */
+  const [selectedSidebarResourcesText, setSelectedSidebarResourcesText] = useState<string>("");
 
   /** 選択されているタスク情報を取得（最初の1つを使用） */
   const { favoriteTasks } = useFavoriteTasks();
@@ -305,6 +307,9 @@ function TimesheetApp() {
             mainTab={mainTab}
             selectedTask={selectedSidebarTask}
             onTaskSelect={setSelectedSidebarTask}
+            onResourceSelectionChange={(resources) =>
+              setSelectedSidebarResourcesText(resources.map((r) => r.label).join("\n"))
+            }
           />
 
           <div className="content-main">
@@ -329,11 +334,11 @@ function TimesheetApp() {
       </section>
 
       {/* モーダル群 */}
-      <TimeEntryModal
-        isOpen={isTimeEntryModalOpen}
-        onClose={() => setIsTimeEntryModalOpen(false)}
-        onSubmit={handleTimeEntrySubmit}
-        onDelete={handleDeleteTimeEntry}
+        <TimeEntryModal
+          isOpen={isTimeEntryModalOpen}
+          onClose={() => setIsTimeEntryModalOpen(false)}
+          onSubmit={handleTimeEntrySubmit}
+          onDelete={handleDeleteTimeEntry}
         onDuplicate={handleDuplicate}
         selectedDateTime={selectedDateTime}
         selectedEvent={selectedEvent}
@@ -344,12 +349,13 @@ function TimesheetApp() {
         timezoneOptions={optionSets?.timezone ?? []}
         endUserOptions={endUserOptions}
         deviceSnOptions={deviceSnOptions}
-        subcategoryOptions={subcategoryOptions}
-        paymentMainCategoryOptions={optionSets?.maincategory ?? []}
-        isSubgrid={isSubgrid}
-        selectedWO={selectedWO}
-        selectedIndirectTask={selectedIndirectTask}
-      />
+          subcategoryOptions={subcategoryOptions}
+          paymentMainCategoryOptions={optionSets?.maincategory ?? []}
+          isSubgrid={isSubgrid}
+          selectedWO={selectedWO}
+          selectedIndirectTask={selectedIndirectTask}
+          selectedResourcesText={selectedSidebarResourcesText}
+        />
 
       <FavoriteTaskModal
         isOpen={isFavoriteTaskModalOpen}

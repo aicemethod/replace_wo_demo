@@ -34,6 +34,7 @@ export type SidebarProps = {
     mainTab: MainTab;
     selectedTask?: string[];
     onTaskSelect?: (taskIds: string[]) => void;
+    onResourceSelectionChange?: (resources: { id: string; label: string }[]) => void;
 };
 
 /** CalendarView Props */
@@ -61,6 +62,7 @@ export type TimeEntryModalProps = {
     paymenttypeOptions: Option[];
     timezoneOptions: Option[];
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
+    selectedResourcesText?: string;
 };
 
 /** FavoriteTaskModal Props */

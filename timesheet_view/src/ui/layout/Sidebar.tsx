@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import * as FaIcons from "react-icons/fa";
 import { Input } from "../components/Input";
 import "../styles/layout/Sidebar.css";
@@ -13,7 +13,12 @@ import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
 /**
  * Sidebar コンポーネント
  */
-export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = [], onTaskSelect }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+    mainTab,
+    selectedTask = [],
+    onTaskSelect,
+    onResourceSelectionChange,
+}) => {
     const { t } = useTranslation();
     const { favoriteTasks } = useFavoriteTasks(); //  Contextからお気に入りタスク取得
 
@@ -49,6 +54,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab, selectedTask = [], on
             fullName: `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim(),
         };
     }, [currentUser, isUserLoading, t]);
+
+    useEffect(() => {
+        if (!onResourceSelectionChange) return;
+
+        const selectedResources = selectedUsers.map((userId) => {
+            if (userId === "self") {
+                const number = `${displaySelf.number}${t("resource.selfTag")}`;
+                const name = displaySelf.fullName || t("resource.noName");
+                return {
+                    id: "self",
+                    label: `${number} ${name}`,
+                };
+            }
+
+            const user = resources.find((r) => r.id === userId);
+            if (!user) {
+                return {
+                    id: userId,
+                    label: `${t("resource.unknownId")} ${t("resource.noName")}`,
+                };
+            }
+
+            const number = user.number ?? t("resource.unknownId");
+            const name = user.name ?? t("resource.noName");
+            return {
+                id: user.id,
+                label: `${number} ${name}`,
+            };
+        });
+
+        onResourceSelectionChange(selectedResources);
+    }, [displaySelf, onResourceSelectionChange, resources, selectedUsers, t]);
 
     /** 表示対象ユーザー（許可済みのみ） */
     const visibleUsers = useMemo(() => {

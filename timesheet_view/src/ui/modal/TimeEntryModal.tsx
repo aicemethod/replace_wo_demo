@@ -35,6 +35,7 @@ export interface TimeEntryModalProps {
     isSubgrid?: boolean;
     selectedWO?: string;
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
+    selectedResourcesText?: string;
 }
 
 /* =========================================================
@@ -59,6 +60,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     isSubgrid = false,
     selectedWO = "",
     selectedIndirectTask = null,
+    selectedResourcesText = "",
 }) => {
     const { t } = useTranslation();
 
@@ -352,6 +354,12 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setPaymentMainCategory("");
         }
     }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        if (selectedEvent) return;
+        setResource(selectedResourcesText);
+    }, [isOpen, selectedEvent, selectedResourcesText]);
 
     /* -------------------------------
        💾 保存処理
