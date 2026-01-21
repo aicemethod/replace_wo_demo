@@ -228,7 +228,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 <label key={user.id} className="sidebar-result-item clickable">
                                     <input
                                         type="checkbox"
-                                        className="sidebar-checkbox sidebar-checkbox-radio"
+                                        className="sidebar-checkbox"
                                         checked={selectedUsers.includes(user.id)}
                                         onChange={() => toggleSelect(user.id)}
                                     />
