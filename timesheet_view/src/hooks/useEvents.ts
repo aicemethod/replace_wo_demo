@@ -77,13 +77,11 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `&$expand=${navigationName}(` +
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone;` +
+        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
+        `_proto_enduser_value;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
-        `),` +
-        `proto_enduser(` +
-        `$select=accountid,name` +
         `),` +
         `proto_devicesearch(` +
         `$select=proto_name` +
@@ -107,8 +105,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             timecategory: t.proto_timecategory,
             subcategory: t._proto_subcategory_value?.replace(/[{}]/g, "") || t.proto_subcategory?.proto_subcategoryid?.replace(/[{}]/g, "") || null,
             subcategoryName: t.proto_subcategory?.proto_name || null,
-            endUser: t._proto_enduser_value?.replace(/[{}]/g, "") || t.proto_enduser?.accountid?.replace(/[{}]/g, "") || null,
-            endUserName: t.proto_enduser?.name || null,
+            endUser: t._proto_enduser_value?.replace(/[{}]/g, "") || null,
+            endUserName: null, // endUserOptionsから検索して取得
             deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
             deviceSnName: t.proto_devicesearch?.proto_name || null,
             paymenttype: t.proto_paymenttype,
