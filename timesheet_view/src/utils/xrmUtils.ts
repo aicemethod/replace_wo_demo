@@ -275,41 +275,14 @@ export const getWorkOrderProtoFields = (): {
 
         // proto_enduser (Lookup)
         const endUserAttr = getAttr("proto_enduser");
-        console.log("proto_enduser attribute:", endUserAttr);
         if (endUserAttr) {
-            try {
-                const endUserValue = endUserAttr.getValue();
-                console.log("proto_enduser value:", endUserValue);
-                if (endUserValue) {
-                    // Lookupフィールドの値は配列またはオブジェクト
-                    const value = Array.isArray(endUserValue) ? endUserValue[0] : endUserValue;
-                    if (value && (value.id || value.name)) {
-                        result.proto_enduser = {
-                            id: value.id?.replace(/[{}]/g, "") || "",
-                            name: value.name || "",
-                        };
-                        console.log("proto_enduser 取得成功:", result.proto_enduser);
-                    } else {
-                        console.log("proto_enduser の値が無効です:", value);
-                    }
-                } else {
-                    console.log("proto_enduser の値が null または undefined です");
-                }
-            } catch (err) {
-                console.error("proto_enduser 取得エラー:", err);
-            }
-        } else {
-            console.log("proto_enduser attribute が取得できませんでした");
-            // 代替方法: 直接エンティティから取得を試みる
-            try {
-                if (page.data && page.data.entity) {
-                    const entity = page.data.entity;
-                    // すべての属性名を取得して確認
-                    const attributes = entity.attributes;
-                    console.log("利用可能な属性:", attributes ? Object.keys(attributes.get()) : "取得できません");
-                }
-            } catch (err) {
-                console.error("属性一覧取得エラー:", err);
+            const endUserValue = endUserAttr.getValue();
+            if (endUserValue && endUserValue.length > 0) {
+                const value = Array.isArray(endUserValue) ? endUserValue[0] : endUserValue;
+                result.proto_enduser = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
             }
         }
 
