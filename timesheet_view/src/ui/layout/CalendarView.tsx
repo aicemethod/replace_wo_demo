@@ -259,12 +259,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             className="context-menu-item"
                             onClick={() => {
                                 const event = events.find(e => String(e.id) === contextMenu.eventId);
-                                if (event) {
+                                if (event && event.start != null && event.end != null) {
+                                    const parseDate = (date: string | number | number[] | Date): Date => {
+                                        if (date instanceof Date) {
+                                            return date;
+                                        }
+                                        if (Array.isArray(date)) {
+                                            // number[]形式: [year, month, day] または [year, month, day, hour, minute]
+                                            return new Date(date[0], date[1] ?? 0, date[2] ?? 1, date[3] ?? 0, date[4] ?? 0);
+                                        }
+                                        return new Date(date);
+                                    };
                                     onEventDuplicate({
                                         id: String(event.id),
                                         title: String(event.title || ''),
-                                        start: event.start instanceof Date ? event.start : new Date(event.start),
-                                        end: event.end instanceof Date ? event.end : new Date(event.end),
+                                        start: parseDate(event.start),
+                                        end: parseDate(event.end),
                                         extendedProps: event.extendedProps,
                                     });
                                 }
