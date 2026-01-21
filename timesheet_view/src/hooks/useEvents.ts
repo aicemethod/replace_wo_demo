@@ -12,7 +12,12 @@ export type EventData = {
     workOrderId: string;
     maincategory?: number;
     timecategory?: number;
-    subcategory?: number;
+    subcategory?: string | number | null;
+    subcategoryName?: string | null;
+    endUser?: string | null;
+    endUserName?: string | null;
+    deviceSn?: string | null;
+    deviceSnName?: string | null;
     paymenttype?: number;
     timezone?: string;
     extendedProps?: Record<string, any>;
@@ -136,12 +141,12 @@ const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
         end: new Date(event.end),
         maincategory: event.maincategory?.toString(),
         timecategory: event.timecategory?.toString(),
-        subcategory: (event as any).subcategory || null,
-        subcategoryName: (event as any).subcategoryName || null,
-        endUser: (event as any).endUser || null,
-        endUserName: (event as any).endUserName || null,
-        deviceSn: (event as any).deviceSn || null,
-        deviceSnName: (event as any).deviceSnName || null,
+        subcategory: event.subcategory || null,
+        subcategoryName: event.subcategoryName || null,
+        endUser: event.endUser || null,
+        endUserName: event.endUserName || null,
+        deviceSn: event.deviceSn || null,
+        deviceSnName: event.deviceSnName || null,
         paymenttype: event.paymenttype?.toString(),
         timezone: event.timezone,
         workOrder: event.workOrderId,
