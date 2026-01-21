@@ -219,20 +219,41 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             // 現在開いている proto_workorder から値を取得して反映
             const protoFields = getWorkOrderProtoFields();
             if (protoFields) {
-                // proto_enduser -> EndUser (nameを使用)
+                // proto_enduser -> EndUser (nameからIDを検索)
                 const endUserName = protoFields.proto_enduser?.name || "";
                 console.log("proto_workorderから取得したEndUser:", endUserName);
-                setEndUser(endUserName);
-                // proto_devicesearch -> 装置S/N (nameを使用)
+                if (endUserName) {
+                    const endUserOption = endUserOptions.find(opt => opt.label === endUserName || opt.value === endUserName);
+                    setEndUser(endUserOption?.value || endUserName);
+                } else {
+                    setEndUser("");
+                }
+
+                // proto_devicesearch -> 装置S/N (nameからIDを検索)
                 const deviceSnName = protoFields.proto_devicesearch?.name || "";
                 console.log("proto_workorderから取得した装置SN:", deviceSnName);
-                setDeviceSn(deviceSnName);
+                if (deviceSnName) {
+                    const deviceSnOption = deviceSnOptions.find(opt => opt.label === deviceSnName || opt.value === deviceSnName);
+                    setDeviceSn(deviceSnOption?.value || deviceSnName);
+                } else {
+                    setDeviceSn("");
+                }
+
                 // proto_paymenttype -> PaymentType
                 setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
+
                 // proto_maincategory -> メインカテゴリ
                 setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
-                // proto_subcategory -> サブカテゴリ (nameを使用)
-                setSubcategory(protoFields.proto_subcategory?.name || "");
+
+                // proto_subcategory -> サブカテゴリ (nameからIDを検索)
+                const subcategoryName = protoFields.proto_subcategory?.name || "";
+                console.log("proto_workorderから取得したサブカテゴリ:", subcategoryName);
+                if (subcategoryName) {
+                    const subcategoryOption = subcategoryOptions.find(opt => opt.label === subcategoryName || opt.value === subcategoryName);
+                    setSubcategory(subcategoryOption?.value || subcategoryName);
+                } else {
+                    setSubcategory("");
+                }
             } else {
                 // 取得できない場合は空で初期化
                 setEndUser("");
@@ -265,7 +286,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setSapBu("");
             setPaymentMainCategory("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions]);
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions]);
 
     /* -------------------------------
        💾 保存処理
