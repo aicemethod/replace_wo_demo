@@ -285,6 +285,19 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     setDeviceSn("");
                 }
 
+                // proto_wotype -> WO種別 (nameまたはIDから検索)
+                const woTypeName = protoFields.proto_wotype?.name || "";
+                const woTypeId = protoFields.proto_wotype?.id || "";
+                console.log("proto_workorderから取得したWO種別:", woTypeName || woTypeId);
+                if (woTypeId || woTypeName) {
+                    const woTypeOption = woTypeOptions.find(
+                        opt => opt.value === woTypeId || opt.label === woTypeName || opt.value === woTypeName
+                    );
+                    setWoType(woTypeOption?.value || woTypeId || woTypeName);
+                } else {
+                    setWoType("");
+                }
+
                 // proto_paymenttype -> PaymentType
                 setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
 
@@ -324,6 +337,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 setPaymentType("");
                 setMainCategory("");
                 setSubcategory("");
+                setWoType("");
             }
 
             // 間接タスクが選択されている場合の処理
@@ -352,9 +366,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setResource("");
             setWisdomBu("");
             setSapBu("");
-            setWoType("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions]);
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions, woTypeOptions]);
 
     useEffect(() => {
         if (!isOpen) return;

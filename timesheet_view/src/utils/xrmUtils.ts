@@ -212,6 +212,7 @@ export const getWorkOrderProtoFields = (): {
     proto_workorderid: string | null;
     proto_enduser?: { id: string; name: string } | null;
     proto_devicesearch?: { id: string; name: string } | null;
+    proto_wotype?: { id: string; name: string } | null;
     proto_paymenttype?: number | null;
     proto_maincategory?: number | null;
     proto_subcategory?: { id: string; name: string } | null;
@@ -266,6 +267,7 @@ export const getWorkOrderProtoFields = (): {
             proto_workorderid: string | null;
             proto_enduser?: { id: string; name: string } | null;
             proto_devicesearch?: { id: string; name: string } | null;
+            proto_wotype?: { id: string; name: string } | null;
             proto_paymenttype?: number | null;
             proto_maincategory?: number | null;
             proto_subcategory?: { id: string; name: string } | null;
@@ -293,6 +295,19 @@ export const getWorkOrderProtoFields = (): {
             if (deviceSearchValue && deviceSearchValue.length > 0) {
                 const value = Array.isArray(deviceSearchValue) ? deviceSearchValue[0] : deviceSearchValue;
                 result.proto_devicesearch = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
+            }
+        }
+
+        // proto_wotype (Lookup)
+        const woTypeAttr = getAttr("proto_wotype");
+        if (woTypeAttr) {
+            const woTypeValue = woTypeAttr.getValue();
+            if (woTypeValue && woTypeValue.length > 0) {
+                const value = Array.isArray(woTypeValue) ? woTypeValue[0] : woTypeValue;
+                result.proto_wotype = {
                     id: value.id?.replace(/[{}]/g, "") || "",
                     name: value.name || "",
                 };
