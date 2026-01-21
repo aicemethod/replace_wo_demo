@@ -319,6 +319,7 @@ function TimesheetApp() {
               }}
               onEventClick={handleEventClick}
               onEventDuplicate={handleEventDuplicate}
+              onEventDelete={handleDeleteTimeEntry}
               events={mergedEvents}
               isSubgrid={isSubgrid}
             />

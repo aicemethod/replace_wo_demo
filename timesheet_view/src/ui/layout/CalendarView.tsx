@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
-import type { EventInput, DateSelectArg, EventClickArg, EventContentArg } from "@fullcalendar/core";
+import type { EventInput, DateSelectArg, EventClickArg, EventContentArg, EventApi } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -33,6 +33,7 @@ export type CalendarViewProps = {
         end: Date;
         extendedProps?: Record<string, any>;
     }) => void;
+    onEventDelete?: (id: string) => void;
     events: EventInput[];
     isSubgrid?: boolean;
 };
@@ -50,12 +51,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     onDateClick,
     onEventClick,
     onEventDuplicate,
+    onEventDelete,
     events,
     isSubgrid = false,
 }) => {
     const calendarRef = useRef<FullCalendar>(null);
     const isInternalUpdateRef = useRef(false);
-    const { i18n } = useTranslation();
+    const { i18n, t } = useTranslation();
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number; eventId: string } | null>(null);
 
     /** 言語に応じた FullCalendar locale の選択 */
     const currentLocale = i18n.language.startsWith("ja") ? jaLocale : enLocale;
@@ -152,6 +155,43 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         }
     };
 
+    /** イベントマウント時に右クリックイベントを追加 */
+    const handleEventDidMount = (arg: { event: EventApi; el: HTMLElement }) => {
+        const { event, el } = arg;
+        
+        const handleContextMenu = (e: MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            setContextMenu({
+                x: e.clientX,
+                y: e.clientY,
+                eventId: String(event.id),
+            });
+        };
+
+        el.addEventListener('contextmenu', handleContextMenu);
+
+        // クリーンアップ関数を返す（FullCalendarが自動的に呼び出す）
+        return () => {
+            el.removeEventListener('contextmenu', handleContextMenu);
+        };
+    };
+
+    /** メニュー外をクリックしたら閉じる */
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setContextMenu(null);
+        };
+
+        if (contextMenu) {
+            document.addEventListener('click', handleClickOutside);
+            return () => {
+                document.removeEventListener('click', handleClickOutside);
+            };
+        }
+    }, [contextMenu]);
+
     return (
         <div className={`calendar-wrapper ${isSubgrid ? 'is-subgrid' : ''}`}>
             <FullCalendar
@@ -200,8 +240,53 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     arg.event.extendedProps?.isTargetWO ? ["highlight-event"] : []
                 }
                 eventContent={renderEventContent}
+                eventDidMount={handleEventDidMount}
                 datesSet={handleDatesSet}
             />
+            {contextMenu && (
+                <div
+                    className="event-context-menu"
+                    style={{
+                        position: 'fixed',
+                        left: `${contextMenu.x}px`,
+                        top: `${contextMenu.y}px`,
+                        zIndex: 10000,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {onEventDuplicate && (
+                        <div
+                            className="context-menu-item"
+                            onClick={() => {
+                                const event = events.find(e => String(e.id) === contextMenu.eventId);
+                                if (event) {
+                                    onEventDuplicate({
+                                        id: String(event.id),
+                                        title: String(event.title || ''),
+                                        start: event.start instanceof Date ? event.start : new Date(event.start),
+                                        end: event.end instanceof Date ? event.end : new Date(event.end),
+                                        extendedProps: event.extendedProps,
+                                    });
+                                }
+                                setContextMenu(null);
+                            }}
+                        >
+                            {t("timeEntryModal.duplicate") || "複製"}
+                        </div>
+                    )}
+                    {onEventDelete && (
+                        <div
+                            className="context-menu-item"
+                            onClick={() => {
+                                onEventDelete(contextMenu.eventId);
+                                setContextMenu(null);
+                            }}
+                        >
+                            {t("timeEntryModal.delete") || "削除"}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
