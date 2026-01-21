@@ -83,7 +83,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
-        `_proto_enduser_value;` +
+        `_proto_enduser_value,_proto_enduser_value@OData.Community.Display.V1.FormattedValue;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
@@ -111,7 +111,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             subcategory: t._proto_subcategory_value?.replace(/[{}]/g, "") || t.proto_subcategory?.proto_subcategoryid?.replace(/[{}]/g, "") || null,
             subcategoryName: t.proto_subcategory?.proto_name || null,
             endUser: t._proto_enduser_value?.replace(/[{}]/g, "") || null,
-            endUserName: null, // endUserOptionsから検索して取得
+            endUserName: t['_proto_enduser_value@OData.Community.Display.V1.FormattedValue'] || null,
             deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
             deviceSnName: t.proto_devicesearch?.proto_name || null,
             paymenttype: t.proto_paymenttype,
