@@ -540,12 +540,18 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     {!isSubgrid && (
                         <>
                             <label className="modal-label">{t("timeEntryModal.woNumber")}</label>
-                            <Select
-                                options={filteredWoOptions}
-                                value={wo || ""}
-                                onChange={setWo}
-                                placeholder={t("timeEntryModal.placeholders.selectWO")}
-                            />
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">
+                                    {filteredWoOptions.find(opt => opt.value === wo)?.label || wo || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={filteredWoOptions}
+                                    value={wo || ""}
+                                    onChange={setWo}
+                                    placeholder={t("timeEntryModal.placeholders.selectWO")}
+                                />
+                            )}
                         </>
                     )}
 
@@ -590,9 +596,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
 
                             <label className="modal-label">EndUser</label>
-                            {endUser ? (
+                            {mode === "duplicate" || endUser ? (
                                 <div className="readonly-text">
-                                    {endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser}
+                                    {endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -604,12 +610,18 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.location")}</label>
-                            <Select
-                                options={timezoneOptions}
-                                value={timezone || ""}
-                                onChange={setTimezone}
-                                placeholder={t("timeEntryModal.placeholders.selectLocation")}
-                            />
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">
+                                    {timezoneOptions.find(opt => opt.value === timezone)?.label || timezone || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={timezoneOptions}
+                                    value={timezone || ""}
+                                    onChange={setTimezone}
+                                    placeholder={t("timeEntryModal.placeholders.selectLocation")}
+                                />
+                            )}
 
                             <div className="resource-header">
                                 <label className="modal-label">{t("timeEntryModal.resource")}</label>
@@ -627,25 +639,33 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
 
                             <label className="modal-label">WISDOM BU</label>
-                            <Select
-                                options={[]}
-                                value={wisdomBu || ""}
-                                onChange={setWisdomBu}
-                                placeholder="WISDOM BU を選択"
-                            />
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">{wisdomBu || "-"}</div>
+                            ) : (
+                                <Select
+                                    options={[]}
+                                    value={wisdomBu || ""}
+                                    onChange={setWisdomBu}
+                                    placeholder="WISDOM BU を選択"
+                                />
+                            )}
 
                             <label className="modal-label">SAP BU</label>
-                            <Select
-                                options={[]}
-                                value={sapBu || ""}
-                                onChange={setSapBu}
-                                placeholder="SAP BU を選択"
-                            />
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">{sapBu || "-"}</div>
+                            ) : (
+                                <Select
+                                    options={[]}
+                                    value={sapBu || ""}
+                                    onChange={setSapBu}
+                                    placeholder="SAP BU を選択"
+                                />
+                            )}
                         </div>
 
                         <div>
                             <label className="modal-label">{t("timeEntryModal.timeCategory")}</label>
-                            {selectedIndirectTask ? (
+                            {mode === "duplicate" || selectedIndirectTask ? (
                                 <div className="readonly-text">
                                     {timecategoryOptions.find(opt => opt.value === timeCategory)?.label || "-"}
                                 </div>
@@ -659,9 +679,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">装置S/N</label>
-                            {deviceSn ? (
+                            {mode === "duplicate" || deviceSn ? (
                                 <div className="readonly-text">
-                                    {deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn}
+                                    {deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -687,18 +707,22 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )} */}
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
-                            <Select
-                                // options={paymentMainCategoryOptions}
-                                options={[]}
-                                value={paymentMainCategory || ""}
-                                onChange={setPaymentMainCategory}
-                                placeholder="カテゴリを選択"
-                            />
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">{paymentMainCategory || "-"}</div>
+                            ) : (
+                                <Select
+                                    // options={paymentMainCategoryOptions}
+                                    options={[]}
+                                    value={paymentMainCategory || ""}
+                                    onChange={setPaymentMainCategory}
+                                    placeholder="カテゴリを選択"
+                                />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
-                            {paymentType ? (
+                            {mode === "duplicate" || paymentType ? (
                                 <div className="readonly-text">
-                                    {paymenttypeOptions.find(opt => opt.value === paymentType)?.label || paymentType}
+                                    {paymenttypeOptions.find(opt => opt.value === paymentType)?.label || paymentType || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -710,9 +734,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">メインカテゴリ</label>
-                            {mainCategory ? (
+                            {mode === "duplicate" || mainCategory ? (
                                 <div className="readonly-text">
-                                    {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory}
+                                    {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -732,9 +756,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             /> */}
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
-                            {subcategory ? (
+                            {mode === "duplicate" || subcategory ? (
                                 <div className="readonly-text">
-                                    {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory}
+                                    {subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -746,17 +770,23 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">作業ステータス</label>
-                            <Select
-                                options={workStatusOptions}
-                                value={workStatus || ""}
-                                onChange={setWorkStatus}
-                                placeholder="作業ステータスを選択"
-                            />
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">
+                                    {workStatusOptions.find(opt => opt.value === workStatus)?.label || workStatus || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={workStatusOptions}
+                                    value={workStatus || ""}
+                                    onChange={setWorkStatus}
+                                    placeholder="作業ステータスを選択"
+                                />
+                            )}
 
                             <label className="modal-label">{t("timeEntryModal.task")}</label>
-                            {selectedIndirectTask ? (
+                            {mode === "duplicate" || selectedIndirectTask ? (
                                 <div className="readonly-text">
-                                    {task || "-"}
+                                    {taskOptions.find(opt => opt.value === task)?.label || task || "-"}
                                 </div>
                             ) : (
                                 <Select
@@ -767,15 +797,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <Textarea
-                                label={t("timeEntryModal.comment")}
-                                value={comment}
-                                onChange={setComment}
-                                placeholder={t("timeEntryModal.placeholders.enterComment")}
-                                rows={4}
-                                showCount
-                                maxLength={2000}
-                            />
+                            <label className="modal-label">{t("timeEntryModal.comment")}</label>
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">{comment || "-"}</div>
+                            ) : (
+                                <Textarea
+                                    label={t("timeEntryModal.comment")}
+                                    value={comment}
+                                    onChange={setComment}
+                                    placeholder={t("timeEntryModal.placeholders.enterComment")}
+                                    rows={4}
+                                    showCount
+                                    maxLength={2000}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
