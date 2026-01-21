@@ -121,6 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return [...favoriteTasks].sort(sortBy[taskSortOption]);
     }, [favoriteTasks, taskSortOption]);
 
+
     /** ユーザー選択トグル */
     const toggleSelect = (userId: string) => {
         setSelectedUsers((prev) =>
@@ -281,7 +282,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 <label key={task.id} className="sidebar-task-radio clickable">
                                     <input
                                         type="checkbox"
-                                        className="sidebar-checkbox"
+                                        className="sidebar-task-checkbox"
                                         checked={selectedTask.includes(task.id)}
                                         onChange={() => {
                                             const newSelected = selectedTask.includes(task.id)

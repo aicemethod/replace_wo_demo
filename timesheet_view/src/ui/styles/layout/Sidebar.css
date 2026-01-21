@@ -356,6 +356,50 @@
     opacity: 1;
 }
 
+/* タスク選択（ラジオ風） */
+.sidebar-task-checkbox {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--main-color);
+    border-radius: 50%;
+    background-color: #fff;
+    margin-right: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.sidebar-task-checkbox:hover {
+    box-shadow: 0 0 0 3px rgba(0, 137, 186, 0.08);
+}
+
+.sidebar-task-checkbox:checked {
+    border-color: var(--main-color);
+    background-color: #fff;
+}
+
+.sidebar-task-checkbox::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--main-color);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sidebar-task-checkbox:checked::after {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
 /* タスク名 */
 .sidebar-task-lines {
     display: flex;
