@@ -30,7 +30,7 @@ export async function fetchFileData(): Promise<FileData[]> {
     const filterQuery = `_proto_wonumber_value eq ${currentRecordId}`;
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
-      `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype,_objectid_value`
+      `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype`
     );
 
     if (attachmentResult.entities.length === 0) {
