@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FiSave, FiRefreshCw, FiPlus } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiPlus, FiTrash2 } from 'react-icons/fi';
 import type { FileData } from '../types';
 import { fetchFileData } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
@@ -12,6 +12,9 @@ export default function FileTable() {
   const [isSaving, setIsSaving] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [addMenuPosition, setAddMenuPosition] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [showAddRow, setShowAddRow] = useState(false);
+  const [newFilename, setNewFilename] = useState('');
+  const [newFileType, setNewFileType] = useState('TSR');
 
   const loadData = async () => {
     try {
@@ -62,6 +65,23 @@ export default function FileTable() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      if (showAddRow) {
+        const now = new Date().toISOString();
+        const newItem: FileData = {
+          id: `new-${Date.now()}`,
+          filename: newFilename,
+          Mimetype: newFileType,
+          createdon: now,
+          selected: false
+        };
+        setFiles((prevFiles) => [newItem, ...prevFiles]);
+        setShowAddRow(false);
+        setNewFilename('');
+        setNewFileType('TSR');
+        setIsAddMenuOpen(false);
+        setAddMenuPosition(null);
+        return;
+      }
       // TODO: 選択されたファイルの保存処理を実装
       const selectedFiles = files.filter((file) => file.selected);
       console.log('保存するファイル:', selectedFiles);
@@ -89,6 +109,7 @@ export default function FileTable() {
     setIsAddMenuOpen(true);
   }, [isAddMenuOpen]);
 
+  const selectableTypes = new Set(['TSR', '技術検収書']);
   const addMenuOptions = [
     { value: 'tsr', label: 'TSR' },
     { value: 'technical-review', label: '技術検収書' },
@@ -97,9 +118,17 @@ export default function FileTable() {
   ];
 
   const handleAddOption = (value: string) => {
-    console.log('追加:', value);
+    const typeLabel = addMenuOptions.find((option) => option.value === value)?.label || 'TSR';
+    setNewFileType(typeLabel);
+    setShowAddRow(true);
     setIsAddMenuOpen(false);
     setAddMenuPosition(null);
+  };
+
+  const handleAddCancel = () => {
+    setShowAddRow(false);
+    setNewFilename('');
+    setNewFileType('TSR');
   };
 
   if (loading) {
@@ -157,24 +186,46 @@ export default function FileTable() {
             type="button"
             className="action-button save-button"
             onClick={handleSave}
-            disabled={isSaving || files.filter((f) => f.selected).length === 0}
+            disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
             style={{
               padding: '0',
               border: 'none',
               backgroundColor: 'transparent',
-              color: isSaving || files.filter((f) => f.selected).length === 0 ? '#bbb' : '#115ea3',
+              color: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? '#bbb' : '#115ea3',
               fontSize: '14px',
-              cursor: isSaving || files.filter((f) => f.selected).length === 0 ? 'not-allowed' : 'pointer',
+              cursor: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              opacity: isSaving || files.filter((f) => f.selected).length === 0 ? 0.5 : 1
+              opacity: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 0.5 : 1
             }}
             title="保存"
           >
             <FiSave size={16} />
             <span>保存</span>
           </button>
+          {showAddRow && (
+            <button
+              type="button"
+              className="action-button cancel-button"
+              onClick={handleAddCancel}
+              style={{
+                padding: '0',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#d32f2f',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title="キャンセル"
+            >
+              <FiTrash2 size={16} />
+              <span>キャンセル</span>
+            </button>
+          )}
           <button
             type="button"
             className="action-button refresh-button"
@@ -204,7 +255,7 @@ export default function FileTable() {
         </div>
       </div>
       {/* デスクトップ用テーブル表示 */}
-      <div className="file-table-wrapper">
+          <div className="file-table-wrapper">
         <table className="file-table">
           <thead>
             <tr>
@@ -216,7 +267,41 @@ export default function FileTable() {
             </tr>
           </thead>
           <tbody>
-            {files.length === 0 ? (
+            {showAddRow && (
+              <tr className="file-table-add-row">
+                <td className="col-select">
+                  <label className="toggle-switch toggle-switch-disabled">
+                    <input type="checkbox" checked={false} disabled aria-label="選択不可" />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </td>
+                <td className="col-filename">
+                  <input
+                    type="text"
+                    className="file-table-input"
+                    value={newFilename}
+                    onChange={(e) => setNewFilename(e.target.value)}
+                    placeholder="ファイル名"
+                  />
+                </td>
+                <td className="col-type">
+                  <select
+                    className="file-table-select"
+                    value={newFileType}
+                    onChange={(e) => setNewFileType(e.target.value)}
+                  >
+                    {addMenuOptions.map((option) => (
+                      <option key={option.value} value={option.label}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td className="col-created">-</td>
+                <td className="col-sync">-</td>
+              </tr>
+            )}
+            {files.length === 0 && !showAddRow ? (
               <tr>
                 <td colSpan={5} className="no-data">
                   データがありません
@@ -226,12 +311,13 @@ export default function FileTable() {
               files.map((file) => (
                 <tr key={file.id}>
                   <td className="col-select">
-                    <label className="toggle-switch">
+                    <label className={`toggle-switch ${selectableTypes.has(file.Mimetype) ? '' : 'toggle-switch-disabled'}`}>
                       <input
                         type="checkbox"
                         checked={file.selected}
                         onChange={() => handleToggleSelect(file.id)}
                         aria-label={file.selected ? '選択解除' : '選択'}
+                        disabled={!selectableTypes.has(file.Mimetype)}
                       />
                       <span className="toggle-slider"></span>
                     </label>
