@@ -301,11 +301,11 @@ export default function FileTable() {
         </div>
       </div>
       {/* デスクトップ用テーブル表示 */}
-          <div className="file-table-wrapper">
+      <div className="file-table-wrapper">
         <table className="file-table">
           <thead>
             <tr>
-              <th className="col-select">選択</th>
+              <th className="col-select">xECM連携</th>
               <th className="col-filename">ファイル名</th>
               <th className="col-type">ファイル種別</th>
               <th className="col-created">保存日時</th>
