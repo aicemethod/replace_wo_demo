@@ -38,9 +38,18 @@ export async function fetchFileData(): Promise<FileData[]> {
     }
 
     const attachmentTypeById = new Map<string, string>();
+    const attachmentTypeLabelMap: Record<number, string> = {
+      931440001: 'TSR',
+      931440002: '技術検収書',
+      931440003: 'Technical Document',
+      931440000: 'Other'
+    };
+
     attachmentResult.entities.forEach((record: any) => {
       const recordId = record.proto_activitymimeattachmentid || record.id;
-      const typeLabel = record['proto_attachmenttype@OData.Community.Display.V1.FormattedValue'] || '';
+      const rawValue = record.proto_attachmenttype;
+      const fallbackLabel = record['proto_attachmenttype@OData.Community.Display.V1.FormattedValue'] || '';
+      const typeLabel = typeof rawValue === 'number' ? (attachmentTypeLabelMap[rawValue] || fallbackLabel) : fallbackLabel;
       attachmentTypeById.set(recordId, typeLabel);
     });
 
