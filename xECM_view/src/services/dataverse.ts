@@ -26,18 +26,23 @@ export async function fetchFileData(): Promise<FileData[]> {
       return [];
     }
 
-    // proto_activitymimeattachmentレコードを取得（931440001と931440003のみ）
     const entityName = 'proto_activitymimeattachment';
-    const filterQuery = `_proto_wonumber_value eq ${currentRecordId} and (proto_attachmenttype eq 931440001 or proto_attachmenttype eq 931440003)`;
-
+    const filterQuery = `_proto_wonumber_value eq ${currentRecordId}`;
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
-      `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid`
+      `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype,_objectid_value`
     );
 
     if (attachmentResult.entities.length === 0) {
       return [];
     }
+
+    const attachmentTypeById = new Map<string, string>();
+    attachmentResult.entities.forEach((record: any) => {
+      const recordId = record.proto_activitymimeattachmentid || record.id;
+      const typeLabel = record['proto_attachmenttype@OData.Community.Display.V1.FormattedValue'] || '';
+      attachmentTypeById.set(recordId, typeLabel);
+    });
 
     // 各proto_activitymimeattachmentに紐づくannotationレコードを取得
     const annotationPromises = attachmentResult.entities.map(async (record: any) => {
@@ -45,9 +50,12 @@ export async function fetchFileData(): Promise<FileData[]> {
       try {
         const annotationResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
           'annotation',
-          `?$filter=_objectid_value eq ${recordId} and mimetype eq 'application/pdf'&$select=annotationid,filename,mimetype,createdon&$orderby=createdon desc`
+          `?$filter=_objectid_value eq ${recordId}&$select=subject,filename,annotationid,createdon,notetext,documentbody&$orderby=createdon desc`
         );
-        return annotationResult.entities;
+        return annotationResult.entities.map((annotation: any) => ({
+          ...annotation,
+          _attachmentTypeLabel: attachmentTypeById.get(recordId) || ''
+        }));
       } catch (err) {
         console.error(`Failed to fetch annotations for ${recordId}:`, err);
         return [];
@@ -62,9 +70,10 @@ export async function fetchFileData(): Promise<FileData[]> {
       return {
         id: annotation.annotationid || annotation.id,
         filename: annotation.filename || '',
-        Mimetype: annotation.mimetype || 'application/pdf',
+        Mimetype: annotation._attachmentTypeLabel || '',
         createdon: annotation.createdon || new Date().toISOString(),
         selected: false,
+        documentbody: annotation.documentbody || '',
       };
     });
 

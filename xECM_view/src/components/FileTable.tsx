@@ -94,6 +94,26 @@ export default function FileTable() {
     }
   };
 
+  const handleDownload = (file: FileData) => {
+    if (!file.documentbody) {
+      return;
+    }
+    const byteCharacters = atob(file.documentbody);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.filename || 'attachment.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
   const handleAddMenuToggle = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     if (isAddMenuOpen) {
       setIsAddMenuOpen(false);
@@ -322,7 +342,19 @@ export default function FileTable() {
                       <span className="toggle-slider"></span>
                     </label>
                   </td>
-                  <td className="col-filename">{file.filename}</td>
+                  <td className="col-filename">
+                    {file.documentbody ? (
+                      <button
+                        type="button"
+                        className="file-table-link"
+                        onClick={() => handleDownload(file)}
+                      >
+                        {file.filename}
+                      </button>
+                    ) : (
+                      file.filename
+                    )}
+                  </td>
                   <td className="col-type">{file.Mimetype}</td>
                   <td className="col-created">{formatDate(file.createdon)}</td>
                   <td className="col-sync">-</td>

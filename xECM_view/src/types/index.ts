@@ -29,4 +29,5 @@ export interface FileData {
   Mimetype: string
   createdon: string
   selected?: boolean
+  documentbody?: string
 }
