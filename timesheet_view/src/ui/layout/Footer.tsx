@@ -7,9 +7,6 @@ import { useTranslation } from "react-i18next";
 export type FooterProps = {
     /** ユーザー一覧設定モーダルを開く */
     onOpenUserList: () => void;
-
-    /** お気に入り間接タスク設定モーダルを開く */
-    onOpenFavoriteTask: () => void;
 };
 
 /**
@@ -19,7 +16,6 @@ export type FooterProps = {
  */
 export const Footer: React.FC<FooterProps> = ({
     onOpenUserList,
-    onOpenFavoriteTask,
 }) => {
     const { t } = useTranslation();
 
@@ -34,13 +30,6 @@ export const Footer: React.FC<FooterProps> = ({
                     color="secondary"
                     icon={<FaIcons.FaUser />}
                     onClick={onOpenUserList}
-                    className="footer-button"
-                />
-                <Button
-                    label={t("footer.favoriteTaskSetting")}
-                    color="secondary"
-                    icon={<FaIcons.FaStar />}
-                    onClick={onOpenFavoriteTask}
                     className="footer-button"
                 />
             </div>

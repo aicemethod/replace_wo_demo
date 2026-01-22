@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { Tabs } from "../components/Tabs";
+// import { Tabs } from "../components/Tabs";
 import { Button } from "../components/Button";
 import "../styles/layout/ContentHeader.css";
 import { useTranslation } from "react-i18next";
 import type { ContentHeaderProps } from "../../types/components";
-import type { MainTab, ViewMode, Option } from "../../types";
+import type { ViewMode } from "../../types";
 
 /**
  * タイムシート上部の操作ヘッダー
@@ -16,8 +16,8 @@ import type { MainTab, ViewMode, Option } from "../../types";
  * - 新規登録ボタン
  */
 export const ContentHeader: React.FC<ContentHeaderProps> = ({
-    mainTab,
-    setMainTab,
+    // mainTab,
+    // setMainTab,
     viewMode,
     setViewMode,
     formattedToday,
@@ -31,13 +31,6 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     isSelectLoading = false,
 }) => {
     const { t } = useTranslation();
-
-    /** メインタブ設定 */
-    const mainTabOptions: Option[] = [
-        { value: "user", label: "ユーザー一覧" },
-        { value: "direct", label: "直接タスク" },
-        { value: "indirect", label: "間接タスク" },
-    ];
 
     /** 表示モードボタン（多言語対応） */
     const viewModes: { value: ViewMode; label: string }[] = [
@@ -89,13 +82,6 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                 左側：タブ + 新規ボタン
             ============================= */}
             <div className="tab-header-left">
-                <Tabs
-                    tabs={mainTabOptions}
-                    activeTab={mainTab}
-                    onChange={(v) => setMainTab(v as MainTab)}
-                    className="main-tabs"
-                />
-
                 <Button
                     label={t("contentHeader.createNew")}
                     color="primary"
