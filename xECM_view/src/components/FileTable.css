@@ -24,6 +24,37 @@
   align-items: center;
 }
 
+.filetable-add-wrapper {
+  position: relative;
+}
+
+.filetable-add-menu {
+  position: fixed;
+  min-width: 180px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.filetable-add-item {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filetable-add-item:hover {
+  background-color: #f5f5f5;
+}
+
 .action-button {
   font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
 }

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { FiSave, FiRefreshCw } from 'react-icons/fi';
+import { useState, useEffect, useCallback } from 'react';
+import { FiSave, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import type { FileData } from '../types';
 import { fetchFileData } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
@@ -10,6 +10,8 @@ export default function FileTable() {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [addMenuPosition, setAddMenuPosition] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const loadData = async () => {
     try {
@@ -26,6 +28,23 @@ export default function FileTable() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.filetable-add-dropdown') && !target.closest('.filetable-add-menu')) {
+        setIsAddMenuOpen(false);
+        setAddMenuPosition(null);
+      }
+    };
+
+    if (isAddMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isAddMenuOpen]);
 
   const handleToggleSelect = (id: string) => {
     setFiles((prevFiles) =>
@@ -55,6 +74,34 @@ export default function FileTable() {
     }
   };
 
+  const handleAddMenuToggle = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    if (isAddMenuOpen) {
+      setIsAddMenuOpen(false);
+      setAddMenuPosition(null);
+      return;
+    }
+    const rect = event.currentTarget.getBoundingClientRect();
+    setAddMenuPosition({
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width
+    });
+    setIsAddMenuOpen(true);
+  }, [isAddMenuOpen]);
+
+  const addMenuOptions = [
+    { value: 'tsr', label: 'TSR' },
+    { value: 'technical-review', label: '技術検収書' },
+    { value: 'technical-document', label: 'Technical Document' },
+    { value: 'other', label: 'Other' }
+  ];
+
+  const handleAddOption = (value: string) => {
+    console.log('追加:', value);
+    setIsAddMenuOpen(false);
+    setAddMenuPosition(null);
+  };
+
   if (loading) {
     return <div className="loading">読み込み中...</div>;
   }
@@ -63,6 +110,49 @@ export default function FileTable() {
     <div className="file-table-container">
       <div className="file-table-header">
         <div className="file-table-actions">
+          <div className="filetable-add-wrapper filetable-add-dropdown">
+            <button
+              type="button"
+              className="action-button add-button"
+              onClick={handleAddMenuToggle}
+              style={{
+                padding: '0',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#333',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title="追加"
+            >
+              <FiPlus size={16} />
+              <span>追加</span>
+            </button>
+            {isAddMenuOpen && addMenuPosition && (
+              <div
+                className="filetable-add-menu"
+                style={{
+                  top: `${addMenuPosition.top}px`,
+                  left: `${addMenuPosition.left}px`,
+                  width: `${addMenuPosition.width}px`
+                }}
+              >
+                {addMenuOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className="filetable-add-item"
+                    onClick={() => handleAddOption(option.value)}
+                  >
+                    <FiPlus size={14} />
+                    <span>{option.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             type="button"
             className="action-button save-button"
@@ -197,4 +287,3 @@ export default function FileTable() {
     </div>
   );
 }
-
