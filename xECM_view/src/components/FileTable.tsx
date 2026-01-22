@@ -73,11 +73,10 @@ export default function FileTable() {
           console.warn('添付ファイルが選択されていません');
           return;
         }
-        const filename = newFilename || newFile.name;
         const saved = await saveFileAttachment({
           typeValue: newFileTypeValue,
           typeLabel: newFileType,
-          filename,
+          filename: newFile.name,
           file: newFile
         });
         if (saved) {
