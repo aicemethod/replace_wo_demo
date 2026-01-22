@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { FiSave, FiRefreshCw, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip } from 'react-icons/fi';
 import type { FileData } from '../types';
-import { fetchFileData } from '../services/dataverse';
+import { fetchFileData, saveFileAttachment } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
 import './FileTable.css';
 
@@ -15,6 +15,9 @@ export default function FileTable() {
   const [showAddRow, setShowAddRow] = useState(false);
   const [newFilename, setNewFilename] = useState('');
   const [newFileType, setNewFileType] = useState('TSR');
+  const [newFileTypeValue, setNewFileTypeValue] = useState(931440001);
+  const [newFile, setNewFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadData = async () => {
     try {
@@ -66,20 +69,30 @@ export default function FileTable() {
     setIsSaving(true);
     try {
       if (showAddRow) {
-        const now = new Date().toISOString();
-        const newItem: FileData = {
-          id: `new-${Date.now()}`,
-          filename: newFilename,
-          Mimetype: newFileType,
-          createdon: now,
-          selected: false
-        };
-        setFiles((prevFiles) => [newItem, ...prevFiles]);
-        setShowAddRow(false);
-        setNewFilename('');
-        setNewFileType('TSR');
-        setIsAddMenuOpen(false);
-        setAddMenuPosition(null);
+        if (!newFile) {
+          console.warn('添付ファイルが選択されていません');
+          return;
+        }
+        const filename = newFilename || newFile.name;
+        const saved = await saveFileAttachment({
+          typeValue: newFileTypeValue,
+          typeLabel: newFileType,
+          filename,
+          file: newFile
+        });
+        if (saved) {
+          setFiles((prevFiles) => [saved, ...prevFiles]);
+          setShowAddRow(false);
+          setNewFilename('');
+          setNewFileType('TSR');
+          setNewFileTypeValue(931440001);
+          setNewFile(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+          setIsAddMenuOpen(false);
+          setAddMenuPosition(null);
+        }
         return;
       }
       // TODO: 選択されたファイルの保存処理を実装
@@ -131,14 +144,15 @@ export default function FileTable() {
 
   const selectableTypes = new Set(['TSR', '技術検収書']);
   const addMenuOptions = [
-    { value: 'tsr', label: 'TSR' },
-    { value: 'technical-review', label: '技術検収書' },
-    { value: 'technical-document', label: 'Technical Document' },
-    { value: 'other', label: 'Other' }
+    { value: 931440001, label: 'TSR' },
+    { value: 931440002, label: '技術検収書' },
+    { value: 931440003, label: 'Technical Document' },
+    { value: 931440000, label: 'Other' }
   ];
 
-  const handleAddOption = (value: string) => {
+  const handleAddOption = (value: number) => {
     const typeLabel = addMenuOptions.find((option) => option.value === value)?.label || 'TSR';
+    setNewFileTypeValue(value);
     setNewFileType(typeLabel);
     setShowAddRow(true);
     setIsAddMenuOpen(false);
@@ -149,6 +163,19 @@ export default function FileTable() {
     setShowAddRow(false);
     setNewFilename('');
     setNewFileType('TSR');
+    setNewFileTypeValue(931440001);
+    setNewFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    setNewFile(file);
+    if (file && !newFilename) {
+      setNewFilename(file.name);
+    }
   };
 
   if (loading) {
@@ -211,13 +238,13 @@ export default function FileTable() {
               padding: '0',
               border: 'none',
               backgroundColor: 'transparent',
-              color: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? '#bbb' : '#115ea3',
+              color: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? '#c7c7c7' : '#115ea3',
               fontSize: '14px',
               cursor: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              opacity: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 0.5 : 1
+              opacity: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 0.7 : 1
             }}
             title="保存"
           >
@@ -296,26 +323,33 @@ export default function FileTable() {
                   </label>
                 </td>
                 <td className="col-filename">
-                  <input
-                    type="text"
-                    className="file-table-input"
-                    value={newFilename}
-                    onChange={(e) => setNewFilename(e.target.value)}
-                    placeholder="ファイル名"
-                  />
+                  <div className="file-table-input-row">
+                    <input
+                      type="text"
+                      className="file-table-input"
+                      value={newFilename}
+                      onChange={(e) => setNewFilename(e.target.value)}
+                      placeholder="ファイル名"
+                    />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      className="file-table-file-input"
+                      onChange={handleFileChange}
+                    />
+                    <button
+                      type="button"
+                      className="file-table-attach-button"
+                      onClick={() => fileInputRef.current?.click()}
+                      title="添付"
+                    >
+                      <FiPaperclip size={16} />
+                    </button>
+                  </div>
+                  {newFile && <div className="file-table-file-preview">{newFile.name}</div>}
                 </td>
                 <td className="col-type">
-                  <select
-                    className="file-table-select"
-                    value={newFileType}
-                    onChange={(e) => setNewFileType(e.target.value)}
-                  >
-                    {addMenuOptions.map((option) => (
-                      <option key={option.value} value={option.label}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="file-table-type-text">{newFileType}</span>
                 </td>
                 <td className="col-created">-</td>
                 <td className="col-sync">-</td>
