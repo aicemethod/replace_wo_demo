@@ -65,6 +65,16 @@
     font-weight: bold;
 }
 
+.fc .fc-timegrid-col.is-selected-day {
+    background-color: rgba(0, 137, 186, 0.08);
+}
+
+.fc .fc-col-header-cell.is-selected-day .fc-col-header-cell-cushion {
+    color: var(--main-color);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
 /* =============================
    イベント表示
 ============================= */

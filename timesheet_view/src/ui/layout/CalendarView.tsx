@@ -59,6 +59,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     const isInternalUpdateRef = useRef(false);
     const { i18n, t } = useTranslation();
     const [contextMenu, setContextMenu] = useState<{ x: number; y: number; eventId: string } | null>(null);
+    const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
 
     /** 言語に応じた FullCalendar locale の選択 */
     const currentLocale = i18n.language.startsWith("ja") ? jaLocale : enLocale;
@@ -77,6 +78,50 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             }, 0);
         }
     }, [currentDate]);
+
+    const toDateKey = (date: Date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+    };
+
+    useEffect(() => {
+        const api = calendarRef.current?.getApi();
+        const rootEl = api?.el;
+        if (!rootEl) return;
+
+        rootEl.querySelectorAll(".fc-timegrid-col.is-selected-day").forEach((el) => {
+            el.classList.remove("is-selected-day");
+        });
+        rootEl.querySelectorAll(".fc-col-header-cell.is-selected-day").forEach((el) => {
+            el.classList.remove("is-selected-day");
+        });
+
+        if (!selectedDateKey) return;
+
+        rootEl
+            .querySelectorAll(`.fc-timegrid-col[data-date="${selectedDateKey}"]`)
+            .forEach((el) => el.classList.add("is-selected-day"));
+        rootEl
+            .querySelectorAll(`.fc-col-header-cell[data-date="${selectedDateKey}"]`)
+            .forEach((el) => el.classList.add("is-selected-day"));
+    }, [selectedDateKey]);
+
+    useEffect(() => {
+        const handleDocClick = (e: MouseEvent) => {
+            const rootEl = calendarRef.current?.getApi().el;
+            if (!rootEl) return;
+            const target = e.target as HTMLElement;
+            if (target.closest(".fc-col-header-cell")) return;
+            setSelectedDateKey(null);
+        };
+
+        document.addEventListener("click", handleDocClick);
+        return () => {
+            document.removeEventListener("click", handleDocClick);
+        };
+    }, []);
 
     /** viewMode に応じて表示モード切替 */
     useEffect(() => {
@@ -218,6 +263,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 dayHeaderFormat={{
                     day: 'numeric',
                     weekday: 'short'
+                }}
+                dayHeaderDidMount={(arg) => {
+                    arg.el.style.cursor = "pointer";
+                    arg.el.onclick = () => setSelectedDateKey(toDateKey(arg.date));
                 }}
                 locale={currentLocale}
                 firstDay={1}
