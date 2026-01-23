@@ -141,6 +141,12 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                         </div>
                     )}
                 </div>
+
+                <Button
+                    label="1dayコピー"
+                    color="primary"
+                    onClick={() => {}}
+                />
             </div>
 
             {/* =============================
