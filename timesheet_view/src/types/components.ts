@@ -23,6 +23,7 @@ export type ContentHeaderProps = {
     onNext: () => void;
     onToday: () => void;
     onCreateNew: () => void;
+    isCopyEnabled?: boolean;
     selectOptions?: Option[];
     selectValue?: string;
     onSelectChange?: (value: string) => void;
@@ -44,6 +45,7 @@ export type CalendarViewProps = {
     onDateChange: (date: Date) => void;
     onDateClick: (range: DateTimeRange) => void;
     onEventClick: (event: Event) => void;
+    onHeaderDateSelect?: (date: Date | null) => void;
     events: Event[];
 };
 

@@ -77,6 +77,8 @@ function TimesheetApp() {
   const [selectedSidebarTask, setSelectedSidebarTask] = useState<string[]>([]);
   /** サイドバーで選択されているリソース（表示用文字列） */
   const [selectedSidebarResourcesText, setSelectedSidebarResourcesText] = useState<string>("");
+  /** カレンダーの日付列選択状態 */
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(null);
 
   /** 選択されているタスク情報を取得（最初の1つを使用） */
   const { favoriteTasks } = useFavoriteTasks();
@@ -242,6 +244,7 @@ function TimesheetApp() {
           onNext={handleNext}
           onToday={handleToday}
           onCreateNew={openNewTimeEntry}
+          isCopyEnabled={!!selectedCalendarDate}
           selectOptions={headerSelectOptions}
           selectValue={headerSelectValue}
           onSelectChange={setHeaderSelectValue}
@@ -275,6 +278,7 @@ function TimesheetApp() {
                 setSelectedEvent(null);
                 setIsTimeEntryModalOpen(true);
               }}
+              onHeaderDateSelect={setSelectedCalendarDate}
               onEventClick={handleEventClick}
               onEventDuplicate={handleEventDuplicate}
               onEventDelete={handleDeleteTimeEntry}

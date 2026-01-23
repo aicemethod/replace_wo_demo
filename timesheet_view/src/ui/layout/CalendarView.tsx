@@ -34,6 +34,7 @@ export type CalendarViewProps = {
         extendedProps?: Record<string, any>;
     }) => void;
     onEventDelete?: (id: string) => void;
+    onHeaderDateSelect?: (date: Date | null) => void;
     events: EventInput[];
     isSubgrid?: boolean;
 };
@@ -52,6 +53,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     onEventClick,
     onEventDuplicate,
     onEventDelete,
+    onHeaderDateSelect,
     events,
     isSubgrid = false,
 }) => {
@@ -115,6 +117,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             const target = e.target as HTMLElement;
             if (target.closest(".fc-col-header-cell")) return;
             setSelectedDateKey(null);
+            onHeaderDateSelect?.(null);
         };
 
         document.addEventListener("click", handleDocClick);
@@ -266,7 +269,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 }}
                 dayHeaderDidMount={(arg) => {
                     arg.el.style.cursor = "pointer";
-                    arg.el.onclick = () => setSelectedDateKey(toDateKey(arg.date));
+                    arg.el.onclick = () => {
+                        setSelectedDateKey(toDateKey(arg.date));
+                        onHeaderDateSelect?.(arg.date);
+                    };
                 }}
                 locale={currentLocale}
                 firstDay={1}
