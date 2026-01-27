@@ -85,13 +85,13 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
-        `_proto_enduser_value,_proto_wo_category_value;` +
+        `_proto_enduser_value,_proto_wo_category_value,_proto_devicesearch_value;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
         `),` +
         `proto_devicesearch(` +
-        `$select=proto_name` +
+        `$select=proto_devicesearchid,proto_name` +
         `),` +
         `proto_wo_category(` +
         `$select=proto_workordertypeid,proto_name` +
