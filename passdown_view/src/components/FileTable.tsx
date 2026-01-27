@@ -52,14 +52,6 @@ export default function FileTable() {
     }
   }, [isAddMenuOpen]);
 
-  const handleToggleSelect = (id: string) => {
-    setFiles((prevFiles) =>
-      prevFiles.map((file) =>
-        file.id === id ? { ...file, selected: !file.selected } : file
-      )
-    );
-  };
-
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await loadData();
@@ -141,7 +133,6 @@ export default function FileTable() {
     setIsAddMenuOpen(true);
   }, [isAddMenuOpen]);
 
-  const selectableTypes = new Set(['PPAC', 'KYM']);
   const addMenuOptions = [
     { value: 931440004, label: 'PPAC' },
     { value: 931440005, label: 'KYM' },
@@ -304,7 +295,6 @@ export default function FileTable() {
         <table className="file-table">
           <thead>
             <tr>
-              <th className="col-select">xECM連携</th>
               <th className="col-filename">ファイル名</th>
               <th className="col-type">ファイル種別</th>
               <th className="col-created">保存日時</th>
@@ -314,12 +304,6 @@ export default function FileTable() {
           <tbody>
             {showAddRow && (
               <tr className="file-table-add-row">
-                <td className="col-select">
-                  <label className="toggle-switch toggle-switch-disabled">
-                    <input type="checkbox" checked={false} disabled aria-label="選択不可" />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </td>
                 <td className="col-filename">
                   <div className="file-table-input-row">
                     <input
@@ -355,25 +339,13 @@ export default function FileTable() {
             )}
             {files.length === 0 && !showAddRow ? (
               <tr>
-                <td colSpan={5} className="no-data">
+                <td colSpan={4} className="no-data">
                   データがありません
                 </td>
               </tr>
             ) : (
               files.map((file) => (
                 <tr key={file.id}>
-                  <td className="col-select">
-                    <label className={`toggle-switch ${selectableTypes.has(file.Mimetype) ? '' : 'toggle-switch-disabled'}`}>
-                      <input
-                        type="checkbox"
-                        checked={file.selected}
-                        onChange={() => handleToggleSelect(file.id)}
-                        aria-label={file.selected ? '選択解除' : '選択'}
-                        disabled={!selectableTypes.has(file.Mimetype)}
-                      />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </td>
                   <td className="col-filename">
                     {file.documentbody ? (
                       <button
@@ -403,17 +375,8 @@ export default function FileTable() {
           <div className="no-data">データがありません</div>
         ) : (
           files.map((file) => (
-            <div key={file.id} className={`file-card ${file.selected ? 'selected' : ''}`}>
+            <div key={file.id} className="file-card">
               <div className="file-card-header">
-                <label className="toggle-switch">
-                  <input
-                    type="checkbox"
-                    checked={file.selected}
-                    onChange={() => handleToggleSelect(file.id)}
-                    aria-label={file.selected ? '選択解除' : '選択'}
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
                 <div className="file-card-filename">{file.filename}</div>
               </div>
               <div className="file-card-body">
