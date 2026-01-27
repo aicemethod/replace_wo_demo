@@ -1,6 +1,6 @@
 // src/App.tsx
 import { useState, useMemo, useEffect } from "react";
-import { Header, Sidebar, ContentHeader, Footer, CalendarView, FavoriteTaskModal, TimeEntryModal, UserListModal, Spinner } from "./ui";
+import { Header, Sidebar, ContentHeader, Footer, CalendarView, FavoriteTaskModal, TimeEntryModal, UserListModal, Spinner, DayCopyModal } from "./ui";
 import { useAppController } from "./hooks/useAppController";
 import { UserListProvider } from "./context/UserListContext";
 import { FavoriteTaskProvider, useFavoriteTasks } from "./context/FavoriteTaskContext";
@@ -79,6 +79,10 @@ function TimesheetApp() {
   const [selectedSidebarResourcesText, setSelectedSidebarResourcesText] = useState<string>("");
   /** カレンダーの日付列選択状態 */
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(null);
+  /** 1日コピー用モーダル */
+  const [isDayCopyModalOpen, setIsDayCopyModalOpen] = useState(false);
+  /** 1日コピー用のコピー元日付 */
+  const [dayCopySourceDate, setDayCopySourceDate] = useState<Date | null>(null);
 
   /** 選択されているタスク情報を取得（最初の1つを使用） */
   const { favoriteTasks } = useFavoriteTasks();
@@ -219,6 +223,15 @@ function TimesheetApp() {
 
   /** 今日の日付フォーマット（例：2025/10/14） */
   const formattedToday = formatToday();
+  const dayCopyEntryCount = useMemo(() => {
+    if (!dayCopySourceDate) return 0;
+    return mergedEvents.filter((event) => {
+      const eventStart = (event as any).start;
+      if (!eventStart) return false;
+      const eventDate = eventStart instanceof Date ? eventStart : new Date(eventStart);
+      return eventDate.toDateString() === dayCopySourceDate.toDateString();
+    }).length;
+  }, [mergedEvents, dayCopySourceDate]);
 
   return (
     <div className={`app-container ${isSubgrid ? 'is-subgrid-mode' : ''}`}>
@@ -245,6 +258,10 @@ function TimesheetApp() {
           onToday={handleToday}
           onCreateNew={openNewTimeEntry}
           isCopyEnabled={!!selectedCalendarDate}
+          onCopyClick={() => {
+            setDayCopySourceDate(selectedCalendarDate);
+            setIsDayCopyModalOpen(true);
+          }}
           selectOptions={headerSelectOptions}
           selectValue={headerSelectValue}
           onSelectChange={setHeaderSelectValue}
@@ -328,6 +345,12 @@ function TimesheetApp() {
         isOpen={isUserListModalOpen}
         onClose={() => setIsUserListModalOpen(false)}
         onSave={handleSaveUserList}
+      />
+      <DayCopyModal
+        isOpen={isDayCopyModalOpen}
+        onClose={() => setIsDayCopyModalOpen(false)}
+        sourceDate={dayCopySourceDate}
+        sourceEntryCount={dayCopyEntryCount}
       />
     </div>
   );

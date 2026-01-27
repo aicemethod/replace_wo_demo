@@ -25,6 +25,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     onNext,
     onToday,
     onCreateNew,
+    onCopyClick,
     isCopyEnabled = false,
     selectOptions = [],
     selectValue,
@@ -147,7 +148,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                     label="1dayコピー"
                     color="primary"
                     disabled={!isCopyEnabled}
-                    onClick={() => {}}
+                    onClick={onCopyClick}
                 />
             </div>
 

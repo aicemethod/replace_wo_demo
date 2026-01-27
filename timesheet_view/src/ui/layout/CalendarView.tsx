@@ -115,6 +115,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             const rootEl = calendarRef.current?.getApi().el;
             if (!rootEl) return;
             const target = e.target as HTMLElement;
+            if (target.closest(".modal-content")) return;
+            if (target.closest(".tab-header")) return;
             if (target.closest(".fc-col-header-cell")) return;
             setSelectedDateKey(null);
             onHeaderDateSelect?.(null);

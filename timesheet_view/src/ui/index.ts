@@ -26,6 +26,7 @@ export { CalendarView } from './layout/CalendarView';
 export { BaseModal } from './modal/BaseModal';
 export { ConfirmDeleteModal } from './modal/ConfirmDeleteModal';
 export { FavoriteTaskModal } from './modal/FavoriteTaskModal';
+export { DayCopyModal } from './modal/DayCopyModal';
 export { TimeEntryModal } from './modal/TimeEntryModal';
 export { UserListModal } from './modal/UserListModal';
 export { ResourceSelectModal } from './modal/ResourceSelectModal';

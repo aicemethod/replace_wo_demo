@@ -23,6 +23,7 @@ export type ContentHeaderProps = {
     onNext: () => void;
     onToday: () => void;
     onCreateNew: () => void;
+    onCopyClick?: () => void;
     isCopyEnabled?: boolean;
     selectOptions?: Option[];
     selectValue?: string;

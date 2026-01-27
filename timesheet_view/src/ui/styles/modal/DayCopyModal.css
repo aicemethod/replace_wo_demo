@@ -1,0 +1,93 @@
+.day-copy-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #ffffff;
+}
+
+.day-copy-modal .modal-header {
+    background: #ffffff;
+}
+
+.day-copy-modal .modal-footer {
+    background: #f6f7f9;
+    gap: 10px;
+}
+
+.day-copy-modal .btn-secondary {
+    background: #ffffff;
+}
+
+.copy-section {
+    margin-top: 20px;
+}
+
+.copy-section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2a37;
+    margin-bottom: 6px;
+}
+
+.copy-required {
+    margin-left: 6px;
+    color: #d32f2f;
+}
+
+.copy-source-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: #ffffff;
+}
+
+.copy-source-icon {
+    color: #5b6776;
+}
+
+.copy-source-date {
+    font-weight: 600;
+    color: #1f2a37;
+}
+
+.copy-source-separator {
+    color: #9aa3ad;
+}
+
+.copy-source-count {
+    color: #3b4754;
+}
+
+.copy-arrow {
+    display: flex;
+    justify-content: center;
+    color: #97a3af;
+}
+
+.copy-warning {
+    display: flex;
+    gap: 10px;
+    border: 1px solid #f3b1b1;
+    background: #fff5f5;
+    color: #9b1c1c;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.copy-warning-icon {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.copy-warning-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.copy-warning-text {
+    font-size: 13px;
+    line-height: 1.4;
+}
