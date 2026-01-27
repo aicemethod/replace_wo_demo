@@ -230,6 +230,7 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
             textColor,
             extendedProps: {
                 ...e.extendedProps,
+                deviceSn: e.deviceSn ?? null,
                 isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
             },
         };
