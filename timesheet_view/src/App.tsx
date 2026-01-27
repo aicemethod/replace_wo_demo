@@ -233,6 +233,59 @@ function TimesheetApp() {
     }).length;
   }, [mergedEvents, dayCopySourceDate]);
 
+  const handleDayCopyExecute = async (targetDate: string) => {
+    if (!dayCopySourceDate) return;
+    const sourceDateKey = dayCopySourceDate.toDateString();
+    const sourceEvents = mergedEvents.filter((event) => {
+      const eventStart = (event as any).start;
+      if (!eventStart) return false;
+      const eventDate = eventStart instanceof Date ? eventStart : new Date(eventStart);
+      return eventDate.toDateString() === sourceDateKey;
+    });
+
+    for (const event of sourceEvents) {
+      const startValue = (event as any).start;
+      const endValue = (event as any).end;
+      if (!startValue || !endValue) continue;
+
+      const sourceStart = startValue instanceof Date ? startValue : new Date(startValue);
+      const sourceEnd = endValue instanceof Date ? endValue : new Date(endValue);
+      const durationMs = sourceEnd.getTime() - sourceStart.getTime();
+
+      const targetStart = new Date(`${targetDate}T00:00:00`);
+      targetStart.setHours(
+        sourceStart.getHours(),
+        sourceStart.getMinutes(),
+        sourceStart.getSeconds(),
+        sourceStart.getMilliseconds()
+      );
+      const targetEnd = new Date(targetStart.getTime() + durationMs);
+
+      await handleTimeEntrySubmit({
+        id: "",
+        wo: (event as any).workOrderId || "",
+        start: targetStart,
+        end: targetEnd,
+        endUser: (event as any).endUser || "",
+        timezone: (event as any).timezone || "",
+        resource: "",
+        wisdomBu: "",
+        sapBu: "",
+        timeCategory: (event as any).timecategory ?? "",
+        mainCategory: (event as any).maincategory ?? "",
+        paymentType: (event as any).paymenttype ?? "",
+        deviceSn: (event as any).deviceSn || "",
+        woType: (event as any).woType || "",
+        subcategory: (event as any).subcategory || "",
+        task: (event as any).title || "",
+        workStatus: "",
+        comment: "",
+      });
+    }
+
+    setIsDayCopyModalOpen(false);
+  };
+
   return (
     <div className={`app-container ${isSubgrid ? 'is-subgrid-mode' : ''}`}>
       {/* ヘッダー（サブグリッドの場合は非表示） */}
@@ -351,6 +404,7 @@ function TimesheetApp() {
         onClose={() => setIsDayCopyModalOpen(false)}
         sourceDate={dayCopySourceDate}
         sourceEntryCount={dayCopyEntryCount}
+        onExecute={handleDayCopyExecute}
       />
     </div>
   );

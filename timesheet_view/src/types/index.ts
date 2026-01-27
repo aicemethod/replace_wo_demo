@@ -94,23 +94,30 @@ export type ModalSize = "small" | "medium" | "large";
 
 /** タイムエントリデータ型 */
 export type TimeEntryData = {
-    startDate: string;
-    startHour: string;
-    startMinute: string;
-    endDate: string;
-    endHour: string;
-    endMinute: string;
+    start?: Date;
+    end?: Date;
+    startDate?: string;
+    startHour?: string;
+    startMinute?: string;
+    endDate?: string;
+    endHour?: string;
+    endMinute?: string;
     wo: string;
-    endUser: string;
-    timezone: string;
-    resource: string;
-    timeCategory: string;
-    mainCategory: string;
-    paymentType: string;
+    endUser?: string;
+    timezone?: string;
+    resource?: string;
+    timeCategory?: string;
+    mainCategory?: string;
+    paymentType?: string;
+    deviceSn?: string;
+    subcategory?: string;
     woType?: string;
+    task?: string;
+    workStatus?: string;
+    wisdomBu?: string;
+    sapBu?: string;
     woTypeName?: string | null;
-    task: string;
-    comment: string;
+    comment?: string;
     id?: string;
 };
 
