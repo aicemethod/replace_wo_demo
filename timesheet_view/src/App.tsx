@@ -274,7 +274,7 @@ function TimesheetApp() {
         timeCategory: (event as any).timecategory ?? "",
         mainCategory: (event as any).maincategory ?? "",
         paymentType: (event as any).paymenttype ?? "",
-        deviceSn: (event as any).deviceSn || (event as any).extendedProps?.deviceSn || "",
+        deviceSn: (event as any).extendedProps?.deviceSn || (event as any).deviceSn || "",
         woType: (event as any).woType || "",
         subcategory: (event as any).subcategory || "",
         task: (event as any).title || "",

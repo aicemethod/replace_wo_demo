@@ -85,13 +85,13 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
-        `_proto_enduser_value,_proto_wo_category_value,_proto_devicesearch_value;` +
+        `_proto_enduser_value,_proto_wo_category_value;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
         `),` +
         `proto_devicesearch(` +
-        `$select=proto_devicesearchid,proto_name` +
+        `$select=proto_name` +
         `),` +
         `proto_wo_category(` +
         `$select=proto_workordertypeid,proto_name` +
@@ -125,6 +125,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             timezone: t.proto_timezone ?? null,
             extendedProps: {
                 timezone: t.proto_timezone ?? null,
+                deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
+                deviceSnName: t.proto_devicesearch?.proto_name || null,
             },
         }))
     );
@@ -230,7 +232,7 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
             textColor,
             extendedProps: {
                 ...e.extendedProps,
-                deviceSn: e.deviceSn ?? null,
+                deviceSn: e.deviceSn ?? e.extendedProps?.deviceSn ?? null,
                 isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
             },
         };
