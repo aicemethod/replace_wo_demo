@@ -27,7 +27,7 @@ export async function fetchFileData(): Promise<FileData[]> {
     }
 
     const entityName = 'proto_activitymimeattachment';
-    const filterQuery = `_proto_wonumber_value eq ${currentRecordId}`;
+    const filterQuery = `_proto_passdown_value eq ${currentRecordId}`;
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
       `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype`
@@ -39,10 +39,9 @@ export async function fetchFileData(): Promise<FileData[]> {
 
     const attachmentTypeById = new Map<string, string>();
     const attachmentTypeLabelMap: Record<number, string> = {
-      931440001: 'TSR',
-      931440002: '技術検収書',
-      931440003: 'Technical Document',
-      931440000: 'Other'
+      931440004: 'PPAC',
+      931440005: 'KYM',
+      931440006: 'Other'
     };
 
     attachmentResult.entities.forEach((record: any) => {
