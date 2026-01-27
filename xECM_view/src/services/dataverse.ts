@@ -27,7 +27,7 @@ export async function fetchFileData(): Promise<FileData[]> {
     }
 
     const entityName = 'proto_activitymimeattachment';
-    const filterQuery = `_proto_passdown_value eq ${currentRecordId}`;
+    const filterQuery = `(_proto_passdown_value eq ${currentRecordId} or _proto_wonumber_value eq ${currentRecordId})`;
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
       `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype`
