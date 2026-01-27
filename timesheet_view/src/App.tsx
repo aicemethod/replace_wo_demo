@@ -260,6 +260,15 @@ function TimesheetApp() {
       );
       const targetEnd = new Date(targetStart.getTime() + durationMs);
 
+      const deviceSnId =
+        detail?.deviceSn ||
+        (detail?.deviceSnName
+          ? deviceSnOptions.find((opt) => opt.label === detail.deviceSnName)?.value
+          : undefined) ||
+        (event as any).extendedProps?.deviceSn ||
+        (event as any).deviceSn ||
+        "";
+
       await handleTimeEntrySubmit({
         id: "",
         wo: detail?.workOrder || (event as any).workOrderId || "",
@@ -273,7 +282,7 @@ function TimesheetApp() {
         timeCategory: detail?.timecategory ?? (event as any).timecategory ?? "",
         mainCategory: detail?.maincategory ?? (event as any).maincategory ?? "",
         paymentType: detail?.paymenttype ?? (event as any).paymenttype ?? "",
-        deviceSn: detail?.deviceSn || (event as any).extendedProps?.deviceSn || (event as any).deviceSn || "",
+        deviceSn: deviceSnId,
         woType: detail?.woType || (event as any).woType || "",
         subcategory: detail?.subcategory || (event as any).subcategory || "",
         task: detail?.title || (event as any).title || "",
