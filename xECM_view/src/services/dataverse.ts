@@ -138,6 +138,21 @@ const getPathdownName = async (recordId: string): Promise<string> => {
   }
 };
 
+const getWorkorderTitle = async (recordId: string): Promise<string> => {
+  const xrm = (window.parent as any).Xrm;
+  const titleValue = xrm?.Page?.getAttribute?.('proto_wotitle')?.getValue?.();
+  if (typeof titleValue === 'string' && titleValue.trim()) {
+    return titleValue;
+  }
+  try {
+    const record = await xrm.WebApi.retrieveRecord('proto_workorder', recordId, '?$select=proto_wotitle');
+    return record?.proto_wotitle || '';
+  } catch (err) {
+    console.error('Failed to retrieve proto_wotitle:', err);
+    return '';
+  }
+};
+
 const getEntitySetName = async (logicalName: string, fallback: string): Promise<string> => {
   const xrm = (window.parent as any).Xrm;
   try {
@@ -180,22 +195,31 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
   }
 
   try {
-    const pathdownName = await getPathdownName(currentRecordId);
+    const entityName = xrm?.Page?.data?.entity?.getEntityName?.();
+    const isPathdown = entityName === 'proto_pathdown';
+    const pathdownName = isPathdown ? await getPathdownName(currentRecordId) : '';
+    const workorderTitle = !isPathdown ? await getWorkorderTitle(currentRecordId) : '';
     const pathdownSetName = await getEntitySetName('proto_pathdown', 'proto_pathdowns');
+    const workorderSetName = await getEntitySetName('proto_workorder', 'proto_workorders');
     const attachmentSetName = await getEntitySetName('proto_activitymimeattachment', 'proto_activitymimeattachments');
 
-    const attachmentQuery = `?$filter=_proto_passdown_value eq ${currentRecordId} and proto_attachmenttype eq ${params.typeValue}&$select=proto_activitymimeattachmentid`;
+    const attachmentQuery = isPathdown
+      ? `?$filter=_proto_passdown_value eq ${currentRecordId} and proto_attachmenttype eq ${params.typeValue}&$select=proto_activitymimeattachmentid`
+      : `?$filter=_proto_wonumber_value eq ${currentRecordId} and proto_attachmenttype eq ${params.typeValue}&$select=proto_activitymimeattachmentid`;
     const attachmentResult = await xrm.WebApi.retrieveMultipleRecords('proto_activitymimeattachment', attachmentQuery);
 
     let attachmentId: string | null = null;
     if (attachmentResult.entities.length > 0) {
       attachmentId = attachmentResult.entities[0].proto_activitymimeattachmentid || attachmentResult.entities[0].id;
     } else {
-      const attachmentName = pathdownName ? `${params.typeLabel}_${pathdownName}` : params.typeLabel;
+      const nameSuffix = isPathdown ? pathdownName : workorderTitle;
+      const attachmentName = nameSuffix ? `${params.typeLabel}_${nameSuffix}` : params.typeLabel;
       const createResponse = await xrm.WebApi.createRecord('proto_activitymimeattachment', {
         proto_attachmenttype: params.typeValue,
         proto_attachmentname: attachmentName,
-        'proto_passdown@odata.bind': `/${pathdownSetName}(${currentRecordId})`
+        ...(isPathdown
+          ? { 'proto_passdown@odata.bind': `/${pathdownSetName}(${currentRecordId})` }
+          : { 'proto_wonumber@odata.bind': `/${workorderSetName}(${currentRecordId})` })
       });
       attachmentId = createResponse.id;
     }
