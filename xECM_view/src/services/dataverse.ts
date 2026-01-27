@@ -26,8 +26,20 @@ export async function fetchFileData(): Promise<FileData[]> {
       return [];
     }
 
+    const pathdownResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
+      'proto_pathdown',
+      `?$filter=_proto_workorder_value eq ${currentRecordId}&$select=proto_pathdownid`
+    );
+    const pathdownIds = pathdownResult.entities
+      .map((record: any) => record.proto_pathdownid || record.id)
+      .filter(Boolean);
+    const passdownFilter = pathdownIds.length > 0
+      ? `(${pathdownIds.map((id: string) => `_proto_passdown_value eq ${id}`).join(' or ')})`
+      : '';
     const entityName = 'proto_activitymimeattachment';
-    const filterQuery = `(_proto_passdown_value eq ${currentRecordId} or _proto_wonumber_value eq ${currentRecordId})`;
+    const filterQuery = passdownFilter
+      ? `(${passdownFilter} or _proto_wonumber_value eq ${currentRecordId})`
+      : `_proto_wonumber_value eq ${currentRecordId}`;
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
       `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype`
