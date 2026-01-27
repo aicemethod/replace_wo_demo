@@ -1,0 +1,24 @@
+.app {
+  min-height: 100vh;
+  background-color: #fff;
+  font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+.app-header {
+  background-color: transparent;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.app-main {
+  width: 100%;
+  margin: 0;
+}
+
