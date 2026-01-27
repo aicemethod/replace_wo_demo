@@ -57,6 +57,7 @@ function TimesheetApp() {
     handleDuplicate,
     handleEventDuplicate,
     openNewTimeEntry,
+    fetchEventDetail,
     handleSaveFavoriteTasks,
     handleSaveUserList,
     handlePrev,
@@ -244,12 +245,10 @@ function TimesheetApp() {
     });
 
     for (const event of sourceEvents) {
-      const startValue = (event as any).start;
-      const endValue = (event as any).end;
-      if (!startValue || !endValue) continue;
-
-      const sourceStart = startValue instanceof Date ? startValue : new Date(startValue);
-      const sourceEnd = endValue instanceof Date ? endValue : new Date(endValue);
+      const detail = (event as any).id ? await fetchEventDetail((event as any).id) : null;
+      const sourceStart = detail?.start || ((event as any).start instanceof Date ? (event as any).start : new Date((event as any).start));
+      const sourceEnd = detail?.end || ((event as any).end instanceof Date ? (event as any).end : new Date((event as any).end));
+      if (!sourceStart || !sourceEnd) continue;
       const durationMs = sourceEnd.getTime() - sourceStart.getTime();
 
       const targetStart = new Date(`${targetDate}T00:00:00`);
@@ -263,21 +262,21 @@ function TimesheetApp() {
 
       await handleTimeEntrySubmit({
         id: "",
-        wo: (event as any).workOrderId || "",
+        wo: detail?.workOrder || (event as any).workOrderId || "",
         start: targetStart,
         end: targetEnd,
-        endUser: (event as any).endUser || "",
-        timezone: (event as any).timezone || "",
+        endUser: detail?.endUser || (event as any).endUser || "",
+        timezone: detail?.timezone || (event as any).timezone || "",
         resource: "",
         wisdomBu: "",
         sapBu: "",
-        timeCategory: (event as any).timecategory ?? "",
-        mainCategory: (event as any).maincategory ?? "",
-        paymentType: (event as any).paymenttype ?? "",
-        deviceSn: (event as any).extendedProps?.deviceSn || (event as any).deviceSn || "",
-        woType: (event as any).woType || "",
-        subcategory: (event as any).subcategory || "",
-        task: (event as any).title || "",
+        timeCategory: detail?.timecategory ?? (event as any).timecategory ?? "",
+        mainCategory: detail?.maincategory ?? (event as any).maincategory ?? "",
+        paymentType: detail?.paymenttype ?? (event as any).paymenttype ?? "",
+        deviceSn: detail?.deviceSn || (event as any).extendedProps?.deviceSn || (event as any).deviceSn || "",
+        woType: detail?.woType || (event as any).woType || "",
+        subcategory: detail?.subcategory || (event as any).subcategory || "",
+        task: detail?.title || (event as any).title || "",
         workStatus: "",
         comment: "",
       });

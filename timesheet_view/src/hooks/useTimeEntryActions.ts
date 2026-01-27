@@ -133,5 +133,6 @@ export const useTimeEntryActions = (
         handleEventDuplicate,
         openNewTimeEntry,
         refetchEvents,
+        fetchEventDetail,
     };
 };
