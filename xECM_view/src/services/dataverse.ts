@@ -27,7 +27,7 @@ export async function fetchFileData(): Promise<FileData[]> {
     }
 
     const entityName = 'proto_activitymimeattachment';
-    const filterQuery = `_proto_wonumber_value eq ${currentRecordId}`;
+    const filterQuery = `_proto_passdown_value eq ${currentRecordId}`;
     const attachmentResult = await (window.parent as any).Xrm.WebApi.retrieveMultipleRecords(
       entityName,
       `?$filter=${filterQuery}&$select=proto_activitymimeattachmentid,proto_attachmentname,proto_attachmenttype`
@@ -39,10 +39,9 @@ export async function fetchFileData(): Promise<FileData[]> {
 
     const attachmentTypeById = new Map<string, string>();
     const attachmentTypeLabelMap: Record<number, string> = {
-      931440001: 'TSR',
-      931440002: '技術検収書',
-      931440003: 'Technical Document',
-      931440000: 'Other'
+      931440004: 'PPAC',
+      931440005: 'KYM',
+      931440006: 'Other'
     };
 
     attachmentResult.entities.forEach((record: any) => {
@@ -112,17 +111,17 @@ const getCurrentRecordId = (): string | null => {
   return null;
 };
 
-const getWorkorderTitle = async (recordId: string): Promise<string> => {
+const getPathdownName = async (recordId: string): Promise<string> => {
   const xrm = (window.parent as any).Xrm;
-  const titleValue = xrm?.Page?.getAttribute?.('proto_wotitle')?.getValue?.();
-  if (typeof titleValue === 'string' && titleValue.trim()) {
-    return titleValue;
+  const nameValue = xrm?.Page?.getAttribute?.('proto_name')?.getValue?.();
+  if (typeof nameValue === 'string' && nameValue.trim()) {
+    return nameValue;
   }
   try {
-    const record = await xrm.WebApi.retrieveRecord('proto_workorder', recordId, '?$select=proto_wotitle');
-    return record?.proto_wotitle || '';
+    const record = await xrm.WebApi.retrieveRecord('proto_pathdown', recordId, '?$select=proto_name');
+    return record?.proto_name || '';
   } catch (err) {
-    console.error('Failed to retrieve proto_wotitle:', err);
+    console.error('Failed to retrieve proto_name:', err);
     return '';
   }
 };
@@ -169,22 +168,22 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
   }
 
   try {
-    const workorderTitle = await getWorkorderTitle(currentRecordId);
-    const workorderSetName = await getEntitySetName('proto_workorder', 'proto_workorders');
+    const pathdownName = await getPathdownName(currentRecordId);
+    const pathdownSetName = await getEntitySetName('proto_pathdown', 'proto_pathdowns');
     const attachmentSetName = await getEntitySetName('proto_activitymimeattachment', 'proto_activitymimeattachments');
 
-    const attachmentQuery = `?$filter=_proto_wonumber_value eq ${currentRecordId} and proto_attachmenttype eq ${params.typeValue}&$select=proto_activitymimeattachmentid`;
+    const attachmentQuery = `?$filter=_proto_passdown_value eq ${currentRecordId} and proto_attachmenttype eq ${params.typeValue}&$select=proto_activitymimeattachmentid`;
     const attachmentResult = await xrm.WebApi.retrieveMultipleRecords('proto_activitymimeattachment', attachmentQuery);
 
     let attachmentId: string | null = null;
     if (attachmentResult.entities.length > 0) {
       attachmentId = attachmentResult.entities[0].proto_activitymimeattachmentid || attachmentResult.entities[0].id;
     } else {
-      const attachmentName = workorderTitle ? `${params.typeLabel}_${workorderTitle}` : params.typeLabel;
+      const attachmentName = pathdownName ? `${params.typeLabel}_${pathdownName}` : params.typeLabel;
       const createResponse = await xrm.WebApi.createRecord('proto_activitymimeattachment', {
         proto_attachmenttype: params.typeValue,
         proto_attachmentname: attachmentName,
-        'proto_wonumber@odata.bind': `/${workorderSetName}(${currentRecordId})`
+        'proto_passdown@odata.bind': `/${pathdownSetName}(${currentRecordId})`
       });
       attachmentId = createResponse.id;
     }
