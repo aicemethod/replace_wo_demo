@@ -89,30 +89,29 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     };
 
     useEffect(() => {
-        const api = calendarRef.current?.getApi();
-        const rootEl = api?.el;
+        const rootEl = (calendarRef.current?.getApi() as any)?.el as HTMLElement | undefined;
         if (!rootEl) return;
 
-        rootEl.querySelectorAll(".fc-timegrid-col.is-selected-day").forEach((el) => {
+        rootEl.querySelectorAll<HTMLElement>(".fc-timegrid-col.is-selected-day").forEach((el) => {
             el.classList.remove("is-selected-day");
         });
-        rootEl.querySelectorAll(".fc-col-header-cell.is-selected-day").forEach((el) => {
+        rootEl.querySelectorAll<HTMLElement>(".fc-col-header-cell.is-selected-day").forEach((el) => {
             el.classList.remove("is-selected-day");
         });
 
         if (!selectedDateKey) return;
 
         rootEl
-            .querySelectorAll(`.fc-timegrid-col[data-date="${selectedDateKey}"]`)
+            .querySelectorAll<HTMLElement>(`.fc-timegrid-col[data-date="${selectedDateKey}"]`)
             .forEach((el) => el.classList.add("is-selected-day"));
         rootEl
-            .querySelectorAll(`.fc-col-header-cell[data-date="${selectedDateKey}"]`)
+            .querySelectorAll<HTMLElement>(`.fc-col-header-cell[data-date="${selectedDateKey}"]`)
             .forEach((el) => el.classList.add("is-selected-day"));
     }, [selectedDateKey]);
 
     useEffect(() => {
         const handleDocClick = (e: MouseEvent) => {
-            const rootEl = calendarRef.current?.getApi().el;
+            const rootEl = (calendarRef.current?.getApi() as any)?.el as HTMLElement | undefined;
             if (!rootEl) return;
             const target = e.target as HTMLElement;
             if (target.closest(".modal-content")) return;
