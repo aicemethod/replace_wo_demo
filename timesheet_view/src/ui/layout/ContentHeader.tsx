@@ -177,7 +177,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                 </div>
 
                 {/* 表示モード切替 */}
-                <div className="view-tabs">
+                {/* <div className="view-tabs">
                     {viewModes.map((mode) => (
                         <button
                             key={mode.value}
@@ -187,7 +187,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                             {mode.label}
                         </button>
                     ))}
-                </div>
+                </div> */}
             </div>
         </header>
     );
