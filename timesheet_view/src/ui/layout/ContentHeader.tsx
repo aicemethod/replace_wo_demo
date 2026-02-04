@@ -145,8 +145,9 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                 </div>
 
                 <Button
-                    label="1dayコピー"
+                    label="1日分のタイムエントリをコピー"
                     color="primary"
+                    icon={<FaIcons.FaPlus />}
                     disabled={!isCopyEnabled}
                     onClick={onCopyClick}
                 />
