@@ -17,7 +17,7 @@ function viewTimesheet(primaryControl) {
                 + "?appid=" + appId
                 + "&pagetype=webresource"
                 + "&webresourceName=" + encodeURIComponent(webResourceName)
-                + "&data=" + encodeURIComponent("id=" + recordId);
+                + "&data=" + encodeURIComponent(recordId);
 
             window.open(url, "_blank");
         },

@@ -19,7 +19,7 @@ export const useAppState = () => {
         if (!data) return "";
         try {
             const params = new URLSearchParams(data);
-            return params.get("id") || "";
+            return params.get("data") || "";
         } catch {
             return "";
         }
