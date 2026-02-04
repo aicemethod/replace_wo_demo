@@ -6,7 +6,7 @@ import { Button } from "../components/Button";
 import "../styles/layout/ContentHeader.css";
 import { useTranslation } from "react-i18next";
 import type { ContentHeaderProps } from "../../types/components";
-import type { ViewMode } from "../../types";
+// import type { ViewMode } from "../../types";
 
 /**
  * タイムシート上部の操作ヘッダー
@@ -18,8 +18,8 @@ import type { ViewMode } from "../../types";
 export const ContentHeader: React.FC<ContentHeaderProps> = ({
     // mainTab,
     // setMainTab,
-    viewMode,
-    setViewMode,
+    // viewMode,
+    // setViewMode,
     formattedToday,
     onPrev,
     onNext,
@@ -35,10 +35,10 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     const { t } = useTranslation();
 
     /** 表示モードボタン（多言語対応） */
-    const viewModes: { value: ViewMode; label: string }[] = [
-        { value: "稼働日", label: t("contentHeader.viewMode.weekdays") },
-        { value: "週", label: t("contentHeader.viewMode.week") },
-    ];
+    // const viewModes: { value: ViewMode; label: string }[] = [
+    //     { value: "稼働日", label: t("contentHeader.viewMode.weekdays") },
+    //     { value: "週", label: t("contentHeader.viewMode.week") },
+    // ];
 
     /** 検索欄付きセレクトの状態 */
     const [selectOpen, setSelectOpen] = useState(false);
