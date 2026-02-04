@@ -1,6 +1,9 @@
 function viewTimesheet(primaryControl) {
 
     var globalContext = Xrm.Utility.getGlobalContext();
+    var recordId = primaryControl.data.entity.getId().replace(/[{}]/g, "");
+
+    console.log("DEBUG MESSAGE");
 
     globalContext.getCurrentAppProperties().then(
         function (appProperties) {
@@ -13,7 +16,8 @@ function viewTimesheet(primaryControl) {
                 + "/main.aspx"
                 + "?appid=" + appId
                 + "&pagetype=webresource"
-                + "&webresourceName=" + encodeURIComponent(webResourceName);
+                + "&webresourceName=" + encodeURIComponent(webResourceName)
+                + "&data=" + encodeURIComponent("id=" + recordId);
 
             window.open(url, "_blank");
         },
