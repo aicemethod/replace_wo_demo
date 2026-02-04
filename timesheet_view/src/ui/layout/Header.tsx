@@ -23,6 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
             label: wo.name || t("header.noName"),
         })),
     ];
+    /** パラメータと value が一致したオプションを初期表示（大文字小文字を無視） */
+    const displayValue = woOptions.find((o) => o.value.toLowerCase() === (selectedWO || "").toLowerCase())?.value ?? selectedWO;
 
     return (
         <header className="app-header">
@@ -35,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <Select
                     options={woOptions}
-                    value={selectedWO}
+                    value={displayValue}
                     onChange={setSelectedWO}
                     placeholder={t("header.selectWO")}
                 />
