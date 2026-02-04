@@ -8,22 +8,10 @@ import type { MainTab, ViewMode, DateTimeRange, Event } from "../types";
  * 画面状態とモーダル状態を管理
  */
 export const useAppState = () => {
-    /** URLパラメータから recordid を取得 */
+    /** URLパラメータ（recordid / data＝WOのGUID）を取得 */
     const { recordid, data } = getUrlParams();
-
-    /**
-     * モデル駆動型アプリの Web リソースで渡される `data` パラメータ（例: "id=xxxx"）から
-     * id を取り出す（最小実装）
-     */
-    const idFromData = (() => {
-        if (!data) return "";
-        try {
-            const params = new URLSearchParams(data);
-            return params.get("data") || "";
-        } catch {
-            return "";
-        }
-    })();
+    /** パラメータと一致する値を Select にセットする用（data は recordId そのもの） */
+    const paramWoId = recordid || data || "";
 
     /** サブグリッドで表示されているかどうか */
     const isSubgrid = isSubgridContext();
@@ -37,8 +25,8 @@ export const useAppState = () => {
         if (parentWorkOrderId) {
             return parentWorkOrderId;
         }
-        // 通常のWEBリソースの場合、URLパラメータ（recordid / data.id）または"all"
-        return recordid || idFromData || "all";
+        // 通常のWEBリソースの場合、URLパラメータ（recordid / data）と一致する値をセット、なければ"all"
+        return paramWoId || "all";
     });
 
     /** サブグリッドの場合、親レコードIDが変更されたら自動的に更新 */
