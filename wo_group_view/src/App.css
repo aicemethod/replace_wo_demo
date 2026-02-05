@@ -1,42 +1,386 @@
+:root {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  color: #1f2328;
+  background: #fff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.page {
+  min-height: 100vh;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.panel {
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 8px 0 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.panel-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2b2f33;
+}
+
+.caret {
+  color: #6f7780;
+  display: inline-flex;
+  align-items: center;
+}
+
+.caret svg {
+  width: 12px;
+  height: 8px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.col-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 180px;
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  padding: 6px 0;
+  z-index: 20;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #2f3337;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: #f2f2f2;
+}
+
+.menu-icon {
+  width: 18px;
+  display: inline-flex;
+  justify-content: center;
+  color: #444b52;
+}
+
+.menu-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.menu-sep {
+  height: 1px;
+  background: #e7e7e7;
+  margin: 4px 0;
+}
+
+.panel-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  color: #3c434c;
+  font-size: 12px;
+}
+
+.top-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #2f3337;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.top-btn:hover {
+  background: #f2f2f2;
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2b73d6;
+}
+
+.btn-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kebab {
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+.kebab span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #6b717a;
+  display: block;
+}
+
+.table-shell {
+  margin-top: 0;
+  border-radius: 0;
+  border: none;
+}
+
+.table-head,
+.tr {
+  display: grid;
+  grid-template-columns: 44px 1.3fr 0.9fr 0.9fr 1.1fr 1.2fr 1.1fr 1fr;
+  align-items: center;
+}
+
+.table-head {
+  background: #fff;
+  color: #3a3f45;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid #d9d9d9;
+  padding: 6px 0;
+  position: relative;
+  z-index: 5;
+}
+
+.th,
+.td {
+  padding: 9px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.td {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.th-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.th-label {
+  pointer-events: none;
+}
+
+.table-body {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.tr {
+  border-bottom: 1px solid #ededed;
+  font-size: 12.5px;
+  color: #2c3137;
+}
+
+.tr:hover {
+  background: #f5f5f5;
+}
+
+.td:hover {
+  background: #dedede;
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.tr.is-selected {
+  background: #d7e9fb;
+}
+
+.checkbox {
+  display: flex;
+  justify-content: center;
+}
+
+.cb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+.cb input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cb-box {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #b5b5b5;
+  border-radius: 3px;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cb-box svg {
+  width: 12px;
+  height: 10px;
+  stroke: #fff;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.cb input:checked + .cb-box {
+  background: #2b73d6;
+  border-color: #2b73d6;
+}
+
+.cb input:checked + .cb-box svg {
+  opacity: 1;
+}
+
+.cb input:focus-visible + .cb-box {
+  outline: 2px solid #2b73d6;
+  outline-offset: 2px;
+}
+
+.link {
+  color: #1a5fb4;
+}
+
+.is-link {
+  color: #1a5fb4;
+  cursor: pointer;
+}
+
+.is-link:hover {
+  text-decoration: underline;
+}
+
+.user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a5fb4;
+  font-weight: 500;
+}
+
+.avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1f2937;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.muted {
+  color: #8b9097;
+}
+
+.table-footer {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #6e747c;
+  border-top: 1px solid #d9d9d9;
+}
+
+@media (max-width: 1024px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .table-head,
+  .tr {
+    grid-template-columns: 44px 1.1fr 0.8fr 0.8fr 1fr 1fr 1fr 1fr;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@media (max-width: 720px) {
+  .table-head,
+  .tr {
+    grid-template-columns: 44px 1.2fr 0.8fr 0.8fr 1fr 1fr 1fr 1fr;
   }
-}
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  .panel-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
