@@ -40,7 +40,7 @@ export default function WorkTable() {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const [sourceRows, setSourceRows] = useState<WorkGroupRow[]>([])
-  const [filterOpen, setFilterOpen] = useState(false)
+  // const [filterOpen, setFilterOpen] = useState(false)
   const [filterValue, setFilterValue] = useState('')
   const [menuFilterKey, setMenuFilterKey] = useState<ColumnKey | null>(null)
   const [filterOperator, setFilterOperator] = useState<FilterOperatorKey>('equals')
@@ -128,7 +128,7 @@ export default function WorkTable() {
     }
     const searchableKeys = Object.values(columnKeyMap)
     setTableRows(filterRows(sourceRows, searchableKeys, filterOperator, value))
-    setFilterOpen(false)
+    // setFilterOpen(false)
     setMenuFilterKey(null)
     setOperatorOpen(false)
   }
