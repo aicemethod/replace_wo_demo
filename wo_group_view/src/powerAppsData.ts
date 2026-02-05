@@ -142,3 +142,39 @@ export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
     projectId: normalizeId(row._proto_project_value),
   }))
 }
+
+export const getMainRows = async (): Promise<WorkGroupRow[]> => {
+  const xrm = getXrm()
+  const form = getFormContext()
+  if (!xrm?.WebApi?.retrieveMultipleRecords || !form) return []
+
+  const account = readLookup(form, 'proto_account')
+  const enduser = readLookup(form, 'proto_enduser')
+  const bu = readLookup(form, 'owningbusinessunit')
+
+  const filters = [
+    account?.id ? `_proto_account_value eq ${normalizeId(account.id)}` : '',
+    enduser?.id ? `_proto_enduser_value eq ${normalizeId(enduser.id)}` : '',
+    bu?.id ? `_owningbusinessunit_value eq ${normalizeId(bu.id)}` : '',
+  ].filter(Boolean)
+
+  if (filters.length === 0) return []
+
+  const query =
+    `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value` +
+    `&$filter=${filters.join(' and ')}` +
+    `&$expand=proto_project($select=proto_name)`
+
+  const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
+  const rows = (result?.entities ?? []) as any[]
+
+  return rows.map((row) => ({
+    id: normalizeId(row.proto_workorderid ?? row.activityid ?? row.id ?? ''),
+    woNumber: row.proto_wonumber ?? '',
+    woTitle: row.proto_wotitle ?? '',
+    status: row['_proto_workordersubstatus_value@OData.Community.Display.V1.FormattedValue'] ?? '',
+    groupNumber: row['_proto_project_value@OData.Community.Display.V1.FormattedValue'] ?? '',
+    groupTitle: row.proto_project?.proto_name ?? '',
+    projectId: normalizeId(row._proto_project_value),
+  }))
+}

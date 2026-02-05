@@ -8,70 +8,11 @@ import {
   getFilterOperatorLabel,
   operatorNeedsValue,
 } from './filterUtils'
-
-type Row = {
-  id: number
-  woNumber: string
-  woTitle: string
-  status: 'In Progress' | 'Signed' | 'Closed'
-  groupNumber: string
-  groupTitle: string
-}
-
-const rows: Row[] = [
-  {
-    id: 1,
-    woNumber: '00000000',
-    woTitle: '定期保守点検',
-    status: 'In Progress',
-    groupNumber: 'WOG01',
-    groupTitle: '北関東メンテ',
-  },
-  {
-    id: 2,
-    woNumber: '00000001',
-    woTitle: '設備更新',
-    status: 'Signed',
-    groupNumber: 'WOG02',
-    groupTitle: '東北エリアA',
-  },
-  {
-    id: 3,
-    woNumber: '00000002',
-    woTitle: '安全対策',
-    status: 'Closed',
-    groupNumber: 'WOG03',
-    groupTitle: '関西支店B',
-  },
-  {
-    id: 4,
-    woNumber: '00000003',
-    woTitle: '定期清掃',
-    status: 'In Progress',
-    groupNumber: 'WOG04',
-    groupTitle: '中部メンテ',
-  },
-  {
-    id: 5,
-    woNumber: '00000004',
-    woTitle: '設備点検',
-    status: 'Signed',
-    groupNumber: 'WOG05',
-    groupTitle: '九州南部',
-  },
-  {
-    id: 6,
-    woNumber: '00000005',
-    woTitle: '試運転',
-    status: 'Closed',
-    groupNumber: 'WOG06',
-    groupTitle: '北海道東部',
-  },
-]
+import { getMainRows, type WorkGroupRow } from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
-const columnKeyMap: Record<ColumnKey, keyof Row> = {
+const columnKeyMap: Record<ColumnKey, keyof WorkGroupRow> = {
   woNumber: 'woNumber',
   woTitle: 'woTitle',
   status: 'status',
@@ -90,9 +31,10 @@ const columns: { key: ColumnKey; label: string }[] = [
 ]
 
 export default function WorkTable() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [openMenu, setOpenMenu] = useState<string | null>(null)
-  const [tableRows, setTableRows] = useState<Row[]>(rows)
+  const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
+  const [sourceRows, setSourceRows] = useState<WorkGroupRow[]>([])
   const [filterOpen, setFilterOpen] = useState(false)
   const [filterValue, setFilterValue] = useState('')
   const [menuFilterKey, setMenuFilterKey] = useState<ColumnKey | null>(null)
@@ -108,7 +50,7 @@ export default function WorkTable() {
     setSelectedIds(checked ? tableRows.map((row) => row.id) : [])
   }
 
-  const toggleRow = (id: number, checked: boolean) => {
+  const toggleRow = (id: string, checked: boolean) => {
     setSelectedIds((prev) => {
       if (checked) {
         return prev.includes(id) ? prev : [...prev, id]
@@ -116,6 +58,18 @@ export default function WorkTable() {
       return prev.filter((item) => item !== id)
     })
   }
+
+  useEffect(() => {
+    let mounted = true
+    getMainRows().then((data) => {
+      if (!mounted) return
+      setSourceRows(data)
+      setTableRows(data)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   useEffect(() => {
     const handle = (event: MouseEvent) => {
@@ -152,17 +106,17 @@ export default function WorkTable() {
   const applyFilter = () => {
     const value = filterValue.trim()
     if (operatorNeedsValue(filterOperator) && !value) {
-      setTableRows(rows)
+      setTableRows(sourceRows)
       return
     }
     const searchableKeys = Object.values(columnKeyMap)
-    setTableRows(filterRows(rows, searchableKeys, filterOperator, value))
+    setTableRows(filterRows(sourceRows, searchableKeys, filterOperator, value))
     setFilterOpen(false)
     setMenuFilterKey(null)
     setOperatorOpen(false)
   }
 
-  const handleCellClick = (columnKey: ColumnKey, rowId: number) => {
+  const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
     // TODO: replace with real navigation
     console.log('navigate', { columnKey, rowId })
