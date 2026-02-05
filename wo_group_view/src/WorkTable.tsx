@@ -145,7 +145,7 @@ export default function WorkTable() {
           <span>WOグループ候補リスト</span>
         </div>
         <div className="panel-actions">
-          <button className="top-btn" type="button">
+          {/* <button className="top-btn" type="button">
             <span className="btn-icon">
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M2 3h9v9H2z" />
@@ -166,11 +166,11 @@ export default function WorkTable() {
               </svg>
             </span>
             フィルターを編集する
-          </button>
+          </button> */}
           <button className="top-btn" type="button" onClick={handleBindGroup}>
             WOグループ紐付け
           </button>
-          {filterOpen ? (
+          {/* {filterOpen ? (
             <div className="filter-pop" role="dialog" aria-label="フィルター">
               <div className="filter-head">
                 <span>フィルター</span>
@@ -235,7 +235,7 @@ export default function WorkTable() {
                 </button>
               </div>
             </div>
-          ) : null}
+          ) : null} */}
         </div>
       </header>
 
@@ -302,7 +302,7 @@ export default function WorkTable() {
                     </span>
                     降順
                   </button>
-                  <div className="menu-sep" />
+                  {/* <div className="menu-sep" />
                   <button className="menu-item" role="menuitem">
                     <span className="menu-icon">
                       <svg viewBox="0 0 16 16">
@@ -310,7 +310,7 @@ export default function WorkTable() {
                       </svg>
                     </span>
                     グループ化
-                  </button>
+                  </button> */}
                   <button
                     className="menu-item"
                     role="menuitem"
@@ -325,7 +325,7 @@ export default function WorkTable() {
                     </span>
                     フィルター
                   </button>
-                  <div className="menu-sep" />
+                  {/* <div className="menu-sep" />
                   <button className="menu-item" role="menuitem">
                     <span className="menu-icon">
                       <svg viewBox="0 0 16 16">
@@ -349,7 +349,7 @@ export default function WorkTable() {
                       </svg>
                     </span>
                     右へ移動
-                  </button>
+                  </button> */}
                   {menuFilterKey === col.key ? (
                     <div
                       className="filter-pop in-menu"
