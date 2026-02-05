@@ -32,6 +32,7 @@ type XrmLike = {
   WebApi?: {
     retrieveRecord: (entityName: string, id: string, query?: string) => Promise<any>
     updateRecord: (entityName: string, id: string, data: Record<string, unknown>) => Promise<any>
+    retrieveMultipleRecords: (entityName: string, query?: string) => Promise<any>
   }
 }
 
@@ -62,6 +63,13 @@ const readLookup = (form: FormContext, name: string): LookupValue | null => {
 }
 
 const normalizeId = (id?: string) => (id ?? '').replace(/[{}]/g, '')
+
+export const getCurrentProjectId = () => {
+  const form = getFormContext()
+  if (!form) return ''
+  const projectLookup = readLookup(form, 'proto_project')
+  return normalizeId(projectLookup?.id)
+}
 
 export const getWorkGroupRows = async (): Promise<WorkGroupRow[]> => {
   const form = getFormContext()
@@ -109,4 +117,28 @@ export const updateProjectName = async (projectId: string, name: string) => {
   await xrm.WebApi.updateRecord('proto_project', normalizedId, {
     proto_name: name,
   })
+}
+
+export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
+  const xrm = getXrm()
+  const projectId = getCurrentProjectId()
+  if (!xrm?.WebApi?.retrieveMultipleRecords || !projectId) return []
+
+  const query =
+    `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value` +
+    `&$filter=_proto_project_value eq ${projectId}` +
+    `&$expand=proto_project($select=proto_name)`
+
+  const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
+  const rows = (result?.entities ?? []) as any[]
+
+  return rows.map((row) => ({
+    id: normalizeId(row.proto_workorderid ?? row.activityid ?? row.id ?? ''),
+    woNumber: row.proto_wonumber ?? '',
+    woTitle: row.proto_wotitle ?? '',
+    status: row['_proto_workordersubstatus_value@OData.Community.Display.V1.FormattedValue'] ?? '',
+    groupNumber: row['_proto_project_value@OData.Community.Display.V1.FormattedValue'] ?? '',
+    groupTitle: row.proto_project?.proto_name ?? '',
+    projectId: normalizeId(row._proto_project_value),
+  }))
 }

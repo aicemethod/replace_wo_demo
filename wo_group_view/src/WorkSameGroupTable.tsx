@@ -1,41 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-
-type Row = {
-  id: number
-  woNumber: string
-  woTitle: string
-  status: 'In Progress' | 'Signed' | 'Closed'
-  groupNumber: string
-  groupTitle: string
-}
-
-const rows: Row[] = [
-  {
-    id: 1,
-    woNumber: '00000010',
-    woTitle: '定期保守点検',
-    status: 'In Progress',
-    groupNumber: 'WOG01',
-    groupTitle: '北関東メンテ',
-  },
-  {
-    id: 2,
-    woNumber: '00000011',
-    woTitle: '設備更新',
-    status: 'Signed',
-    groupNumber: 'WOG01',
-    groupTitle: '北関東メンテ',
-  },
-  {
-    id: 3,
-    woNumber: '00000012',
-    woTitle: '安全対策',
-    status: 'Closed',
-    groupNumber: 'WOG01',
-    groupTitle: '北関東メンテ',
-  },
-]
+import { getSameGroupRows, type WorkGroupRow } from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -50,17 +15,18 @@ const columns: { key: ColumnKey; label: string }[] = [
 ]
 
 export default function WorkSameGroupTable() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const allSelected = useMemo(
-    () => rows.length > 0 && selectedIds.length === rows.length,
-    [selectedIds]
+    () => tableRows.length > 0 && selectedIds.length === tableRows.length,
+    [selectedIds, tableRows.length]
   )
 
   const toggleAll = (checked: boolean) => {
-    setSelectedIds(checked ? rows.map((row) => row.id) : [])
+    setSelectedIds(checked ? tableRows.map((row) => row.id) : [])
   }
 
-  const toggleRow = (id: number, checked: boolean) => {
+  const toggleRow = (id: string, checked: boolean) => {
     setSelectedIds((prev) => {
       if (checked) {
         return prev.includes(id) ? prev : [...prev, id]
@@ -69,7 +35,17 @@ export default function WorkSameGroupTable() {
     })
   }
 
-  const handleCellClick = (columnKey: ColumnKey, rowId: number) => {
+  useEffect(() => {
+    let mounted = true
+    getSameGroupRows().then((data) => {
+      if (mounted) setTableRows(data)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
     console.log('navigate', { columnKey, rowId })
   }
@@ -107,7 +83,7 @@ export default function WorkSameGroupTable() {
         </div>
 
         <div className="table-body">
-          {rows.map((row) => (
+          {tableRows.map((row) => (
             <div
               className={`tr ${selectedIds.includes(row.id) ? 'is-selected' : ''}`}
               key={row.id}
@@ -142,7 +118,7 @@ export default function WorkSameGroupTable() {
           ))}
         </div>
 
-        <div className="table-footer">行: {rows.length}</div>
+        <div className="table-footer">行: {tableRows.length}</div>
       </div>
     </section>
   )
