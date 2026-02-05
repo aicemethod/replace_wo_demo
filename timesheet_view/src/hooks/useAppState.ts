@@ -8,10 +8,11 @@ import type { MainTab, ViewMode, DateTimeRange, Event } from "../types";
  * 画面状態とモーダル状態を管理
  */
 export const useAppState = () => {
-    /** URLパラメータ（recordid / data / value＝WOのGUID）を取得 */
+    /** URLパラメータ（recordid / data＝WOのGUID、data は "id\u0001label" 形式のときあり）を取得 */
     const { recordid, data, value } = getUrlParams();
-    /** パラメータと一致する値を Select にセットする用 */
-    const paramWoId = recordid || data || value || "";
+    const raw = recordid || data || value || "";
+    /** パラメータと一致する値を Select にセットする用（data が "id\u0001label" のときは id のみ使用） */
+    const paramWoId = raw.includes("\u0001") ? raw.split("\u0001")[0] : raw;
 
     /** サブグリッドで表示されているかどうか */
     const isSubgrid = isSubgridContext();

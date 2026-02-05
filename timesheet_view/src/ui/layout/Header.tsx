@@ -16,7 +16,9 @@ export const Header: React.FC<HeaderProps> = ({
     setSelectedWO,
 }) => {
     const { t } = useTranslation();
-    const { label: paramLabel } = getUrlParams();
+    const params = getUrlParams();
+    const dataParam = params.data || params.recordid || params.value || "";
+    const paramLabel = dataParam.includes("\u0001") ? (dataParam.split("\u0001")[1] || "") : "";
 
     const woOptions = [
         { value: "all", label: t("header.all") },

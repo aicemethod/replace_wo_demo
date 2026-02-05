@@ -12,16 +12,15 @@ function viewTimesheet(primaryControl) {
             var appId = appProperties.appId;
             var webResourceName = "proto_timesheet_ui_demo";
 
-            var label = workOrderName ? workOrderName : "";
+            var label = (workOrderName != null && workOrderName !== "") ? String(workOrderName) : "";
+            var data = label ? recordId + "\u0001" + label : recordId;
             var url =
                 globalContext.getClientUrl()
                 + "/main.aspx"
                 + "?appid=" + appId
                 + "&pagetype=webresource"
                 + "&webresourceName=" + encodeURIComponent(webResourceName)
-                + "&data=" + encodeURIComponent(recordId)
-                + "&value=" + encodeURIComponent(recordId)
-                + "&label=" + encodeURIComponent(label);
+                + "&data=" + encodeURIComponent(data);
 
             window.open(url, "_blank");
         },
