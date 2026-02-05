@@ -34,6 +34,9 @@ type XrmLike = {
     updateRecord: (entityName: string, id: string, data: Record<string, unknown>) => Promise<any>
     retrieveMultipleRecords: (entityName: string, query?: string) => Promise<any>
   }
+  Navigation?: {
+    openForm: (options: { entityName: string; entityId: string }) => Promise<any>
+  }
 }
 
 const getXrm = (): XrmLike | null => {
@@ -193,4 +196,14 @@ export const updateWorkordersProject = async (workorderIds: string[]) => {
   await Promise.all(
     workorderIds.map((id) => xrm.WebApi!.updateRecord('proto_workorder', id, bind))
   )
+}
+
+export const openWorkorderForm = async (id: string) => {
+  const xrm = getXrm()
+  const normalizedId = normalizeId(id)
+  if (!xrm?.Navigation?.openForm || !normalizedId) return
+  await xrm.Navigation.openForm({
+    entityName: 'proto_workorder',
+    entityId: normalizedId,
+  })
 }

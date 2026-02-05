@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { getSameGroupRows, type WorkGroupRow } from './powerAppsData'
+import { getSameGroupRows, type WorkGroupRow, openWorkorderForm } from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -47,7 +47,7 @@ export default function WorkSameGroupTable() {
 
   const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
-    console.log('navigate', { columnKey, rowId })
+    openWorkorderForm(rowId)
   }
 
   return (

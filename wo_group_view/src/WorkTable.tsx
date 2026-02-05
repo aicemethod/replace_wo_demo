@@ -8,7 +8,12 @@ import {
   getFilterOperatorLabel,
   operatorNeedsValue,
 } from './filterUtils'
-import { getMainRows, type WorkGroupRow, updateWorkordersProject } from './powerAppsData'
+import {
+  getMainRows,
+  type WorkGroupRow,
+  updateWorkordersProject,
+  openWorkorderForm,
+} from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -130,8 +135,7 @@ export default function WorkTable() {
 
   const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
-    // TODO: replace with real navigation
-    console.log('navigate', { columnKey, rowId })
+    openWorkorderForm(rowId)
   }
 
   return (
