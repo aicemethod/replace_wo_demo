@@ -52,10 +52,10 @@ export default function WorkGroupTable() {
     console.log('navigate', { columnKey, rowId })
   }
 
-  const refreshRows = async () => {
-    const data = await getWorkGroupRows()
-    setTableRows(data)
-  }
+  // const refreshRows = async () => {
+  //   const data = await getWorkGroupRows()
+  //   setTableRows(data)
+  // }
 
   const handleGroupTitleChange = (id: string, value: string) => {
     setTableRows((prev) =>
