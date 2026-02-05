@@ -65,7 +65,8 @@ body {
 
 .col-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
+  transform: none;
   left: 0;
   width: 190px;
   background: #fff;
@@ -74,6 +75,15 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
   padding: 6px 0;
   z-index: 20;
+}
+
+.panel.is-filter-open .col-menu {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(226, 226, 226, 0.6);
+}
+
+.panel.is-filter-open .col-menu .menu-item {
+  opacity: 0.55;
 }
 
 .menu-item {
@@ -167,6 +177,7 @@ body {
   top: calc(100% + 8px);
   right: 0;
   width: 240px;
+  height: 220px;
   background: #fff;
   border: 1px solid #e2e2e2;
   border-radius: 10px;
@@ -175,7 +186,7 @@ body {
 }
 
 .filter-pop.in-menu {
-  top: 6px;
+  top: 0px;
   right: auto;
   left: calc(100% + 8px);
 }
@@ -202,6 +213,7 @@ body {
   padding: 12px;
   display: grid;
   gap: 10px;
+  height: calc(100% - 41px);
 }
 
 .filter-label {
@@ -237,7 +249,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 28px 8px 10px;
+  padding: 8px;
   border: 1px solid #cfd2d6;
   border-radius: 6px;
   background: #fff;
@@ -249,10 +261,12 @@ body {
 
 .select-options {
   position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
+  top: -84px;
+  left: calc(100% + 20px);
+  right: auto;
+  width: 220px;
   max-height: 220px;
+  height: 220px;
   overflow-y: auto;
   background: #fff;
   border: 1px solid #e2e2e2;
@@ -280,10 +294,8 @@ body {
 }
 
 .filter-select .select-caret {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: static;
+  margin-left: auto;
   color: #6f7780;
   pointer-events: none;
 }
@@ -461,16 +473,16 @@ body {
   opacity: 0;
 }
 
-.cb input:checked + .cb-box {
+.cb input:checked+.cb-box {
   background: #2b73d6;
   border-color: #2b73d6;
 }
 
-.cb input:checked + .cb-box svg {
+.cb input:checked+.cb-box svg {
   opacity: 1;
 }
 
-.cb input:focus-visible + .cb-box {
+.cb input:focus-visible+.cb-box {
   outline: 2px solid #2b73d6;
   outline-offset: 2px;
 }
@@ -552,6 +564,7 @@ body {
 }
 
 @media (max-width: 720px) {
+
   .table-head,
   .tr {
     grid-template-columns: 44px 0.9fr 1.2fr 0.9fr 0.9fr 1.1fr;

@@ -40,7 +40,7 @@ export default function WorkTable() {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const [sourceRows, setSourceRows] = useState<WorkGroupRow[]>([])
-  // const [filterOpen, setFilterOpen] = useState(false)
+  const [filterOpen, setFilterOpen] = useState(false)
   const [filterValue, setFilterValue] = useState('')
   const [menuFilterKey, setMenuFilterKey] = useState<ColumnKey | null>(null)
   const [filterOperator, setFilterOperator] = useState<FilterOperatorKey>('equals')
@@ -128,9 +128,10 @@ export default function WorkTable() {
     }
     const searchableKeys = Object.values(columnKeyMap)
     setTableRows(filterRows(sourceRows, searchableKeys, filterOperator, value))
-    // setFilterOpen(false)
+    setFilterOpen(false)
     setMenuFilterKey(null)
     setOperatorOpen(false)
+    setOpenMenu(null)
   }
 
   const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
@@ -139,7 +140,7 @@ export default function WorkTable() {
   }
 
   return (
-    <section className="panel">
+    <section className={`panel ${menuFilterKey ? 'is-filter-open' : ''}`}>
       <header className="panel-header">
         <div className="panel-title">
           <span>WOグループ候補リスト</span>
@@ -409,11 +410,6 @@ export default function WorkTable() {
                             placeholder=""
                             disabled={!operatorNeedsValue(filterOperator)}
                           />
-                          <span className="select-caret" aria-hidden="true">
-                            <svg viewBox="0 0 12 8">
-                              <path d="M2 2.5L6 6l4-3.5" />
-                            </svg>
-                          </span>
                         </div>
                         <button className="filter-apply" type="button" onClick={applyFilter}>
                           適用
