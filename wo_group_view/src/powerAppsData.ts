@@ -151,11 +151,13 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
   const account = readLookup(form, 'proto_account')
   const enduser = readLookup(form, 'proto_enduser')
   const bu = readLookup(form, 'owningbusinessunit')
+  const currentProjectId = getCurrentProjectId()
 
   const filters = [
     account?.id ? `_proto_account_value eq ${normalizeId(account.id)}` : '',
     enduser?.id ? `_proto_enduser_value eq ${normalizeId(enduser.id)}` : '',
     bu?.id ? `_owningbusinessunit_value eq ${normalizeId(bu.id)}` : '',
+    currentProjectId ? `_proto_project_value ne ${currentProjectId}` : '',
   ].filter(Boolean)
 
   if (filters.length === 0) return []
