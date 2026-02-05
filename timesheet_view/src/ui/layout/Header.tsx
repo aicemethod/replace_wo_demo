@@ -1,6 +1,7 @@
 import { Select } from "../components/Select";
 import "../styles/layout/Header.css";
 import { useTranslation } from "react-i18next";
+import { getUrlParams } from "../../utils/url";
 import type { HeaderProps } from "../../types/components";
 
 /**
@@ -15,16 +16,16 @@ export const Header: React.FC<HeaderProps> = ({
     setSelectedWO,
 }) => {
     const { t } = useTranslation();
+    const { label: paramLabel } = getUrlParams();
 
     const woOptions = [
         { value: "all", label: t("header.all") },
+        ...(paramLabel && selectedWO && selectedWO !== "all" ? [{ value: selectedWO, label: paramLabel }] : []),
         ...workOrders.map((wo) => ({
             value: wo.id,
             label: wo.name || t("header.noName"),
         })),
     ];
-    /** パラメータと value が一致したオプションを初期表示（大文字小文字を無視） */
-    const displayValue = woOptions.find((o) => o.value.toLowerCase() === (selectedWO || "").toLowerCase())?.value ?? selectedWO;
 
     return (
         <header className="app-header">
@@ -37,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <Select
                     options={woOptions}
-                    value={displayValue}
+                    value={selectedWO}
                     onChange={setSelectedWO}
                     placeholder={t("header.selectWO")}
                 />

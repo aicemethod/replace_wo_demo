@@ -2,7 +2,7 @@ function viewTimesheet(primaryControl) {
 
     var globalContext = Xrm.Utility.getGlobalContext();
     var recordId = primaryControl.data.entity.getId().replace(/[{}]/g, "");
-    const workOrderName = primaryControl.data.entity.attributes.get("proto_wonumber");
+    const workOrderName = primaryControl.data.entity.attributes.get("proto_wonumber").getValue();
 
     console.log("DEBUG MESSAGE");
 
@@ -12,6 +12,7 @@ function viewTimesheet(primaryControl) {
             var appId = appProperties.appId;
             var webResourceName = "proto_timesheet_ui_demo";
 
+            var label = workOrderName ? workOrderName : "";
             var url =
                 globalContext.getClientUrl()
                 + "/main.aspx"
@@ -19,7 +20,8 @@ function viewTimesheet(primaryControl) {
                 + "&pagetype=webresource"
                 + "&webresourceName=" + encodeURIComponent(webResourceName)
                 + "&data=" + encodeURIComponent(recordId)
-                + "&wonumber=" + encodeURIComponent(workOrderName ? (workOrderName.getValue() || "") : "");
+                + "&value=" + encodeURIComponent(recordId)
+                + "&label=" + encodeURIComponent(label);
 
             window.open(url, "_blank");
         },
