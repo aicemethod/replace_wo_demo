@@ -1,59 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-
-type Row = {
-  id: number
-  woNumber: string
-  woTitle: string
-  status: 'In Progress' | 'Signed' | 'Closed'
-  groupNumber: string
-  groupTitle: string
-}
-
-const rows: Row[] = [
-  {
-    id: 1,
-    woNumber: '00000000',
-    woTitle: '定期保守点検',
-    status: 'In Progress',
-    groupNumber: 'WOG01',
-    groupTitle: '北関東メンテ',
-  },
-  {
-    id: 2,
-    woNumber: '00000001',
-    woTitle: '設備更新',
-    status: 'Signed',
-    groupNumber: 'WOG02',
-    groupTitle: '東北エリアA',
-  },
-  {
-    id: 3,
-    woNumber: '00000002',
-    woTitle: '安全対策',
-    status: 'Closed',
-    groupNumber: 'WOG03',
-    groupTitle: '関西支店B',
-  },
-  {
-    id: 4,
-    woNumber: '00000003',
-    woTitle: '定期清掃',
-    status: 'In Progress',
-    groupNumber: 'WOG04',
-    groupTitle: '中部メンテ',
-  },
-]
+import { getWorkGroupRows, type WorkGroupRow } from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
-
-// const columnKeyMap: Record<ColumnKey, keyof Row> = {
-//   woNumber: 'woNumber',
-//   woTitle: 'woTitle',
-//   status: 'status',
-//   groupNumber: 'groupNumber',
-//   groupTitle: 'groupTitle',
-// }
 
 const linkableColumns = new Set<ColumnKey>(['groupNumber'])
 
@@ -66,9 +15,9 @@ const columns: { key: ColumnKey; label: string }[] = [
 ]
 
 export default function WorkGroupTable() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([])
-  const [tableRows, setTableRows] = useState<Row[]>(rows)
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const allSelected = useMemo(
     () => tableRows.length > 0 && selectedIds.length === tableRows.length,
@@ -79,7 +28,7 @@ export default function WorkGroupTable() {
     setSelectedIds(checked ? tableRows.map((row) => row.id) : [])
   }
 
-  const toggleRow = (id: number, checked: boolean) => {
+  const toggleRow = (id: string, checked: boolean) => {
     setSelectedIds((prev) => {
       if (checked) {
         return prev.includes(id) ? prev : [...prev, id]
@@ -88,18 +37,28 @@ export default function WorkGroupTable() {
     })
   }
 
-  const handleCellClick = (columnKey: ColumnKey, rowId: number) => {
+  useEffect(() => {
+    let mounted = true
+    getWorkGroupRows().then((data) => {
+      if (mounted) setTableRows(data)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
     console.log('navigate', { columnKey, rowId })
   }
 
-  const handleGroupTitleChange = (id: number, value: string) => {
+  const handleGroupTitleChange = (id: string, value: string) => {
     setTableRows((prev) =>
       prev.map((row) => (row.id === id ? { ...row, groupTitle: value } : row))
     )
   }
 
-  const handleStartEdit = (id: number) => {
+  const handleStartEdit = (id: string) => {
     setEditingId(id)
   }
 
