@@ -8,7 +8,7 @@ import {
   getFilterOperatorLabel,
   operatorNeedsValue,
 } from './filterUtils'
-import { getMainRows, type WorkGroupRow } from './powerAppsData'
+import { getMainRows, type WorkGroupRow, updateWorkordersProject } from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -70,6 +70,18 @@ export default function WorkTable() {
       mounted = false
     }
   }, [])
+
+  const refreshMainRows = async () => {
+    const data = await getMainRows()
+    setSourceRows(data)
+    setTableRows(data)
+  }
+
+  const handleBindGroup = async () => {
+    if (selectedIds.length === 0) return
+    await updateWorkordersProject(selectedIds)
+    await refreshMainRows()
+  }
 
   useEffect(() => {
     const handle = (event: MouseEvent) => {
@@ -150,6 +162,9 @@ export default function WorkTable() {
               </svg>
             </span>
             フィルターを編集する
+          </button>
+          <button className="top-btn" type="button" onClick={handleBindGroup}>
+            WOグループ紐付け
           </button>
           {filterOpen ? (
             <div className="filter-pop" role="dialog" aria-label="フィルター">

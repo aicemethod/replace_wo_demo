@@ -180,3 +180,17 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
     projectId: normalizeId(row._proto_project_value),
   }))
 }
+
+export const updateWorkordersProject = async (workorderIds: string[]) => {
+  const xrm = getXrm()
+  const projectId = getCurrentProjectId()
+  if (!xrm?.WebApi?.updateRecord || !projectId || workorderIds.length === 0) return
+
+  const bind = {
+    'proto_project@odata.bind': `/proto_projects(${projectId})`,
+  }
+
+  await Promise.all(
+    workorderIds.map((id) => xrm.WebApi!.updateRecord('proto_workorder', id, bind))
+  )
+}
