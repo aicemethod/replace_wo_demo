@@ -207,3 +207,13 @@ export const openWorkorderForm = async (id: string) => {
     entityId: normalizedId,
   })
 }
+
+export const openProjectForm = async (id: string) => {
+  const xrm = getXrm()
+  const normalizedId = normalizeId(id)
+  if (!xrm?.Navigation?.openForm || !normalizedId) return
+  await xrm.Navigation.openForm({
+    entityName: 'proto_project',
+    entityId: normalizedId,
+  })
+}

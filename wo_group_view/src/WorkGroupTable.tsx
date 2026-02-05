@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { getWorkGroupRows, type WorkGroupRow, updateProjectName } from './powerAppsData'
+import {
+  getWorkGroupRows,
+  type WorkGroupRow,
+  updateProjectName,
+  openProjectForm,
+} from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -49,7 +54,10 @@ export default function WorkGroupTable() {
 
   const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
-    console.log('navigate', { columnKey, rowId })
+    const row = tableRows.find((item) => item.id === rowId)
+    if (row?.projectId) {
+      openProjectForm(row.projectId)
+    }
   }
 
   // const refreshRows = async () => {
