@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { getWorkGroupRows, type WorkGroupRow } from './powerAppsData'
+import { getWorkGroupRows, type WorkGroupRow, updateProjectName } from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -52,10 +52,21 @@ export default function WorkGroupTable() {
     console.log('navigate', { columnKey, rowId })
   }
 
-  const handleGroupTitleChange = (id: string, value: string) => {
+  const refreshRows = async () => {
+    const data = await getWorkGroupRows()
+    setTableRows(data)
+  }
+
+  const handleGroupTitleChange = async (
+    id: string,
+    projectId: string,
+    value: string
+  ) => {
     setTableRows((prev) =>
       prev.map((row) => (row.id === id ? { ...row, groupTitle: value } : row))
     )
+    await updateProjectName(projectId, value)
+    await refreshRows()
   }
 
   const handleStartEdit = (id: string) => {
@@ -142,7 +153,9 @@ export default function WorkGroupTable() {
                   <input
                     className="cell-input is-editing"
                     value={row.groupTitle}
-                    onChange={(event) => handleGroupTitleChange(row.id, event.target.value)}
+                    onChange={(event) =>
+                      handleGroupTitleChange(row.id, row.projectId, event.target.value)
+                    }
                     onBlur={handleFinishEdit}
                     autoFocus
                   />
@@ -154,7 +167,7 @@ export default function WorkGroupTable() {
           ))}
         </div>
 
-        <div className="table-footer">行: {tableRows.length}</div>
+        {/* <div className="table-footer">行: {tableRows.length}</div> */}
       </div>
     </section>
   )

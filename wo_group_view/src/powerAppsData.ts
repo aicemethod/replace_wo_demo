@@ -5,6 +5,7 @@ export type WorkGroupRow = {
   status: string
   groupNumber: string
   groupTitle: string
+  projectId: string
 }
 
 type LookupValue = {
@@ -30,6 +31,7 @@ type XrmLike = {
   Page?: FormContext
   WebApi?: {
     retrieveRecord: (entityName: string, id: string, query?: string) => Promise<any>
+    updateRecord: (entityName: string, id: string, data: Record<string, unknown>) => Promise<any>
   }
 }
 
@@ -94,6 +96,17 @@ export const getWorkGroupRows = async (): Promise<WorkGroupRow[]> => {
       status: statusLookup?.name ?? '',
       groupNumber: projectLookup?.name ?? '',
       groupTitle: projectTitle,
+      projectId,
     },
   ]
+}
+
+export const updateProjectName = async (projectId: string, name: string) => {
+  const normalizedId = normalizeId(projectId)
+  if (!normalizedId) return
+  const xrm = getXrm()
+  if (!xrm?.WebApi?.updateRecord) return
+  await xrm.WebApi.updateRecord('proto_project', normalizedId, {
+    proto_name: name,
+  })
 }
