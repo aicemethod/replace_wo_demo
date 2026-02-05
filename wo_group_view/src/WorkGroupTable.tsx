@@ -57,14 +57,13 @@ export default function WorkGroupTable() {
     setTableRows(data)
   }
 
-  const handleGroupTitleChange = async (
-    id: string,
-    projectId: string,
-    value: string
-  ) => {
+  const handleGroupTitleChange = (id: string, value: string) => {
     setTableRows((prev) =>
       prev.map((row) => (row.id === id ? { ...row, groupTitle: value } : row))
     )
+  }
+
+  const handleGroupTitleCommit = async (projectId: string, value: string) => {
     await updateProjectName(projectId, value)
     await refreshRows()
   }
@@ -153,10 +152,11 @@ export default function WorkGroupTable() {
                   <input
                     className="cell-input is-editing"
                     value={row.groupTitle}
-                    onChange={(event) =>
-                      handleGroupTitleChange(row.id, row.projectId, event.target.value)
-                    }
-                    onBlur={handleFinishEdit}
+                    onChange={(event) => handleGroupTitleChange(row.id, event.target.value)}
+                    onBlur={() => {
+                      handleFinishEdit()
+                      handleGroupTitleCommit(row.projectId, row.groupTitle)
+                    }}
                     autoFocus
                   />
                 ) : (
