@@ -1,13 +1,5 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import './App.css'
-import { sortRows, type SortDirection } from './sortUtils'
-import {
-  filterRows,
-  type FilterOperatorKey,
-  filterOperatorOptions,
-  getFilterOperatorLabel,
-  operatorNeedsValue,
-} from './filterUtils'
 
 type Row = {
   id: number
@@ -55,13 +47,13 @@ const rows: Row[] = [
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
-const columnKeyMap: Record<ColumnKey, keyof Row> = {
-  woNumber: 'woNumber',
-  woTitle: 'woTitle',
-  status: 'status',
-  groupNumber: 'groupNumber',
-  groupTitle: 'groupTitle',
-}
+// const columnKeyMap: Record<ColumnKey, keyof Row> = {
+//   woNumber: 'woNumber',
+//   woTitle: 'woTitle',
+//   status: 'status',
+//   groupNumber: 'groupNumber',
+//   groupTitle: 'groupTitle',
+// }
 
 const linkableColumns = new Set<ColumnKey>(['groupNumber'])
 
@@ -75,12 +67,7 @@ const columns: { key: ColumnKey; label: string }[] = [
 
 export default function WorkGroupTable() {
   const [selectedIds, setSelectedIds] = useState<number[]>([])
-  const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [tableRows, setTableRows] = useState<Row[]>(rows)
-  const [filterValue, setFilterValue] = useState('')
-  const [menuFilterKey, setMenuFilterKey] = useState<ColumnKey | null>(null)
-  const [filterOperator, setFilterOperator] = useState<FilterOperatorKey>('equals')
-  const [operatorOpen, setOperatorOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
 
   const allSelected = useMemo(
@@ -99,50 +86,6 @@ export default function WorkGroupTable() {
       }
       return prev.filter((item) => item !== id)
     })
-  }
-
-  useEffect(() => {
-    const handle = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null
-      if (target?.closest('.col-menu') || target?.closest('.filter-pop')) {
-        return
-      }
-      setOpenMenu(null)
-      setMenuFilterKey(null)
-    }
-    document.addEventListener('click', handle)
-    return () => document.removeEventListener('click', handle)
-  }, [])
-
-  const toggleMenu = (key: string) => {
-    setOpenMenu((prev) => {
-      const next = prev === key ? null : key
-      if (!next) {
-        setMenuFilterKey(null)
-      } else if (prev && prev !== key) {
-        setMenuFilterKey(null)
-      }
-      return next
-    })
-  }
-
-  const handleSort = (columnKey: ColumnKey, direction: SortDirection) => {
-    setTableRows((prev) => sortRows(prev, columnKeyMap, columnKey, direction))
-    setOpenMenu(null)
-  }
-
-  const operatorLabel = getFilterOperatorLabel(filterOperator)
-
-  const applyFilter = () => {
-    const value = filterValue.trim()
-    if (operatorNeedsValue(filterOperator) && !value) {
-      setTableRows(rows)
-      return
-    }
-    const searchableKeys = Object.values(columnKeyMap)
-    setTableRows(filterRows(rows, searchableKeys, filterOperator, value))
-    setMenuFilterKey(null)
-    setOperatorOpen(false)
   }
 
   const handleCellClick = (columnKey: ColumnKey, rowId: number) => {
