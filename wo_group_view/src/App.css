@@ -67,11 +67,11 @@ body {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  width: 180px;
+  width: 190px;
   background: #fff;
-  border: 1px solid #e4e4e4;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
   padding: 6px 0;
   z-index: 20;
 }
@@ -81,7 +81,7 @@ body {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 9px 12px;
   border: none;
   background: transparent;
   color: #2f3337;
@@ -113,8 +113,8 @@ body {
 
 .menu-sep {
   height: 1px;
-  background: #e7e7e7;
-  margin: 4px 0;
+  background: #ededed;
+  margin: 6px 0;
 }
 
 .panel-actions {
@@ -123,6 +123,7 @@ body {
   gap: 16px;
   color: #3c434c;
   font-size: 12px;
+  position: relative;
 }
 
 .top-btn {
@@ -161,6 +162,151 @@ body {
   stroke-linejoin: round;
 }
 
+.filter-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+}
+
+.filter-pop.in-menu {
+  top: 6px;
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+.filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ededed;
+  font-weight: 600;
+  color: #2f3337;
+}
+
+.filter-close {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  color: #6f7780;
+}
+
+.filter-body {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.filter-label {
+  font-size: 11px;
+  color: #6b7077;
+}
+
+.filter-select {
+  position: relative;
+}
+
+.filter-select input {
+  width: 100%;
+  padding: 8px 28px 8px 10px;
+  border: 1px solid #cfd2d6;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+}
+
+.filter-select input {
+  padding-right: 28px;
+}
+
+.filter-select input:disabled {
+  background: #f5f5f5;
+  color: #9aa0a6;
+}
+
+.select-button {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 28px 8px 10px;
+  border: 1px solid #cfd2d6;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  color: #2f3337;
+  cursor: pointer;
+  text-align: left;
+}
+
+.select-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  padding: 6px 0;
+  z-index: 30;
+}
+
+.select-option {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+  color: #2f3337;
+  cursor: pointer;
+}
+
+.select-option:hover {
+  background: #f2f2f2;
+}
+
+.filter-select .select-caret {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6f7780;
+  pointer-events: none;
+}
+
+.filter-select .select-caret svg {
+  width: 12px;
+  height: 8px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.filter-apply {
+  justify-self: end;
+  padding: 7px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #1e6bd6;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 .kebab {
   border: none;
   background: transparent;
@@ -188,7 +334,7 @@ body {
 .table-head,
 .tr {
   display: grid;
-  grid-template-columns: 44px 1.3fr 0.9fr 0.9fr 1.1fr 1.2fr 1.1fr 1fr;
+  grid-template-columns: 44px 0.9fr 1.4fr 1fr 1fr 1.4fr;
   align-items: center;
 }
 
@@ -369,14 +515,14 @@ body {
 
   .table-head,
   .tr {
-    grid-template-columns: 44px 1.1fr 0.8fr 0.8fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 44px 0.9fr 1.3fr 1fr 1fr 1.2fr;
   }
 }
 
 @media (max-width: 720px) {
   .table-head,
   .tr {
-    grid-template-columns: 44px 1.2fr 0.8fr 0.8fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 44px 0.9fr 1.2fr 0.9fr 0.9fr 1.1fr;
   }
 
   .panel-actions {

@@ -1,84 +1,117 @@
 import { useMemo, useState, useEffect } from 'react'
 import './App.css'
+import { sortRows, type SortDirection } from './sortUtils'
+import {
+  filterRows,
+  type FilterOperatorKey,
+  filterOperatorOptions,
+  getFilterOperatorLabel,
+  operatorNeedsValue,
+} from './filterUtils'
 
-const rows = [
+type Row = {
+  id: number
+  woNumber: string
+  woTitle: string
+  status: 'In Progress' | 'Signed' | 'Closed'
+  groupNumber: string
+  groupTitle: string
+}
+
+const rows: Row[] = [
   {
     id: 1,
-    title: 'あああああ',
-    status: 'アクティブ',
-    region: '',
-    recordDate: '',
-    author: '阿部 大輔',
-    delegate: '',
-    createdAt: '2025/10/11 16:50',
+    woNumber: '00000000',
+    woTitle: '定期保守点検',
+    status: 'In Progress',
+    groupNumber: 'WOG01',
+    groupTitle: '北関東メンテ',
   },
   {
     id: 2,
-    title: 'サンプル②',
-    status: 'アクティブ',
-    region: '',
-    recordDate: '',
-    author: '阿部 大輔',
-    delegate: '',
-    createdAt: '2025/10/13 22:11',
+    woNumber: '00000001',
+    woTitle: '設備更新',
+    status: 'Signed',
+    groupNumber: 'WOG02',
+    groupTitle: '東北エリアA',
   },
   {
     id: 3,
-    title: 'テスト',
-    status: 'アクティブ',
-    region: '',
-    recordDate: '',
-    author: '阿部 大輔',
-    delegate: '',
-    createdAt: '2025/12/17 16:08',
+    woNumber: '00000002',
+    woTitle: '安全対策',
+    status: 'Closed',
+    groupNumber: 'WOG03',
+    groupTitle: '関西支店B',
   },
   {
     id: 4,
-    title: '',
-    status: 'アクティブ',
-    region: '',
-    recordDate: '',
-    author: '阿部 大輔',
-    delegate: '',
-    createdAt: '2026/01/22 10:20',
+    woNumber: '00000003',
+    woTitle: '定期清掃',
+    status: 'In Progress',
+    groupNumber: 'WOG04',
+    groupTitle: '中部メンテ',
   },
   {
     id: 5,
-    title: 'サンプル③',
-    status: 'アクティブ',
-    region: '',
-    recordDate: '',
-    author: '阿部 大輔',
-    delegate: '',
-    createdAt: '2026/01/29 09:12',
+    woNumber: '00000004',
+    woTitle: '設備点検',
+    status: 'Signed',
+    groupNumber: 'WOG05',
+    groupTitle: '九州南部',
   },
   {
     id: 6,
-    title: 'サンプル④',
-    status: 'アクティブ',
-    region: '',
-    recordDate: '',
-    author: '阿部 大輔',
-    delegate: '',
-    createdAt: '2026/02/01 14:35',
+    woNumber: '00000005',
+    woTitle: '試運転',
+    status: 'Closed',
+    groupNumber: 'WOG06',
+    groupTitle: '北海道東部',
   },
 ]
 
-const linkableColumns = new Set([
-  'work',
-  'status',
+type ColumnKey =
+  | 'woNumber'
+  | 'woTitle'
+  | 'status'
+  | 'groupNumber'
+  | 'groupTitle'
+
+const columnKeyMap: Record<ColumnKey, keyof Row> = {
+  woNumber: 'woNumber',
+  woTitle: 'woTitle',
+  status: 'status',
+  groupNumber: 'groupNumber',
+  groupTitle: 'groupTitle',
+}
+
+const linkableColumns = new Set<ColumnKey>([
+  'woNumber',
 ])
+
+const columns: { key: ColumnKey; label: string }[] = [
+  { key: 'woNumber', label: 'WO番号' },
+  { key: 'woTitle', label: 'WOタイトル' },
+  { key: 'status', label: 'ステータス' },
+  { key: 'groupNumber', label: 'WOグループ番号' },
+  { key: 'groupTitle', label: 'WOグループタイトル' },
+]
 
 function App() {
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const [tableRows, setTableRows] = useState<Row[]>(rows)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filterValue, setFilterValue] = useState('')
+  const [menuFilterKey, setMenuFilterKey] = useState<ColumnKey | null>(null)
+  const [filterOperator, setFilterOperator] = useState<FilterOperatorKey>('equals')
+  const [operatorOpen, setOperatorOpen] = useState(false)
   const allSelected = useMemo(
-    () => rows.length > 0 && selectedIds.length === rows.length,
-    [selectedIds]
+    () => tableRows.length > 0 && selectedIds.length === tableRows.length,
+    [selectedIds, tableRows.length]
   )
 
   const toggleAll = (checked: boolean) => {
-    setSelectedIds(checked ? rows.map((row) => row.id) : [])
+    setSelectedIds(checked ? tableRows.map((row) => row.id) : [])
   }
 
   const toggleRow = (id: number, checked: boolean) => {
@@ -91,16 +124,51 @@ function App() {
   }
 
   useEffect(() => {
-    const handle = () => setOpenMenu(null)
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
+    const handle = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null
+      if (target?.closest('.col-menu') || target?.closest('.filter-pop')) {
+        return
+      }
+      setOpenMenu(null)
+      setMenuFilterKey(null)
+    }
+    document.addEventListener('click', handle)
+    return () => document.removeEventListener('click', handle)
   }, [])
 
   const toggleMenu = (key: string) => {
-    setOpenMenu((prev) => (prev === key ? null : key))
+    setOpenMenu((prev) => {
+      const next = prev === key ? null : key
+      if (!next) {
+        setMenuFilterKey(null)
+      } else if (prev && prev !== key) {
+        setMenuFilterKey(null)
+      }
+      return next
+    })
   }
 
-  const handleCellClick = (columnKey: string, rowId: number) => {
+  const handleSort = (columnKey: ColumnKey, direction: SortDirection) => {
+    setTableRows((prev) => sortRows(prev, columnKeyMap, columnKey, direction))
+    setOpenMenu(null)
+  }
+
+  const operatorLabel = getFilterOperatorLabel(filterOperator)
+
+  const applyFilter = () => {
+    const value = filterValue.trim()
+    if (operatorNeedsValue(filterOperator) && !value) {
+      setTableRows(rows)
+      return
+    }
+    const searchableKeys = Object.values(columnKeyMap)
+    setTableRows(filterRows(rows, searchableKeys, filterOperator, value))
+    setFilterOpen(false)
+    setMenuFilterKey(null)
+    setOperatorOpen(false)
+  }
+
+  const handleCellClick = (columnKey: ColumnKey, rowId: number) => {
     if (!linkableColumns.has(columnKey)) return
     // TODO: replace with real navigation
     console.log('navigate', { columnKey, rowId })
@@ -129,7 +197,11 @@ function App() {
               </span>
               列 の編集
             </button>
-            <button className="top-btn" type="button">
+            <button
+              className="top-btn"
+              type="button"
+              onClick={() => setFilterOpen((prev) => !prev)}
+            >
               <span className="btn-icon">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
                   <path d="M2 3h12l-5 5v4l-2 1V8L2 3z" />
@@ -137,6 +209,50 @@ function App() {
               </span>
               フィルターを編集する
             </button>
+            {filterOpen ? (
+              <div className="filter-pop" role="dialog" aria-label="フィルター">
+                <div className="filter-head">
+                  <span>フィルター</span>
+                  <button
+                    className="filter-close"
+                    type="button"
+                    onClick={() => setFilterOpen(false)}
+                    aria-label="close"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="filter-body">
+                  <div className="filter-label">次の値と等しい</div>
+                  <div className="filter-select">
+                    <select>
+                      <option>次の値と等しい</option>
+                    </select>
+                    <span className="select-caret" aria-hidden="true">
+                      <svg viewBox="0 0 12 8">
+                        <path d="M2 2.5L6 6l4-3.5" />
+                      </svg>
+                    </span>
+                  </div>
+                  <div className="filter-select">
+                    <input
+                      type="text"
+                      value={filterValue}
+                      onChange={(event) => setFilterValue(event.target.value)}
+                      placeholder=""
+                    />
+                    <span className="select-caret" aria-hidden="true">
+                      <svg viewBox="0 0 12 8">
+                        <path d="M2 2.5L6 6l4-3.5" />
+                      </svg>
+                    </span>
+                  </div>
+                  <button className="filter-apply" type="button" onClick={applyFilter}>
+                    適用
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </header>
 
@@ -157,15 +273,7 @@ function App() {
                 </span>
               </label>
             </div>
-            {[
-              { key: 'work', label: '作業番号' },
-              { key: 'status', label: 'ステータス' },
-              { key: 'region', label: 'リージョン' },
-              { key: 'record', label: 'レコード作成日' },
-              { key: 'author', label: '作成者' },
-              { key: 'delegate', label: '修正者（代理）' },
-              { key: 'created', label: '作成日' },
-            ].map((col) => (
+            {columns.map((col) => (
               <div
                 key={col.key}
                 className="th th-menu"
@@ -185,8 +293,13 @@ function App() {
                     className="col-menu"
                     role="menu"
                     onClick={(event) => event.stopPropagation()}
+                    onMouseDown={(event) => event.stopPropagation()}
                   >
-                    <button className="menu-item" role="menuitem">
+                    <button
+                      className="menu-item"
+                      role="menuitem"
+                      onClick={() => handleSort(col.key, 'asc')}
+                    >
                       <span className="menu-icon">
                         <svg viewBox="0 0 16 16">
                           <path d="M8 13V3M8 3l-3 3M8 3l3 3" />
@@ -194,7 +307,11 @@ function App() {
                       </span>
                       昇順
                     </button>
-                    <button className="menu-item" role="menuitem">
+                    <button
+                      className="menu-item"
+                      role="menuitem"
+                      onClick={() => handleSort(col.key, 'desc')}
+                    >
                       <span className="menu-icon">
                         <svg viewBox="0 0 16 16">
                           <path d="M8 3v10M8 13l-3-3M8 13l3-3" />
@@ -211,7 +328,13 @@ function App() {
                       </span>
                       グループ化
                     </button>
-                    <button className="menu-item" role="menuitem">
+                    <button
+                      className="menu-item"
+                      role="menuitem"
+                      onClick={() =>
+                        setMenuFilterKey((prev) => (prev === col.key ? null : col.key))
+                      }
+                    >
                       <span className="menu-icon">
                         <svg viewBox="0 0 16 16">
                           <path d="M2 3h12l-5 5v4l-2 1V8L2 3z" />
@@ -244,6 +367,81 @@ function App() {
                       </span>
                       右へ移動
                     </button>
+                    {menuFilterKey === col.key ? (
+                      <div
+                        className="filter-pop in-menu"
+                        role="dialog"
+                        aria-label="フィルター"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        <div className="filter-head">
+                          <span>フィルター</span>
+                          <button
+                            className="filter-close"
+                            type="button"
+                            onClick={() => setMenuFilterKey(null)}
+                            aria-label="close"
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <div className="filter-body">
+                          <div className="filter-label">次の値と等しい</div>
+                          <div className="filter-select">
+                            <button
+                              className="select-button"
+                              type="button"
+                              onClick={() => setOperatorOpen((prev) => !prev)}
+                            >
+                              <span>{operatorLabel}</span>
+                              <span className="select-caret" aria-hidden="true">
+                                <svg viewBox="0 0 12 8">
+                                  <path d="M2 2.5L6 6l4-3.5" />
+                                </svg>
+                              </span>
+                            </button>
+                            {operatorOpen ? (
+                              <div className="select-options">
+                                {filterOperatorOptions.map((option) => (
+                                  <button
+                                    key={option.key}
+                                    className="select-option"
+                                    type="button"
+                                    onClick={() => {
+                                      setFilterOperator(option.key as FilterOperatorKey)
+                                      setOperatorOpen(false)
+                                    }}
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                          <div className="filter-select">
+                            <input
+                              type="text"
+                              value={filterValue}
+                              onChange={(event) => setFilterValue(event.target.value)}
+                              placeholder=""
+                              disabled={!operatorNeedsValue(filterOperator)}
+                            />
+                            <span className="select-caret" aria-hidden="true">
+                              <svg viewBox="0 0 12 8">
+                                <path d="M2 2.5L6 6l4-3.5" />
+                              </svg>
+                            </span>
+                          </div>
+                          <button
+                            className="filter-apply"
+                            type="button"
+                            onClick={applyFilter}
+                          >
+                            適用
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
@@ -251,7 +449,7 @@ function App() {
           </div>
 
           <div className="table-body">
-            {rows.map((row) => (
+            {tableRows.map((row) => (
               <div
                 className={`tr ${selectedIds.includes(row.id) ? 'is-selected' : ''}`}
                 key={row.id}
@@ -272,11 +470,18 @@ function App() {
                   </label>
                 </div>
                 <div
-                  className={`td ${linkableColumns.has('work') ? 'is-link' : ''}`}
-                  onClick={() => handleCellClick('work', row.id)}
-                  role={linkableColumns.has('work') ? 'link' : undefined}
+                  className={`td ${linkableColumns.has('woNumber') ? 'is-link' : ''}`}
+                  onClick={() => handleCellClick('woNumber', row.id)}
+                  role={linkableColumns.has('woNumber') ? 'link' : undefined}
                 >
-                  {row.title ? row.title : <span className="muted">（空）</span>}
+                  {row.woNumber}
+                </div>
+                <div
+                  className={`td ${linkableColumns.has('woTitle') ? 'is-link' : ''}`}
+                  onClick={() => handleCellClick('woTitle', row.id)}
+                  role={linkableColumns.has('woTitle') ? 'link' : undefined}
+                >
+                  {row.woTitle}
                 </div>
                 <div
                   className={`td status-cell ${linkableColumns.has('status') ? 'is-link' : ''}`}
@@ -286,48 +491,24 @@ function App() {
                   {row.status}
                 </div>
                 <div
-                  className={`td muted ${linkableColumns.has('region') ? 'is-link' : ''}`}
-                  onClick={() => handleCellClick('region', row.id)}
-                  role={linkableColumns.has('region') ? 'link' : undefined}
+                  className={`td ${linkableColumns.has('groupNumber') ? 'is-link' : ''}`}
+                  onClick={() => handleCellClick('groupNumber', row.id)}
+                  role={linkableColumns.has('groupNumber') ? 'link' : undefined}
                 >
-                  {row.region || ''}
+                  {row.groupNumber}
                 </div>
                 <div
-                  className={`td muted ${linkableColumns.has('record') ? 'is-link' : ''}`}
-                  onClick={() => handleCellClick('record', row.id)}
-                  role={linkableColumns.has('record') ? 'link' : undefined}
+                  className={`td ${linkableColumns.has('groupTitle') ? 'is-link' : ''}`}
+                  onClick={() => handleCellClick('groupTitle', row.id)}
+                  role={linkableColumns.has('groupTitle') ? 'link' : undefined}
                 >
-                  {row.recordDate || ''}
-                </div>
-                <div
-                  className={`td ${linkableColumns.has('author') ? 'is-link' : ''}`}
-                  onClick={() => handleCellClick('author', row.id)}
-                  role={linkableColumns.has('author') ? 'link' : undefined}
-                >
-                  <span className="user">
-                    <span className="avatar">阿</span>
-                    {row.author}
-                  </span>
-                </div>
-                <div
-                  className={`td muted ${linkableColumns.has('delegate') ? 'is-link' : ''}`}
-                  onClick={() => handleCellClick('delegate', row.id)}
-                  role={linkableColumns.has('delegate') ? 'link' : undefined}
-                >
-                  {row.delegate || ''}
-                </div>
-                <div
-                  className={`td ${linkableColumns.has('created') ? 'is-link' : ''}`}
-                  onClick={() => handleCellClick('created', row.id)}
-                  role={linkableColumns.has('created') ? 'link' : undefined}
-                >
-                  {row.createdAt}
+                  {row.groupTitle}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="table-footer">行: {rows.length}</div>
+          <div className="table-footer">行: {tableRows.length}</div>
         </div>
       </section>
     </div>
