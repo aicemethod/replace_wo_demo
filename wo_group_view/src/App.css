@@ -361,6 +361,18 @@ body {
   align-self: stretch;
   display: flex;
   align-items: center;
+  min-height: 32px;
+  line-height: 26px;
+}
+
+.td .cell-input {
+  height: 26px;
+  line-height: 26px;
+  box-sizing: border-box;
+}
+
+.td .cell-input.is-editing {
+  padding: 0 8px;
 }
 
 .th-menu {
@@ -472,6 +484,24 @@ body {
 
 .is-link:hover {
   text-decoration: underline;
+}
+
+.cell-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #cfd2d6;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #fff;
+}
+
+.cell-input.is-editing {
+  border-color: #2b73d6;
+}
+
+.cell-input:focus {
+  outline: 2px solid #2b73d6;
+  outline-offset: 1px;
 }
 
 .user {
