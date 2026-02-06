@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import {
   getWorkGroupRows,
@@ -7,40 +7,18 @@ import {
   openProjectForm,
 } from './powerAppsData'
 
-type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
+type ColumnKey = 'groupNumber' | 'groupTitle'
 
 const linkableColumns = new Set<ColumnKey>(['groupNumber'])
 
 const columns: { key: ColumnKey; label: string }[] = [
-  { key: 'woNumber', label: 'WO番号' },
-  { key: 'woTitle', label: 'WOタイトル' },
-  { key: 'status', label: 'ステータス' },
   { key: 'groupNumber', label: 'WOグループ番号' },
   { key: 'groupTitle', label: 'WOグループタイトル' },
 ]
 
 export default function WorkGroupTable() {
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
-
-  const allSelected = useMemo(
-    () => tableRows.length > 0 && selectedIds.length === tableRows.length,
-    [selectedIds, tableRows.length]
-  )
-
-  const toggleAll = (checked: boolean) => {
-    setSelectedIds(checked ? tableRows.map((row) => row.id) : [])
-  }
-
-  const toggleRow = (id: string, checked: boolean) => {
-    setSelectedIds((prev) => {
-      if (checked) {
-        return prev.includes(id) ? prev : [...prev, id]
-      }
-      return prev.filter((item) => item !== id)
-    })
-  }
 
   useEffect(() => {
     let mounted = true
@@ -87,7 +65,7 @@ export default function WorkGroupTable() {
   }
 
   return (
-    <section className="panel">
+    <section className="panel work-group">
       <header className="panel-header">
         <div className="panel-title">
           <span>このWOが所属するWOグループ</span>
@@ -96,21 +74,6 @@ export default function WorkGroupTable() {
 
       <div className="table-shell">
         <div className="table-head">
-          <div className="th checkbox">
-            <label className="cb">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={(event) => toggleAll(event.target.checked)}
-                aria-label="select all"
-              />
-              <span className="cb-box" aria-hidden="true">
-                <svg viewBox="0 0 12 10">
-                  <path d="M1.5 5.5L4.5 8.5L10.5 1.5" />
-                </svg>
-              </span>
-            </label>
-          </div>
           {columns.map((col) => (
             <div key={col.key} className="th">
               <span className="th-label">{col.label}</span>
@@ -120,33 +83,7 @@ export default function WorkGroupTable() {
 
         <div className="table-body">
           {tableRows.map((row) => (
-            <div
-              className={`tr ${selectedIds.includes(row.id) ? 'is-selected' : ''}`}
-              key={row.id}
-            >
-              <div className="td checkbox">
-                <label className="cb">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(row.id)}
-                    onChange={(event) => toggleRow(row.id, event.target.checked)}
-                    aria-label="select row"
-                  />
-                  <span className="cb-box" aria-hidden="true">
-                    <svg viewBox="0 0 12 10">
-                      <path d="M1.5 5.5L4.5 8.5L10.5 1.5" />
-                    </svg>
-                  </span>
-                </label>
-              </div>
-              <div
-                className="td"
-                onClick={() => handleCellClick('woNumber', row.id)}
-              >
-                {row.woNumber}
-              </div>
-              <div className="td">{row.woTitle}</div>
-              <div className="td status-cell">{row.status}</div>
+            <div className="tr" key={row.id}>
               <div
                 className={`td ${linkableColumns.has('groupNumber') ? 'is-link' : ''}`}
                 onClick={() => handleCellClick('groupNumber', row.id)}
@@ -154,10 +91,7 @@ export default function WorkGroupTable() {
               >
                 {row.groupNumber}
               </div>
-              <div
-                className="td"
-                onClick={() => handleStartEdit(row.id)}
-              >
+              <div className="td" onClick={() => handleStartEdit(row.id)}>
                 {editingId === row.id ? (
                   <input
                     className="cell-input is-editing"

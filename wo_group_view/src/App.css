@@ -352,6 +352,11 @@ body {
   align-items: center;
 }
 
+.work-group .table-head,
+.work-group .tr {
+  grid-template-columns: minmax(260px, 1.4fr) minmax(360px, 2.2fr);
+}
+
 .table-head {
   background: #fff;
   color: #3a3f45;
