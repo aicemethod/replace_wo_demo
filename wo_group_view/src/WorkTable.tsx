@@ -144,6 +144,9 @@ export default function WorkTable() {
       <header className="panel-header">
         <div className="panel-title">
           <span>WOグループ候補リスト</span>
+          <button className="top-btn" type="button" onClick={handleBindGroup}>
+            WOグループ紐付け
+          </button>
         </div>
         <div className="panel-actions">
           {/* <button className="top-btn" type="button">
@@ -168,9 +171,6 @@ export default function WorkTable() {
             </span>
             フィルターを編集する
           </button> */}
-          <button className="top-btn" type="button" onClick={handleBindGroup}>
-            WOグループ紐付け
-          </button>
           {/* {filterOpen ? (
             <div className="filter-pop" role="dialog" aria-label="フィルター">
               <div className="filter-head">
