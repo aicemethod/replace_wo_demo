@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { getSameGroupRows, type WorkGroupRow, openWorkorderForm } from './powerAppsData'
+import {
+  getSameGroupRows,
+  type WorkGroupRow,
+  openWorkorderForm,
+  clearWorkordersProject,
+} from './powerAppsData'
 
 type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle'
 
@@ -45,6 +50,18 @@ export default function WorkSameGroupTable() {
     }
   }, [])
 
+  const refreshSameGroupRows = async () => {
+    const data = await getSameGroupRows()
+    setTableRows(data)
+  }
+
+  const handleClearGroup = async () => {
+    if (selectedIds.length === 0) return
+    await clearWorkordersProject(selectedIds)
+    setSelectedIds([])
+    await refreshSameGroupRows()
+  }
+
   const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
     openWorkorderForm(rowId)
@@ -55,6 +72,9 @@ export default function WorkSameGroupTable() {
       <header className="panel-header">
         <div className="panel-title">
           <span>同一グループのWO</span>
+          <button className="top-btn" type="button" onClick={handleClearGroup}>
+            グループ解除
+          </button>
         </div>
       </header>
 

@@ -198,6 +198,19 @@ export const updateWorkordersProject = async (workorderIds: string[]) => {
   )
 }
 
+export const clearWorkordersProject = async (workorderIds: string[]) => {
+  const xrm = getXrm()
+  if (!xrm?.WebApi?.updateRecord || workorderIds.length === 0) return
+
+  const clear = {
+    'proto_project@odata.bind': null,
+  }
+
+  await Promise.all(
+    workorderIds.map((id) => xrm.WebApi!.updateRecord('proto_workorder', id, clear))
+  )
+}
+
 export const openWorkorderForm = async (id: string) => {
   const xrm = getXrm()
   const normalizedId = normalizeId(id)
