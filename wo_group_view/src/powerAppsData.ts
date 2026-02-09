@@ -74,6 +74,13 @@ export const getCurrentProjectId = () => {
   return normalizeId(projectLookup?.id)
 }
 
+export const getCurrentWorkorderId = () => {
+  const form = getFormContext()
+  if (!form) return ''
+  const entityId = form.data.entity.getId()
+  return normalizeId(entityId)
+}
+
 export const getWorkGroupRows = async (): Promise<WorkGroupRow[]> => {
   const form = getFormContext()
   if (!form) return []
@@ -125,11 +132,13 @@ export const updateProjectName = async (projectId: string, name: string) => {
 export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
   const xrm = getXrm()
   const projectId = getCurrentProjectId()
+  const currentWorkorderId = getCurrentWorkorderId()
   if (!xrm?.WebApi?.retrieveMultipleRecords || !projectId) return []
 
   const query =
     `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value` +
     `&$filter=_proto_project_value eq ${projectId}` +
+    (currentWorkorderId ? ` and proto_workorderid ne ${currentWorkorderId}` : '') +
     `&$expand=proto_project($select=proto_name)`
 
   const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
@@ -155,12 +164,14 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
   const enduser = readLookup(form, 'proto_enduser')
   const bu = readLookup(form, 'owningbusinessunit')
   const currentProjectId = getCurrentProjectId()
+  const currentWorkorderId = getCurrentWorkorderId()
 
   const filters = [
     account?.id ? `_proto_account_value eq ${normalizeId(account.id)}` : '',
     enduser?.id ? `_proto_enduser_value eq ${normalizeId(enduser.id)}` : '',
     bu?.id ? `_owningbusinessunit_value eq ${normalizeId(bu.id)}` : '',
     currentProjectId ? `_proto_project_value ne ${currentProjectId}` : '',
+    currentWorkorderId ? `proto_workorderid ne ${currentWorkorderId}` : '',
   ].filter(Boolean)
 
   if (filters.length === 0) return []
