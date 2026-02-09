@@ -145,7 +145,7 @@ export default function WorkTable() {
         <div className="panel-title">
           <span>WOグループ候補リスト</span>
           <button className="top-btn" type="button" onClick={handleBindGroup}>
-            WOグループ紐付け
+            WOグループ化
           </button>
         </div>
         <div className="panel-actions">
