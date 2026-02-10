@@ -20,6 +20,11 @@ export default function WorkGroupTable() {
   const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
 
+  const refreshRows = async () => {
+    const data = await getWorkGroupRows()
+    setTableRows(data)
+  }
+
   useEffect(() => {
     let mounted = true
     getWorkGroupRows().then((data) => {
@@ -30,6 +35,21 @@ export default function WorkGroupTable() {
     }
   }, [])
 
+  useEffect(() => {
+    const handleRefresh = () => {
+      void refreshRows()
+    }
+    const handleVisibility = () => {
+      if (!document.hidden) handleRefresh()
+    }
+    window.addEventListener('focus', handleRefresh)
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      window.removeEventListener('focus', handleRefresh)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [])
+
   const handleCellClick = (columnKey: ColumnKey, rowId: string) => {
     if (!linkableColumns.has(columnKey)) return
     const row = tableRows.find((item) => item.id === rowId)
@@ -37,11 +57,6 @@ export default function WorkGroupTable() {
       openProjectForm(row.projectId)
     }
   }
-
-  // const refreshRows = async () => {
-  //   const data = await getWorkGroupRows()
-  //   setTableRows(data)
-  // }
 
   const handleGroupTitleChange = (id: string, value: string) => {
     setTableRows((prev) =>

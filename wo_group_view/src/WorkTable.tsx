@@ -64,6 +64,12 @@ export default function WorkTable() {
     })
   }
 
+  const refreshMainRows = async () => {
+    const data = await getMainRows()
+    setSourceRows(data)
+    setTableRows(data)
+  }
+
   useEffect(() => {
     let mounted = true
     getMainRows().then((data) => {
@@ -76,11 +82,20 @@ export default function WorkTable() {
     }
   }, [])
 
-  const refreshMainRows = async () => {
-    const data = await getMainRows()
-    setSourceRows(data)
-    setTableRows(data)
-  }
+  useEffect(() => {
+    const handleRefresh = () => {
+      void refreshMainRows()
+    }
+    const handleVisibility = () => {
+      if (!document.hidden) handleRefresh()
+    }
+    window.addEventListener('focus', handleRefresh)
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      window.removeEventListener('focus', handleRefresh)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [])
 
   const handleBindGroup = async () => {
     if (selectedIds.length === 0) return

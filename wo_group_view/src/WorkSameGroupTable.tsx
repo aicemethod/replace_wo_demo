@@ -40,6 +40,11 @@ export default function WorkSameGroupTable() {
     })
   }
 
+  const refreshSameGroupRows = async () => {
+    const data = await getSameGroupRows()
+    setTableRows(data)
+  }
+
   useEffect(() => {
     let mounted = true
     getSameGroupRows().then((data) => {
@@ -50,10 +55,20 @@ export default function WorkSameGroupTable() {
     }
   }, [])
 
-  const refreshSameGroupRows = async () => {
-    const data = await getSameGroupRows()
-    setTableRows(data)
-  }
+  useEffect(() => {
+    const handleRefresh = () => {
+      void refreshSameGroupRows()
+    }
+    const handleVisibility = () => {
+      if (!document.hidden) handleRefresh()
+    }
+    window.addEventListener('focus', handleRefresh)
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      window.removeEventListener('focus', handleRefresh)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [])
 
   const handleClearGroup = async () => {
     if (selectedIds.length === 0) return
