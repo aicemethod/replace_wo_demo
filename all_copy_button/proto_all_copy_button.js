@@ -3,12 +3,13 @@ async function copyWorkOrderInfo(primaryControl) {
     const SUB_STATUS_FIELD_LOGICAL_NAME = "proto_workordersubstatus";
     const SUB_STATUS_NAVIGATION_PROPERTY_NAME = "proto_workordersubstatus";
     const PROGRESS_MESSAGE = "登録中...";
+    console.log("DEBUG");
 
     Xrm.Utility.showProgressIndicator(PROGRESS_MESSAGE);
 
     try {
         const formContext = primaryControl;
-        const subStatusAttribute = formContext.getAttribute(SUB_STATUS_FIELD_LOGICAL_NAME);
+        const subStatusAttribute = Xrm?.Page?.getAttribute(SUB_STATUS_FIELD_LOGICAL_NAME);
         const subStatusValue = subStatusAttribute ? subStatusAttribute.getValue() : null;
         const subStatusAttributeType = subStatusAttribute ? subStatusAttribute.getAttributeType() : null;
         const createData = {};
