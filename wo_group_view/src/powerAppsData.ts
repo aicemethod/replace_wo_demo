@@ -6,6 +6,17 @@ export type WorkGroupRow = {
   groupNumber: string
   groupTitle: string
   projectId: string
+  endUser?: string
+  bu?: string
+  woType?: string
+  equipmentSn?: string
+  woStatus?: string
+  calcStatus?: string
+  customerPoNo?: string
+  customerPoNoText?: string
+  soNo?: string
+  soNoText?: string
+  primarySo?: string
 }
 
 type LookupValue = {
@@ -177,7 +188,7 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
   if (filters.length === 0) return []
 
   const query =
-    `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value` +
+    `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value,_proto_enduser_value,_owningbusinessunit_value,_proto_wotype_value,_proto_devicesearch_value,proto_calc_status,_proto_primaryso_value` +
     `&$filter=${filters.join(' and ')}` +
     `&$expand=proto_project($select=proto_name)`
 
@@ -192,6 +203,35 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
     groupNumber: row['_proto_project_value@OData.Community.Display.V1.FormattedValue'] ?? '',
     groupTitle: row.proto_project?.proto_name ?? '',
     projectId: normalizeId(row._proto_project_value),
+    endUser:
+      row['_proto_enduser_value@OData.Community.Display.V1.FormattedValue'] ??
+      row.proto_enduser ??
+      '',
+    bu:
+      row['_owningbusinessunit_value@OData.Community.Display.V1.FormattedValue'] ??
+      row.owningbusinessunit ??
+      '',
+    woType:
+      row['_proto_wotype_value@OData.Community.Display.V1.FormattedValue'] ??
+      row.proto_wotype ??
+      '',
+    equipmentSn:
+      row['_proto_devicesearch_value@OData.Community.Display.V1.FormattedValue'] ??
+      row.proto_devicesearch ??
+      '',
+    woStatus: '',
+    calcStatus:
+      row['proto_calc_status@OData.Community.Display.V1.FormattedValue'] ??
+      row.proto_calc_status ??
+      '',
+    customerPoNo: '',
+    customerPoNoText: '',
+    soNo: '',
+    soNoText: '',
+    primarySo:
+      row['_proto_primaryso_value@OData.Community.Display.V1.FormattedValue'] ??
+      row.proto_primaryso ??
+      '',
   }))
 }
 
