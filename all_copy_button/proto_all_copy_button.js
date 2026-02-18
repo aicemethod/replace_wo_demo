@@ -62,7 +62,11 @@ async function copyWorkOrderInfo(primaryControl) {
             createData[DEVICE_SEARCH_FIELD_LOGICAL_NAME] = deviceSearch.value;
         }
 
-        await Xrm.WebApi.createRecord(SOURCE_ENTITY_LOGICAL_NAME, createData);
+        const createResult = await Xrm.WebApi.createRecord(SOURCE_ENTITY_LOGICAL_NAME, createData);
+        await Xrm.Navigation.openForm({
+            entityName: SOURCE_ENTITY_LOGICAL_NAME,
+            entityId: createResult.id
+        });
     } catch (error) {
         Xrm.Navigation.openAlertDialog({
             title: "エラー",
