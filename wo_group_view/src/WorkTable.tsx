@@ -86,6 +86,7 @@ export default function WorkTable() {
   const [menuFilterKey, setMenuFilterKey] = useState<ColumnKey | null>(null)
   const [filterOperator, setFilterOperator] = useState<FilterOperatorKey>('equals')
   const [operatorOpen, setOperatorOpen] = useState(false)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null)
 
   const allSelected = useMemo(
     () => tableRows.length > 0 && selectedIds.length === tableRows.length,
@@ -157,13 +158,21 @@ export default function WorkTable() {
     return () => document.removeEventListener('click', handle)
   }, [])
 
-  const toggleMenu = (key: string) => {
+  const toggleMenu = (key: string, triggerEl?: HTMLElement) => {
     setOpenMenu((prev) => {
       const next = prev === key ? null : key
       if (!next) {
         setMenuFilterKey(null)
+        setMenuPosition(null)
       } else if (prev && prev !== key) {
         setMenuFilterKey(null)
+      }
+      if (next && triggerEl) {
+        const rect = triggerEl.getBoundingClientRect()
+        setMenuPosition({
+          top: rect.bottom + 8,
+          left: rect.left,
+        })
       }
       return next
     })
@@ -358,7 +367,7 @@ export default function WorkTable() {
                 className="th th-menu"
                 onClick={(event) => {
                   event.stopPropagation()
-                  toggleMenu(col.key)
+                  toggleMenu(col.key, event.currentTarget as HTMLElement)
                 }}
               >
                 <span className="th-label">{col.label}</span>
@@ -370,6 +379,10 @@ export default function WorkTable() {
                 {openMenu === col.key ? (
                   <div
                     className="col-menu"
+                    style={{
+                      top: menuPosition?.top ?? 0,
+                      left: menuPosition?.left ?? 0,
+                    }}
                     role="menu"
                     onClick={(event) => event.stopPropagation()}
                     onMouseDown={(event) => event.stopPropagation()}

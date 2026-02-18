@@ -219,7 +219,7 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
       row['_proto_devicesearch_value@OData.Community.Display.V1.FormattedValue'] ??
       row.proto_devicesearch ??
       '',
-    woStatus: '',
+    woStatus: row['_proto_workordersubstatus_value@OData.Community.Display.V1.FormattedValue'] ?? '',
     calcStatus:
       row['proto_calc_status@OData.Community.Display.V1.FormattedValue'] ??
       row.proto_calc_status ??
