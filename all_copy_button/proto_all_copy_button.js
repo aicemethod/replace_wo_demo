@@ -11,13 +11,12 @@ async function copyWorkOrderInfo(primaryControl) {
     Xrm.Utility.showProgressIndicator(PROGRESS_MESSAGE);
 
     try {
-        const formContext = primaryControl;
-        const subStatusAttribute = formContext.getAttribute(SUB_STATUS_FIELD_LOGICAL_NAME);
+        const subStatusAttribute = Xrm?.Page?.getAttribute(SUB_STATUS_FIELD_LOGICAL_NAME);
         const subStatusValue = subStatusAttribute ? subStatusAttribute.getValue() : null;
         const subStatusAttributeType = subStatusAttribute ? subStatusAttribute.getAttributeType() : null;
-        const woTitleAttribute = formContext.getAttribute(WO_TITLE_FIELD_LOGICAL_NAME);
+        const woTitleAttribute = Xrm?.Page?.getAttribute(WO_TITLE_FIELD_LOGICAL_NAME);
         const woTitleValue = woTitleAttribute ? woTitleAttribute.getValue() : null;
-        const deviceSearchAttribute = formContext.getAttribute(DEVICE_SEARCH_FIELD_LOGICAL_NAME);
+        const deviceSearchAttribute = Xrm?.Page?.getAttribute(DEVICE_SEARCH_FIELD_LOGICAL_NAME);
         const deviceSearchValue = deviceSearchAttribute ? deviceSearchAttribute.getValue() : null;
         const deviceSearchAttributeType = deviceSearchAttribute ? deviceSearchAttribute.getAttributeType() : null;
         const createData = {};
