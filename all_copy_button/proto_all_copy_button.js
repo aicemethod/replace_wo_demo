@@ -5,7 +5,7 @@ async function copyWorkOrderInfo(primaryControl) {
     const WO_TITLE_FIELD_LOGICAL_NAME = "proto_wotitle";
     const DEVICE_SEARCH_FIELD_LOGICAL_NAME = "proto_devicesearch";
     const DEVICE_SEARCH_NAVIGATION_PROPERTY_NAME = "proto_devicesearch";
-    const PROGRESS_MESSAGE = "登録中...";
+    const PROGRESS_MESSAGE = "コピー中...";
     console.log("DEBUG");
 
     Xrm.Utility.showProgressIndicator(PROGRESS_MESSAGE);
