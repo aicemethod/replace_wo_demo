@@ -11,52 +11,55 @@ async function copyWorkOrderInfo(primaryControl) {
     Xrm.Utility.showProgressIndicator(PROGRESS_MESSAGE);
 
     try {
-        const subStatusAttribute = Xrm?.Page?.getAttribute(SUB_STATUS_FIELD_LOGICAL_NAME);
-        const subStatusValue = subStatusAttribute ? subStatusAttribute.getValue() : null;
-        const subStatusAttributeType = subStatusAttribute ? subStatusAttribute.getAttributeType() : null;
-        const woTitleAttribute = Xrm?.Page?.getAttribute(WO_TITLE_FIELD_LOGICAL_NAME);
-        const woTitleValue = woTitleAttribute ? woTitleAttribute.getValue() : null;
-        const deviceSearchAttribute = Xrm?.Page?.getAttribute(DEVICE_SEARCH_FIELD_LOGICAL_NAME);
-        const deviceSearchValue = deviceSearchAttribute ? deviceSearchAttribute.getValue() : null;
-        const deviceSearchAttributeType = deviceSearchAttribute ? deviceSearchAttribute.getAttributeType() : null;
+        const getAttributeInfo = (logicalName) => {
+            const attribute = Xrm?.Page?.getAttribute(logicalName);
+            return {
+                value: attribute ? attribute.getValue() : null,
+                type: attribute ? attribute.getAttributeType() : null
+            };
+        };
+
+        const subStatus = getAttributeInfo(SUB_STATUS_FIELD_LOGICAL_NAME);
+        const woTitle = getAttributeInfo(WO_TITLE_FIELD_LOGICAL_NAME);
+        const deviceSearch = getAttributeInfo(DEVICE_SEARCH_FIELD_LOGICAL_NAME);
         const createData = {};
 
         if (
-            (subStatusAttributeType === "lookup" ||
-                subStatusAttributeType === "customer" ||
-                subStatusAttributeType === "owner") &&
-            Array.isArray(subStatusValue) &&
-            subStatusValue.length > 0
+            (subStatus.type === "lookup" ||
+                subStatus.type === "customer" ||
+                subStatus.type === "owner") &&
+            Array.isArray(subStatus.value) &&
+            subStatus.value.length > 0
         ) {
-            const lookupValue = subStatusValue[0];
+            const lookupValue = subStatus.value[0];
             const lookupEntityMetadata = await Xrm.Utility.getEntityMetadata(lookupValue.entityType);
             const lookupId = lookupValue.id.replace(/[{}]/g, "");
 
             createData[`${SUB_STATUS_NAVIGATION_PROPERTY_NAME}@odata.bind`] =
                 `/${lookupEntityMetadata.EntitySetName}(${lookupId})`;
-        } else if (subStatusValue !== null && subStatusValue !== undefined) {
-            createData[SUB_STATUS_FIELD_LOGICAL_NAME] = subStatusValue;
+        } else if (subStatus.value !== null && subStatus.value !== undefined) {
+            createData[SUB_STATUS_FIELD_LOGICAL_NAME] = subStatus.value;
         }
 
-        if (woTitleValue !== null && woTitleValue !== undefined) {
-            createData[WO_TITLE_FIELD_LOGICAL_NAME] = woTitleValue;
+        if (woTitle.value !== null && woTitle.value !== undefined) {
+            createData[WO_TITLE_FIELD_LOGICAL_NAME] = woTitle.value;
         }
 
         if (
-            (deviceSearchAttributeType === "lookup" ||
-                deviceSearchAttributeType === "customer" ||
-                deviceSearchAttributeType === "owner") &&
-            Array.isArray(deviceSearchValue) &&
-            deviceSearchValue.length > 0
+            (deviceSearch.type === "lookup" ||
+                deviceSearch.type === "customer" ||
+                deviceSearch.type === "owner") &&
+            Array.isArray(deviceSearch.value) &&
+            deviceSearch.value.length > 0
         ) {
-            const lookupValue = deviceSearchValue[0];
+            const lookupValue = deviceSearch.value[0];
             const lookupEntityMetadata = await Xrm.Utility.getEntityMetadata(lookupValue.entityType);
             const lookupId = lookupValue.id.replace(/[{}]/g, "");
 
             createData[`${DEVICE_SEARCH_NAVIGATION_PROPERTY_NAME}@odata.bind`] =
                 `/${lookupEntityMetadata.EntitySetName}(${lookupId})`;
-        } else if (deviceSearchValue !== null && deviceSearchValue !== undefined) {
-            createData[DEVICE_SEARCH_FIELD_LOGICAL_NAME] = deviceSearchValue;
+        } else if (deviceSearch.value !== null && deviceSearch.value !== undefined) {
+            createData[DEVICE_SEARCH_FIELD_LOGICAL_NAME] = deviceSearch.value;
         }
 
         await Xrm.WebApi.createRecord(SOURCE_ENTITY_LOGICAL_NAME, createData);
