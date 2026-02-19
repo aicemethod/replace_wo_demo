@@ -14,8 +14,8 @@ export default function FileTable() {
   const [addMenuPosition, setAddMenuPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [showAddRow, setShowAddRow] = useState(false);
   const [newFilename, setNewFilename] = useState('');
-  const [newFileType, setNewFileType] = useState('TSR');
-  const [newFileTypeValue, setNewFileTypeValue] = useState(931440001);
+  const [newFileType, setNewFileType] = useState('Passdown/Daily Report');
+  const [newFileTypeValue, setNewFileTypeValue] = useState(931440007);
   const [newFile, setNewFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,8 +75,8 @@ export default function FileTable() {
           setFiles((prevFiles) => [saved, ...prevFiles]);
           setShowAddRow(false);
           setNewFilename('');
-          setNewFileType('TSR');
-          setNewFileTypeValue(931440001);
+          setNewFileType('Passdown/Daily Report');
+          setNewFileTypeValue(931440007);
           setNewFile(null);
           if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -134,13 +134,14 @@ export default function FileTable() {
   }, [isAddMenuOpen]);
 
   const addMenuOptions = [
-    { value: 931440004, label: 'PPAC' },
-    { value: 931440005, label: 'KYM' },
+    { value: 931440007, label: 'Passdown/Daily Report' },
+    { value: 931440008, label: 'PPAC/YKM' },
+    { value: 931440009, label: 'Technical Document' },
     { value: 931440006, label: 'Other' }
   ];
 
   const handleAddOption = (value: number) => {
-    const typeLabel = addMenuOptions.find((option) => option.value === value)?.label || 'PPAC';
+    const typeLabel = addMenuOptions.find((option) => option.value === value)?.label || 'Passdown/Daily Report';
     setNewFileTypeValue(value);
     setNewFileType(typeLabel);
     setShowAddRow(true);
@@ -151,8 +152,8 @@ export default function FileTable() {
   const handleAddCancel = () => {
     setShowAddRow(false);
     setNewFilename('');
-    setNewFileType('PPAC');
-    setNewFileTypeValue(931440004);
+    setNewFileType('Passdown/Daily Report');
+    setNewFileTypeValue(931440007);
     setNewFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

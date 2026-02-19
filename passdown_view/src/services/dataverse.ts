@@ -39,8 +39,9 @@ export async function fetchFileData(): Promise<FileData[]> {
 
     const attachmentTypeById = new Map<string, string>();
     const attachmentTypeLabelMap: Record<number, string> = {
-      931440004: 'PPAC',
-      931440005: 'KYM',
+      931440007: 'Passdown/Daily Report',
+      931440008: 'PPAC/YKM',
+      931440009: 'Technical Document',
       931440006: 'Other'
     };
 
