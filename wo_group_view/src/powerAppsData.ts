@@ -188,9 +188,9 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
   if (filters.length === 0) return []
 
   const query =
-    `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value,_proto_enduser_value,_owningbusinessunit_value,_proto_wotype_value,_proto_devicesearch_value,proto_calc_status,_proto_primaryso_value` +
+    `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value,_proto_enduser_value,_owningbusinessunit_value,_proto_wotype_value,_proto_devicesearch_value,proto_calc_status,_proto_primaryso_value,proto_kyakusakichuban,proto_kyakusakichubantext,proto_wo_tmp_so_no_text,_proto_com_serviceorderheader_value` +
     `&$filter=${filters.join(' and ')}` +
-    `&$expand=proto_project($select=proto_name)`
+    `&$expand=proto_project($select=proto_name),proto_com_serviceorderheader($select=proto_name)`
 
   const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
   const rows = (result?.entities ?? []) as any[]
@@ -224,10 +224,13 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
       row['proto_calc_status@OData.Community.Display.V1.FormattedValue'] ??
       row.proto_calc_status ??
       '',
-    customerPoNo: '',
-    customerPoNoText: '',
-    soNo: '',
-    soNoText: '',
+    customerPoNo: row.proto_kyakusakichuban ?? '',
+    customerPoNoText: row.proto_kyakusakichubantext ?? '',
+    soNo:
+      row.proto_com_serviceorderheader?.proto_name ??
+      row['_proto_com_serviceorderheader_value@OData.Community.Display.V1.FormattedValue'] ??
+      '',
+    soNoText: row.proto_wo_tmp_so_no_text ?? '',
     primarySo:
       row['_proto_primaryso_value@OData.Community.Display.V1.FormattedValue'] ??
       row.proto_primaryso ??
