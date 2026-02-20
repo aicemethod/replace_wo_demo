@@ -136,28 +136,6 @@ function getAttributeValue(context, fieldName) {
     return context.getFormContext().getAttribute(fieldName)?.getValue();
 }
 
-function applyFilter(formContext, fieldName, allowedTexts) {
-    const control = formContext.getControl(fieldName);
-    const attr = formContext.getAttribute(fieldName);
-    const source = paymentOptionCache?.[fieldName] || [];
-    if (!control || !attr) return;
-
-    const allowAll = !Array.isArray(allowedTexts);
-    const allowedSet = new Set((allowedTexts || []).map(function (v) { return normalizeText(v); }));
-    const options = allowAll
-        ? source
-        : source.filter(function (opt) { return allowedSet.has(normalizeText(opt.text)); });
-
-    control.clearOptions();
-    options.forEach(function (opt) { control.addOption(opt); });
-    control.setDisabled(options.length === 0);
-
-    const current = attr.getValue();
-    if (current != null && !options.some(function (opt) { return Number(opt.value) === Number(current); })) {
-        attr.setValue(null);
-    }
-}
-
 function applyFilterByValues(formContext, fieldName, allowedValues) {
     const control = formContext.getControl(fieldName);
     const attr = formContext.getAttribute(fieldName);
@@ -180,17 +158,30 @@ function applyFilterByValues(formContext, fieldName, allowedValues) {
     }
 }
 
-function filterPaymentType(context) {
-    // formContextの有無を判定
-    if (!formContext) return;
+function disablePaymentFields(formContext) {
+    PAYMENT_TARGET_FIELDS.forEach(function (name) {
+        const control = formContext.getControl(name);
+        if (control) control.setDisabled(true);
+    });
+}
 
+function onLoadPaymentType(context) {
+    const formContext = context?.getFormContext?.();
+    if (!formContext) return;
+    initOptionCache(formContext);
+    disablePaymentFields(formContext);
+}
+
+function onChangePaymentType(context) {
+    const formContext = context?.getFormContext?.();
+    if (!formContext) return;
     initOptionCache(formContext);
 
     const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
     const pattern = detectPatternFromWoType(woTypeText);
     const tree = pattern ? PAYMENT_TYPE_TREE[pattern] : null;
 
-    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : undefined);
+    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
 
     const billableValue = getAttributeValue(context, "proto_billabletype");
     const paymentTypeNode = getNodeByValue(tree, billableValue);
@@ -203,4 +194,8 @@ function filterPaymentType(context) {
     const paymentToValue = getAttributeValue(context, "proto_paymentto_tobe");
     const concessionNode = getNodeByValue(paymentToNode, paymentToValue);
     applyFilterByValues(formContext, "proto_concessiontype_tobe", getChildKeys(concessionNode));
+}
+
+function filterPaymentType(context) {
+    onChangePaymentType(context);
 }
