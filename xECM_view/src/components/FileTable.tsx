@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip } from 'react-icons/fi';
 import type { FileData } from '../types';
-import { fetchFileData, saveFileAttachment } from '../services/dataverse';
+import { fetchFileData, saveFileAttachment, deleteFileAttachments } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
 import './FileTable.css';
 
@@ -11,6 +11,7 @@ export default function FileTable() {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [addMenuPosition, setAddMenuPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [showAddRow, setShowAddRow] = useState(false);
@@ -79,12 +80,22 @@ export default function FileTable() {
     });
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (deleteSelectedIds.size === 0) {
       return;
     }
-    setFiles((prevFiles) => prevFiles.filter((file) => !deleteSelectedIds.has(file.id)));
-    setDeleteSelectedIds(new Set());
+    setIsDeleting(true);
+    try {
+      const targetIds = Array.from(deleteSelectedIds);
+      const deletedIds = await deleteFileAttachments(targetIds);
+      if (deletedIds.length > 0) {
+        const deletedSet = new Set(deletedIds);
+        setFiles((prevFiles) => prevFiles.filter((file) => !deletedSet.has(file.id)));
+      }
+      setDeleteSelectedIds(new Set());
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -299,18 +310,18 @@ export default function FileTable() {
               type="button"
               className="action-button delete-button"
               onClick={handleDeleteSelected}
-              disabled={deleteSelectedCount === 0}
+              disabled={deleteSelectedCount === 0 || isDeleting}
               style={{
                 padding: '0',
                 border: 'none',
                 backgroundColor: 'transparent',
-                color: deleteSelectedCount === 0 ? '#c7c7c7' : '#d32f2f',
+                color: deleteSelectedCount === 0 || isDeleting ? '#c7c7c7' : '#d32f2f',
                 fontSize: '14px',
-                cursor: deleteSelectedCount === 0 ? 'not-allowed' : 'pointer',
+                cursor: deleteSelectedCount === 0 || isDeleting ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                opacity: deleteSelectedCount === 0 ? 0.7 : 1
+                opacity: deleteSelectedCount === 0 || isDeleting ? 0.7 : 1
               }}
               title="削除"
             >

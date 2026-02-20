@@ -251,3 +251,24 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
     return null;
   }
 }
+
+export async function deleteFileAttachments(annotationIds: string[]): Promise<string[]> {
+  if (typeof (window.parent as any).Xrm === 'undefined' || !(window.parent as any).Xrm?.WebApi) {
+    console.warn('Xrm.WebApiが利用できません');
+    return [];
+  }
+
+  const xrm = (window.parent as any).Xrm;
+  const deletedIds: string[] = [];
+
+  for (const id of annotationIds) {
+    try {
+      await xrm.WebApi.deleteRecord('annotation', id);
+      deletedIds.push(id);
+    } catch (err) {
+      console.error(`Failed to delete annotation ${id}:`, err);
+    }
+  }
+
+  return deletedIds;
+}
