@@ -7,6 +7,7 @@ import './FileTable.css';
 
 export default function FileTable() {
   const [files, setFiles] = useState<FileData[]>([]);
+  const [deleteSelectedIds, setDeleteSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -23,6 +24,7 @@ export default function FileTable() {
     try {
       const data = await fetchFileData();
       setFiles(data);
+      setDeleteSelectedIds(new Set());
     } catch (error) {
       console.error('データの取得に失敗しました:', error);
     } finally {
@@ -63,6 +65,26 @@ export default function FileTable() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await loadData();
+  };
+
+  const handleDeleteCheckToggle = (id: string) => {
+    setDeleteSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    if (deleteSelectedIds.size === 0) {
+      return;
+    }
+    setFiles((prevFiles) => prevFiles.filter((file) => !deleteSelectedIds.has(file.id)));
+    setDeleteSelectedIds(new Set());
   };
 
   const handleSave = async () => {
@@ -142,6 +164,7 @@ export default function FileTable() {
   }, [isAddMenuOpen]);
 
   const selectableTypes = new Set(['TSR', '技術検収書(Technical Acceptance)']);
+  const deleteSelectedCount = files.filter((file) => deleteSelectedIds.has(file.id)).length;
   const addMenuOptions = [
     { value: 931440001, label: 'TSR' },
     { value: 931440002, label: '技術検収書(Technical Acceptance)' },
@@ -250,7 +273,7 @@ export default function FileTable() {
             <FiSave size={16} />
             <span>保存</span>
           </button>
-          {showAddRow && (
+          {showAddRow ? (
             <button
               type="button"
               className="action-button cancel-button"
@@ -270,6 +293,29 @@ export default function FileTable() {
             >
               <FiTrash2 size={16} />
               <span>キャンセル</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="action-button delete-button"
+              onClick={handleDeleteSelected}
+              disabled={deleteSelectedCount === 0}
+              style={{
+                padding: '0',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: deleteSelectedCount === 0 ? '#c7c7c7' : '#d32f2f',
+                fontSize: '14px',
+                cursor: deleteSelectedCount === 0 ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                opacity: deleteSelectedCount === 0 ? 0.7 : 1
+              }}
+              title="削除"
+            >
+              <FiTrash2 size={16} />
+              <span>削除</span>
             </button>
           )}
           <button
@@ -305,6 +351,7 @@ export default function FileTable() {
         <table className="file-table">
           <thead>
             <tr>
+              <th className="col-delete">削除</th>
               <th className="col-select">xECM連携対象</th>
               <th className="col-filename">ファイル名</th>
               <th className="col-type">ファイル種別</th>
@@ -315,6 +362,12 @@ export default function FileTable() {
           <tbody>
             {showAddRow && (
               <tr className="file-table-add-row">
+                <td className="col-delete">
+                  <label className="file-delete-checkbox file-delete-checkbox-disabled">
+                    <input type="checkbox" checked={false} disabled aria-label="削除選択不可" />
+                    <span className="file-delete-checkbox-box"></span>
+                  </label>
+                </td>
                 <td className="col-select">
                   <label className="toggle-switch toggle-switch-disabled">
                     <input type="checkbox" checked={false} disabled aria-label="選択不可" />
@@ -356,13 +409,24 @@ export default function FileTable() {
             )}
             {files.length === 0 && !showAddRow ? (
               <tr>
-                <td colSpan={5} className="no-data">
+                <td colSpan={6} className="no-data">
                   データがありません
                 </td>
               </tr>
             ) : (
               files.map((file) => (
                 <tr key={file.id}>
+                  <td className="col-delete">
+                    <label className="file-delete-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={deleteSelectedIds.has(file.id)}
+                        onChange={() => handleDeleteCheckToggle(file.id)}
+                        aria-label={deleteSelectedIds.has(file.id) ? '削除選択解除' : '削除選択'}
+                      />
+                      <span className="file-delete-checkbox-box"></span>
+                    </label>
+                  </td>
                   <td className="col-select">
                     <label className={`toggle-switch ${selectableTypes.has(file.Mimetype) ? '' : 'toggle-switch-disabled'}`}>
                       <input
