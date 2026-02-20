@@ -76,12 +76,10 @@ const PAYMENT_TYPE_TREE = {
 
 const PAYMENT_TARGET_FIELDS = [
     "proto_billabletype",
-    "proto_paymenttype_tobe",
+    "proto_payment_tobe",
     "proto_paymentto_tobe",
-    "proto_concessiontype_tobe"
+    "proto_concession_tobe"
 ];
-
-let paymentOptionCache = null;
 
 function normalizeText(text) {
     return String(text || "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -120,18 +118,6 @@ function getNodeByValue(node, selectedValue) {
     return node[String(selectedValue)] ?? null;
 }
 
-function initOptionCache(formContext) {
-    if (paymentOptionCache) return;
-    paymentOptionCache = {};
-    PAYMENT_TARGET_FIELDS.forEach(function (name) {
-        const control = formContext.getControl(name);
-        if (!control) return;
-        paymentOptionCache[name] = control.getOptions().map(function (opt) {
-            return { value: opt.value, text: opt.text };
-        });
-    });
-}
-
 function getAttributeValue(context, fieldName) {
     return context.getFormContext().getAttribute(fieldName)?.getValue();
 }
@@ -139,8 +125,8 @@ function getAttributeValue(context, fieldName) {
 function applyFilterByValues(formContext, fieldName, allowedValues) {
     const control = formContext.getControl(fieldName);
     const attr = formContext.getAttribute(fieldName);
-    const source = paymentOptionCache?.[fieldName] || [];
     if (!control || !attr) return;
+    const source = attr.getOptions ? attr.getOptions() : control.getOptions();
 
     const allowAll = !Array.isArray(allowedValues);
     const allowedSet = new Set((allowedValues || []).map(function (v) { return Number(v); }));
@@ -168,14 +154,12 @@ function disablePaymentFields(formContext) {
 function onLoadPaymentType(context) {
     const formContext = context?.getFormContext?.();
     if (!formContext) return;
-    initOptionCache(formContext);
     disablePaymentFields(formContext);
 }
 
 function onChangePaymentType(context) {
     const formContext = context?.getFormContext?.();
     if (!formContext) return;
-    initOptionCache(formContext);
 
     const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
     const pattern = detectPatternFromWoType(woTypeText);
