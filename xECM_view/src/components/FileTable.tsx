@@ -141,7 +141,7 @@ export default function FileTable() {
     setIsAddMenuOpen(true);
   }, [isAddMenuOpen]);
 
-  const selectableTypes = new Set(['TSR', '技術検収書']);
+  const selectableTypes = new Set(['TSR', '技術検収書(Technical Acceptance)']);
   const addMenuOptions = [
     { value: 931440001, label: 'TSR' },
     { value: 931440002, label: '技術検収書(Technical Acceptance)' },
