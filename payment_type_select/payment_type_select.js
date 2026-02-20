@@ -115,14 +115,6 @@ function getChildKeys(node) {
     return Object.keys(node);
 }
 
-function getNodeByText(node, selectedText) {
-    if (!node || !selectedText) return null;
-    const selected = normalizeText(selectedText);
-    const keys = Object.keys(node);
-    const hitKey = keys.find(function (k) { return normalizeText(k) === selected; });
-    return hitKey ? node[hitKey] : null;
-}
-
 function getNodeByValue(node, selectedValue) {
     if (!node || selectedValue == null) return null;
     return node[String(selectedValue)] ?? null;
@@ -142,15 +134,6 @@ function initOptionCache(formContext) {
 
 function getAttributeValue(context, fieldName) {
     return context.getFormContext().getAttribute(fieldName)?.getValue();
-}
-
-function getSelectedText(context, fieldName) {
-    const formContext = context.getFormContext();
-    const source = paymentOptionCache?.[fieldName] || formContext.getControl(fieldName)?.getOptions() || [];
-    const value = getAttributeValue(context, fieldName);
-    if (value == null) return "";
-    const hit = source.find(function (opt) { return Number(opt.value) === Number(value); });
-    return hit?.text || "";
 }
 
 function applyFilter(formContext, fieldName, allowedTexts) {
@@ -198,12 +181,12 @@ function applyFilterByValues(formContext, fieldName, allowedValues) {
 }
 
 function filterPaymentType(context) {
-    const formContext = context?.getFormContext();
+    // formContextの有無を判定
     if (!formContext) return;
 
     initOptionCache(formContext);
 
-    const woTypeText = getSelectedText(context, "proto_wotype");
+    const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
     const pattern = detectPatternFromWoType(woTypeText);
     const tree = pattern ? PAYMENT_TYPE_TREE[pattern] : null;
 
