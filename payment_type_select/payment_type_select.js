@@ -155,6 +155,11 @@ function onLoadPaymentType(context) {
     const formContext = context?.getFormContext?.();
     if (!formContext) return;
     disablePaymentFields(formContext);
+
+    const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
+    const pattern = detectPatternFromWoType(woTypeText);
+    const tree = pattern ? PAYMENT_TYPE_TREE[pattern] : null;
+    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
 }
 
 function onChangePaymentType(context) {
@@ -169,15 +174,15 @@ function onChangePaymentType(context) {
 
     const billableValue = getAttributeValue(context, "proto_billabletype");
     const paymentTypeNode = getNodeByValue(tree, billableValue);
-    applyFilterByValues(formContext, "proto_paymenttype_tobe", getChildKeys(paymentTypeNode));
+    applyFilterByValues(formContext, "proto_payment_tobe", getChildKeys(paymentTypeNode));
 
-    const paymentTypeValue = getAttributeValue(context, "proto_paymenttype_tobe");
+    const paymentTypeValue = getAttributeValue(context, "proto_payment_tobe");
     const paymentToNode = getNodeByValue(paymentTypeNode, paymentTypeValue);
     applyFilterByValues(formContext, "proto_paymentto_tobe", getChildKeys(paymentToNode));
 
     const paymentToValue = getAttributeValue(context, "proto_paymentto_tobe");
     const concessionNode = getNodeByValue(paymentToNode, paymentToValue);
-    applyFilterByValues(formContext, "proto_concessiontype_tobe", getChildKeys(concessionNode));
+    applyFilterByValues(formContext, "proto_concession_tobe", getChildKeys(concessionNode));
 }
 
 function filterPaymentType(context) {
