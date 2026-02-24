@@ -90,6 +90,7 @@ function detectPatternFromWoType(woTypeText) {
 
     if (text.includes("startup") || text.includes("新規・中古機再販")) return 1;
     if (text.includes("fcn/si")) return 2;
+    if (text.includes("troubleshooting")) return 4;
     if (
         text.includes("modification")
         || text.includes("relocation")
@@ -99,8 +100,8 @@ function detectPatternFromWoType(woTypeText) {
         || text === "pm"
         || text.includes("装置の立ち下げ作業")
         || text.includes("装置の再立ち上げ作業")
+        || text.includes("repair")
     ) return 3;
-    if (text.includes("troubleshooting") || text === "repair") return 4;
     if (text.includes("process / application") || text.includes("consulting / analysis")) return 5;
     if (text.includes("software installation")) return 6;
     if (text.includes("customer training")) return 7;
