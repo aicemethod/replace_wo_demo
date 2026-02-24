@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip, FiChevronDown } from 'react-icons/fi';
 import type { FileData } from '../types';
 import { fetchFileData, saveFileAttachment } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
@@ -179,23 +179,13 @@ export default function FileTable() {
           <div className="filetable-add-wrapper filetable-add-dropdown">
             <button
               type="button"
-              className="action-button add-button"
+              className={`action-button action-button-neutral action-button-menu ${isAddMenuOpen ? 'is-open' : ''}`}
               onClick={handleAddMenuToggle}
-              style={{
-                padding: '0',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: '#333',
-                fontSize: '14px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
               title="追加"
             >
               <FiPlus size={16} />
               <span>追加</span>
+              <FiChevronDown size={14} className="action-button-menu-caret" />
             </button>
             {isAddMenuOpen && addMenuPosition && (
               <div
@@ -221,21 +211,9 @@ export default function FileTable() {
           </div>
           <button
             type="button"
-            className="action-button save-button"
+            className="action-button action-button-primary"
             onClick={handleSave}
             disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
-            style={{
-              padding: '0',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? '#c7c7c7' : '#115ea3',
-              fontSize: '14px',
-              cursor: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              opacity: isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0) ? 0.7 : 1
-            }}
             title="保存"
           >
             <FiSave size={16} />
@@ -244,19 +222,8 @@ export default function FileTable() {
           {showAddRow && (
             <button
               type="button"
-              className="action-button cancel-button"
+              className="action-button action-button-danger"
               onClick={handleAddCancel}
-              style={{
-                padding: '0',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: '#d32f2f',
-                fontSize: '14px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
               title="キャンセル"
             >
               <FiTrash2 size={16} />
@@ -265,27 +232,14 @@ export default function FileTable() {
           )}
           <button
             type="button"
-            className="action-button refresh-button"
+            className="action-button action-button-neutral action-button-refresh"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            style={{
-              padding: '0',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: '#333',
-              fontSize: '14px',
-              cursor: isRefreshing ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              opacity: isRefreshing ? 0.6 : 1
-            }}
+            title="更新"
           >
             <FiRefreshCw
               size={16}
-              style={{
-                animation: isRefreshing ? 'spin 0.8s ease-in-out infinite' : 'none'
-              }}
+              className={isRefreshing ? 'action-button-icon-spin' : ''}
             />
             <span>更新</span>
           </button>
