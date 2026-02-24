@@ -224,7 +224,7 @@ function applyConditionalVisibility(formContext, pattern) {
         }
     }
 
-    if (pattern === 4) {
+    if (pattern === 4 || pattern === 5) {
         if (paymentToBe === 931440002 && region === "EU") {
             setFieldVisible(formContext, "proto_wo_soassociation", true);
         }
@@ -239,7 +239,7 @@ function applyConditionalVisibility(formContext, pattern) {
             }
         }
 
-        if (paymentToBe === 931440007 && region === "EU") {
+        if (pattern === 4 && paymentToBe === 931440007 && region === "EU") {
             setFieldVisible(formContext, "proto_wo_installation", true);
         }
 
