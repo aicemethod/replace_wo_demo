@@ -238,6 +238,7 @@
   font-weight: 600;
   color: #333;
   border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
 }
 
 .file-table td {
@@ -245,6 +246,7 @@
   font-size: 14px;
   color: #333;
   border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
 }
 
 .file-table tbody tr:hover {
