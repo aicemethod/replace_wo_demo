@@ -157,9 +157,7 @@
 
         function getCustomer(row) {
             return (
-                row["proto_customer@OData.Community.Display.V1.FormattedValue"] ||
                 row["_proto_customer_value@OData.Community.Display.V1.FormattedValue"] ||
-                row.proto_customer ||
                 row._proto_customer_value ||
                 ""
             );
@@ -201,7 +199,7 @@
 
             try {
                 var query =
-                    "?$select=proto_caseno,proto_currentprocessstage,proto_priority,proto_name,proto_customer,proto_createon";
+                    "?$select=proto_caseno,proto_currentprocessstage,proto_priority,proto_name,_proto_customer_value,proto_createon";
                 var result = await xrm.WebApi.retrieveMultipleRecords("proto_incident", query);
                 renderRows(result.entities || []);
             } catch (e) {
