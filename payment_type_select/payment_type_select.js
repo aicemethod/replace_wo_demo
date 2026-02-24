@@ -86,7 +86,10 @@ const CONDITIONAL_VISIBLE_FIELDS = [
     "proto_wo_soassociation",
     "proto_tel_wo_sow",
     "proto_tel_wo_concession_reason",
-    "proto_cnt_contractsummary"
+    "proto_cnt_contractsummary",
+    "proto_tel_wo_retrofitfcnno",
+    "proto_tel_wo_continuouswork",
+    "proto_wo_installation"
 ];
 
 function normalizeText(text) {
@@ -145,6 +148,15 @@ function setFieldVisible(formContext, fieldName, visible) {
     if (control) control.setVisible(!!visible);
 }
 
+function onChangeRetrofitFcnNo(context) {
+    const formContext = context?.getFormContext?.();
+    if (!formContext) return;
+
+    const value = formContext.getAttribute("proto_tel_wo_retrofitfcnno")?.getValue();
+    const hasValue = Array.isArray(value) ? value.length > 0 : String(value || "").trim() !== "";
+    setFieldVisible(formContext, "proto_wo_fcnsiid", hasValue);
+}
+
 function applyConditionalVisibility(formContext, pattern) {
     CONDITIONAL_VISIBLE_FIELDS.forEach(function (name) {
         setFieldVisible(formContext, name, false);
@@ -153,24 +165,38 @@ function applyConditionalVisibility(formContext, pattern) {
     const region = getAttributeLabel(formContext, "proto_region").toUpperCase();
     const paymentToBe = Number(formContext.getAttribute("proto_payment_tobe")?.getValue());
     const paymentToToBe = Number(formContext.getAttribute("proto_paymentto_tobe")?.getValue());
+    const concessionToBe = Number(formContext.getAttribute("proto_concession_tobe")?.getValue());
 
-    if (pattern !== 1) return;
+    if (pattern === 1) {
+        if ((region === "JP" || region === "US") && [931440000, 931440001, 931440002].includes(paymentToBe)) {
+            setFieldVisible(formContext, "proto_primaryso", true);
+        }
 
-    if ((region === "JP" || region === "US") && [931440000, 931440001, 931440002].includes(paymentToBe)) {
-        setFieldVisible(formContext, "proto_primaryso", true);
+        if (region === "EU" && [931440000, 931440002, 931440003].includes(paymentToBe)) {
+            setFieldVisible(formContext, "proto_wo_soassociation", true);
+        }
+
+        if (paymentToBe === 931440003) {
+            setFieldVisible(formContext, "proto_tel_wo_sow", true);
+            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
+        }
+
+        if (paymentToToBe === 931440002) {
+            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
+        }
     }
 
-    if (region === "EU" && [931440000, 931440002, 931440003].includes(paymentToBe)) {
-        setFieldVisible(formContext, "proto_wo_soassociation", true);
-    }
+    if (pattern === 2) {
+        setFieldVisible(formContext, "proto_tel_wo_retrofitfcnno", true);
+        setFieldVisible(formContext, "proto_tel_wo_continuouswork", true);
 
-    if (paymentToBe === 931440003) {
-        setFieldVisible(formContext, "proto_tel_wo_sow", true);
-        setFieldVisible(formContext, "proto_cnt_contractsummary", true);
-    }
+        if (paymentToToBe === 931440002) {
+            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
+        }
 
-    if (paymentToToBe === 931440002) {
-        setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
+        if (region === "EU" && paymentToToBe === 931440003 && concessionToBe === 931440000) {
+            setFieldVisible(formContext, "proto_wo_installation", true);
+        }
     }
 }
 
