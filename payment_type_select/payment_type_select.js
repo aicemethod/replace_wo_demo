@@ -81,6 +81,12 @@ const PAYMENT_TARGET_FIELDS = [
     "proto_concession_tobe"
 ];
 
+const CONDITIONAL_VISIBLE_FIELDS = [
+    "proto_primaryso",
+    "proto_wo_soassociation",
+    "proto_tel_wo_sow"
+];
+
 function normalizeText(text) {
     return String(text || "").toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -123,6 +129,43 @@ function getAttributeValue(context, fieldName) {
     return context.getFormContext().getAttribute(fieldName)?.getValue();
 }
 
+function getAttributeLabel(formContext, fieldName) {
+    const attr = formContext.getAttribute(fieldName);
+    if (!attr) return "";
+    const value = attr.getValue();
+    if (Array.isArray(value) && value[0]?.name) return String(value[0].name);
+    if (typeof attr.getText === "function") return String(attr.getText() || "");
+    return "";
+}
+
+function setFieldVisible(formContext, fieldName, visible) {
+    const control = formContext.getControl(fieldName);
+    if (control) control.setVisible(!!visible);
+}
+
+function applyConditionalVisibility(formContext, pattern) {
+    CONDITIONAL_VISIBLE_FIELDS.forEach(function (name) {
+        setFieldVisible(formContext, name, false);
+    });
+
+    const region = getAttributeLabel(formContext, "proto_region").toUpperCase();
+    const paymentToBe = Number(formContext.getAttribute("proto_payment_tobe")?.getValue());
+
+    if (pattern !== 1) return;
+
+    if ((region === "JP" || region === "US") && [931440000, 931440001, 931440002].includes(paymentToBe)) {
+        setFieldVisible(formContext, "proto_primaryso", true);
+    }
+
+    if (region === "EU" && [931440000, 931440002, 931440003].includes(paymentToBe)) {
+        setFieldVisible(formContext, "proto_wo_soassociation", true);
+    }
+
+    if (paymentToBe === 931440003) {
+        setFieldVisible(formContext, "proto_tel_wo_sow", true);
+    }
+}
+
 function applyFilterByValues(formContext, fieldName, allowedValues) {
     const control = formContext.getControl(fieldName);
     const attr = formContext.getAttribute(fieldName);
@@ -161,6 +204,7 @@ function onLoadPaymentType(context) {
     const pattern = detectPatternFromWoType(woTypeText);
     const tree = pattern ? PAYMENT_TYPE_TREE[pattern] : null;
     applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
+    applyConditionalVisibility(formContext, pattern);
 }
 
 function onChangePaymentType(context) {
@@ -184,6 +228,8 @@ function onChangePaymentType(context) {
     const paymentToValue = getAttributeValue(context, "proto_paymentto_tobe");
     const concessionNode = getNodeByValue(paymentToNode, paymentToValue);
     applyFilterByValues(formContext, "proto_concession_tobe", getChildKeys(concessionNode));
+
+    applyConditionalVisibility(formContext, pattern);
 }
 
 function filterPaymentType(context) {
