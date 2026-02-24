@@ -92,7 +92,7 @@ const CONDITIONAL_VISIBLE_FIELDS = [
     "proto_wo_installation"
 ];
 
-const WO_TYPE_VISIBLE_TAB_NAME = "";
+const WO_TYPE_VISIBLE_TAB_NAME = "tab_14";
 
 // パターン判定用に文字列を正規化する。
 function normalizeText(text) {
@@ -436,8 +436,9 @@ function onChangePaymentType(context) {
 }
 
 // WO種別に応じて指定タブの表示/非表示を切り替える。
-function toggleTabByWoType(context, tabName) {
+function toggleTabByWoType(context) {
     const formContext = context?.getFormContext?.();
+    const tabName = "tab_14";
     if (!formContext || !tabName) return;
 
     const woTypeText = getAttributeValue(formContext, "proto_wotype")?.[0]?.name || "";
