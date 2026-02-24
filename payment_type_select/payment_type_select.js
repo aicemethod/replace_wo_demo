@@ -239,6 +239,10 @@ function applyConditionalVisibility(formContext, pattern) {
             }
         }
 
+        if (paymentToBe === 931440007 && region === "EU") {
+            setFieldVisible(formContext, "proto_wo_installation", true);
+        }
+
         if (paymentToToBe === 931440002) {
             setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
         }
