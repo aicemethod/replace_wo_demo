@@ -84,7 +84,9 @@ const PAYMENT_TARGET_FIELDS = [
 const CONDITIONAL_VISIBLE_FIELDS = [
     "proto_primaryso",
     "proto_wo_soassociation",
-    "proto_tel_wo_sow"
+    "proto_tel_wo_sow",
+    "proto_tel_wo_concession_reason",
+    "proto_cnt_contractsummary"
 ];
 
 function normalizeText(text) {
@@ -150,6 +152,7 @@ function applyConditionalVisibility(formContext, pattern) {
 
     const region = getAttributeLabel(formContext, "proto_region").toUpperCase();
     const paymentToBe = Number(formContext.getAttribute("proto_payment_tobe")?.getValue());
+    const paymentToToBe = Number(formContext.getAttribute("proto_paymentto_tobe")?.getValue());
 
     if (pattern !== 1) return;
 
@@ -163,6 +166,11 @@ function applyConditionalVisibility(formContext, pattern) {
 
     if (paymentToBe === 931440003) {
         setFieldVisible(formContext, "proto_tel_wo_sow", true);
+        setFieldVisible(formContext, "proto_cnt_contractsummary", true);
+    }
+
+    if (paymentToToBe === 931440002) {
+        setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
     }
 }
 
