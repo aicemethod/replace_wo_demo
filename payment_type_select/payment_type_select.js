@@ -443,9 +443,9 @@ function toggleTabByWoType(context, tabName) {
     const woTypeText = getAttributeValue(formContext, "proto_wotype")?.[0]?.name || "";
     const text = normalizeText(woTypeText);
     const shouldShow = text.includes("modification") || text.includes("software installation");
-    const tab = formContext.ui.tabs.get(tabName);
+    const modificationEquipmentTab = formContext.ui.tabs.get(tabName);
 
-    if (tab) tab.setVisible(shouldShow);
+    if (modificationEquipmentTab) modificationEquipmentTab.setVisible(shouldShow);
 }
 
 // フォームイベントで使っている既存エイリアスを維持する。
