@@ -411,7 +411,6 @@ function onChangeRetrofitFcnNo(context) {
 
 // フォーム読込時に支払選択肢と表示状態を初期化する。
 function onLoadPaymentType(context) {
-    const formContext = context?.getFormContext?.();
     if (!formContext) return;
 
     disablePaymentFields(formContext);
