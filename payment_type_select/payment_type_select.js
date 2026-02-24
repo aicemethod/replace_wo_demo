@@ -92,6 +92,8 @@ const CONDITIONAL_VISIBLE_FIELDS = [
     "proto_wo_installation"
 ];
 
+const WO_TYPE_VISIBLE_TAB_NAME = "";
+
 // パターン判定用に文字列を正規化する。
 function normalizeText(text) {
     return String(text || "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -411,6 +413,7 @@ function onChangeRetrofitFcnNo(context) {
 
 // フォーム読込時に支払選択肢と表示状態を初期化する。
 function onLoadPaymentType(context) {
+    const formContext = context?.getFormContext?.();
     if (!formContext) return;
 
     disablePaymentFields(formContext);
@@ -418,6 +421,7 @@ function onLoadPaymentType(context) {
     const info = getPaymentPatternInfo(formContext);
     applyFilterByValues(formContext, "proto_billabletype", info.tree ? getChildKeys(info.tree) : []);
     applyConditionalVisibility(formContext, info.pattern);
+    toggleTabByWoType(context, WO_TYPE_VISIBLE_TAB_NAME);
 }
 
 // 値変更時に支払選択肢と表示状態を再計算する。
@@ -428,4 +432,23 @@ function onChangePaymentType(context) {
     const info = getPaymentPatternInfo(formContext);
     applyPaymentTreeFilters(formContext, info.tree);
     applyConditionalVisibility(formContext, info.pattern);
+    toggleTabByWoType(context, WO_TYPE_VISIBLE_TAB_NAME);
+}
+
+// WO種別に応じて指定タブの表示/非表示を切り替える。
+function toggleTabByWoType(context, tabName) {
+    const formContext = context?.getFormContext?.();
+    if (!formContext || !tabName) return;
+
+    const woTypeText = getAttributeValue(formContext, "proto_wotype")?.[0]?.name || "";
+    const text = normalizeText(woTypeText);
+    const shouldShow = text.includes("modification") || text.includes("software installation");
+    const tab = formContext.ui.tabs.get(tabName);
+
+    if (tab) tab.setVisible(shouldShow);
+}
+
+// フォームイベントで使っている既存エイリアスを維持する。
+function filterPaymentType(context) {
+    onChangePaymentType(context);
 }
