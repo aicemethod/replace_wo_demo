@@ -254,6 +254,16 @@ export default function FileTable() {
           </div>
           <button
             type="button"
+            className="action-button action-button-primary"
+            onClick={handleSave}
+            disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
+            title="保存"
+          >
+            <FiSave size={16} />
+            <span>保存</span>
+          </button>
+          <button
+            type="button"
             className="action-button action-button-neutral action-button-refresh"
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -264,16 +274,6 @@ export default function FileTable() {
               className={isRefreshing ? 'action-button-icon-spin' : ''}
             />
             <span>更新</span>
-          </button>
-          <button
-            type="button"
-            className="action-button action-button-primary"
-            onClick={handleSave}
-            disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
-            title="保存"
-          >
-            <FiSave size={16} />
-            <span>保存</span>
           </button>
           {showAddRow ? (
             <button
