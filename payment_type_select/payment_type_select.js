@@ -92,10 +92,12 @@ const CONDITIONAL_VISIBLE_FIELDS = [
     "proto_wo_installation"
 ];
 
+// パターン判定用に文字列を正規化する。
 function normalizeText(text) {
     return String(text || "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
+// WO種別の文字列からパターン番号を判定する。
 function detectPatternFromWoType(woTypeText) {
     const text = normalizeText(woTypeText);
 
@@ -120,250 +122,311 @@ function detectPatternFromWoType(woTypeText) {
     return null;
 }
 
+// ツリーノードから選択可能な子キー一覧を返す。
 function getChildKeys(node) {
     if (!node || typeof node !== "object") return [];
     return Object.keys(node);
 }
 
+// 選択値に対応する子ノードを返す。
 function getNodeByValue(node, selectedValue) {
     if (!node || selectedValue == null) return null;
     return node[String(selectedValue)] ?? null;
 }
 
-function getAttributeValue(context, fieldName) {
-    return context.getFormContext().getAttribute(fieldName)?.getValue();
+// フォーム項目の値を取得する。
+function getAttributeValue(formContext, fieldName) {
+    return formContext.getAttribute(fieldName)?.getValue();
 }
 
+// Lookup または選択肢項目のラベルを取得する。
 function getAttributeLabel(formContext, fieldName) {
     const attr = formContext.getAttribute(fieldName);
     if (!attr) return "";
+
     const value = attr.getValue();
-    if (Array.isArray(value) && value[0]?.name) return String(value[0].name);
-    if (typeof attr.getText === "function") return String(attr.getText() || "");
+    if (Array.isArray(value) && value[0] && value[0].name) {
+        return String(value[0].name);
+    }
+
+    if (typeof attr.getText === "function") {
+        return String(attr.getText() || "");
+    }
+
     return "";
 }
 
+// 単一コントロールの表示/非表示を安全に切り替える。
 function setFieldVisible(formContext, fieldName, visible) {
     const control = formContext.getControl(fieldName);
     if (control) control.setVisible(!!visible);
 }
 
-function onChangeRetrofitFcnNo(context) {
-    const formContext = context?.getFormContext?.();
-    if (!formContext) return;
-
-    const value = formContext.getAttribute("proto_tel_wo_retrofitfcnno")?.getValue();
-    const hasValue = Array.isArray(value) ? value.length > 0 : String(value || "").trim() !== "";
-    setFieldVisible(formContext, "proto_wo_fcnsiid", hasValue);
+// 複数コントロールを表示する。
+function showFields(formContext, fieldNames) {
+    fieldNames.forEach(function (fieldName) {
+        setFieldVisible(formContext, fieldName, true);
+    });
 }
 
-function applyConditionalVisibility(formContext, pattern) {
-    CONDITIONAL_VISIBLE_FIELDS.forEach(function (name) {
-        setFieldVisible(formContext, name, false);
+// 条件判定前に対象項目をすべて非表示に戻す。
+function resetConditionalVisibility(formContext) {
+    CONDITIONAL_VISIBLE_FIELDS.forEach(function (fieldName) {
+        setFieldVisible(formContext, fieldName, false);
     });
+}
 
-    const region = getAttributeLabel(formContext, "proto_region").toUpperCase();
-    const paymentToBe = Number(formContext.getAttribute("proto_payment_tobe")?.getValue());
-    const paymentToToBe = Number(formContext.getAttribute("proto_paymentto_tobe")?.getValue());
-    const concessionToBe = Number(formContext.getAttribute("proto_concession_tobe")?.getValue());
+// 表示判定で使う値をまとめた状態オブジェクトを作る。
+function getVisibilityState(formContext) {
+    return {
+        region: getAttributeLabel(formContext, "proto_region").toUpperCase(),
+        paymentToBe: Number(getAttributeValue(formContext, "proto_payment_tobe")),
+        paymentToToBe: Number(getAttributeValue(formContext, "proto_paymentto_tobe")),
+        concessionToBe: Number(getAttributeValue(formContext, "proto_concession_tobe"))
+    };
+}
+
+// proto_payment_tobe = 931440003 の共通表示を行う。
+function showCommonPaymentToBe003Fields(formContext, region) {
+    showFields(formContext, ["proto_tel_wo_sow", "proto_cnt_contractsummary"]);
+
+    if (region === "EU") {
+        showFields(formContext, ["proto_wo_installation", "proto_wo_soassociation"]);
+    }
+}
+
+// proto_paymentto_tobe = 931440002 のとき値引き理由を表示する。
+function showConcessionReasonIfNeeded(formContext, paymentToToBe) {
+    if (paymentToToBe === 931440002) {
+        setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
+    }
+}
+
+// パターン1の表示ルールを適用する。
+function applyPattern1Visibility(formContext, state) {
+    if ((state.region === "JP" || state.region === "US") && [931440000, 931440001, 931440002].includes(state.paymentToBe)) {
+        setFieldVisible(formContext, "proto_primaryso", true);
+    }
+
+    if (state.region === "EU" && [931440000, 931440002, 931440003].includes(state.paymentToBe)) {
+        setFieldVisible(formContext, "proto_wo_soassociation", true);
+    }
+
+    if (state.paymentToBe === 931440003) {
+        showFields(formContext, ["proto_tel_wo_sow", "proto_cnt_contractsummary"]);
+    }
+
+    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
+}
+
+// パターン2の表示ルールを適用する。
+function applyPattern2Visibility(formContext, state) {
+    showFields(formContext, ["proto_tel_wo_retrofitfcnno", "proto_tel_wo_continuouswork"]);
+    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
+
+    if (state.region === "EU" && state.paymentToToBe === 931440003 && state.concessionToBe === 931440000) {
+        setFieldVisible(formContext, "proto_wo_installation", true);
+    }
+}
+
+// パターン3の表示ルールを適用する。
+function applyPattern3Visibility(formContext, state) {
+    if (state.paymentToBe === 931440002 && state.region === "EU") {
+        showFields(formContext, ["proto_wo_installation", "proto_wo_soassociation"]);
+    }
+
+    if (state.paymentToBe === 931440003) {
+        showCommonPaymentToBe003Fields(formContext, state.region);
+    }
+
+    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
+
+    if (state.paymentToToBe === 931440003 && state.concessionToBe === 931440000) {
+        setFieldVisible(formContext, "proto_wo_installation", true);
+    }
+}
+
+// パターン4/5の表示ルールを適用する。
+function applyPattern4And5Visibility(formContext, state, pattern) {
+    if (state.paymentToBe === 931440002 && state.region === "EU") {
+        setFieldVisible(formContext, "proto_wo_soassociation", true);
+    }
+
+    if (state.paymentToBe === 931440003) {
+        showCommonPaymentToBe003Fields(formContext, state.region);
+    }
+
+    if (pattern === 4 && state.paymentToBe === 931440007 && state.region === "EU") {
+        setFieldVisible(formContext, "proto_wo_installation", true);
+    }
+
+    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
+
+    if (state.paymentToToBe === 931440003 && state.concessionToBe === 931440000 && state.region === "EU") {
+        setFieldVisible(formContext, "proto_wo_installation", true);
+    }
+}
+
+// パターン6の表示ルールを適用する。
+function applyPattern6Visibility(formContext, state) {
+    if (state.paymentToBe === 931440002 && state.region === "EU") {
+        showFields(formContext, ["proto_wo_soassociation", "proto_wo_installation"]);
+    }
+
+    if (state.paymentToBe === 931440003) {
+        showCommonPaymentToBe003Fields(formContext, state.region);
+    }
+
+    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
+
+    if (state.paymentToToBe === 931440003 && state.concessionToBe === 931440000 && state.region === "EU") {
+        setFieldVisible(formContext, "proto_wo_installation", true);
+    }
+}
+
+// パターン7の表示ルールを適用する。
+function applyPattern7Visibility(formContext, state) {
+    if (state.paymentToBe === 931440002 && state.region === "EU") {
+        setFieldVisible(formContext, "proto_wo_soassociation", true);
+    }
+
+    if (state.paymentToBe === 931440003) {
+        showCommonPaymentToBe003Fields(formContext, state.region);
+    }
+
+    if (state.paymentToBe === 931440004 && state.region === "EU") {
+        setFieldVisible(formContext, "proto_wo_installation", true);
+    }
+}
+
+// 選択されたパターンの表示ルールを適用する。
+function applyConditionalVisibility(formContext, pattern) {
+    resetConditionalVisibility(formContext);
+
+    const state = getVisibilityState(formContext);
 
     if (pattern === 1) {
-        if ((region === "JP" || region === "US") && [931440000, 931440001, 931440002].includes(paymentToBe)) {
-            setFieldVisible(formContext, "proto_primaryso", true);
-        }
-
-        if (region === "EU" && [931440000, 931440002, 931440003].includes(paymentToBe)) {
-            setFieldVisible(formContext, "proto_wo_soassociation", true);
-        }
-
-        if (paymentToBe === 931440003) {
-            setFieldVisible(formContext, "proto_tel_wo_sow", true);
-            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
-        }
-
-        if (paymentToToBe === 931440002) {
-            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
-        }
+        applyPattern1Visibility(formContext, state);
+        return;
     }
 
     if (pattern === 2) {
-        setFieldVisible(formContext, "proto_tel_wo_retrofitfcnno", true);
-        setFieldVisible(formContext, "proto_tel_wo_continuouswork", true);
-
-        if (paymentToToBe === 931440002) {
-            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
-        }
-
-        if (region === "EU" && paymentToToBe === 931440003 && concessionToBe === 931440000) {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
+        applyPattern2Visibility(formContext, state);
+        return;
     }
 
     if (pattern === 3) {
-        if (paymentToBe === 931440002 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-            setFieldVisible(formContext, "proto_wo_soassociation", true);
-        }
-
-        if (paymentToBe === 931440003) {
-            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
-            setFieldVisible(formContext, "proto_tel_wo_sow", true);
-
-            if (region === "EU") {
-                setFieldVisible(formContext, "proto_wo_installation", true);
-                setFieldVisible(formContext, "proto_wo_soassociation", true);
-            }
-        }
-
-        if (paymentToToBe === 931440002) {
-            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
-        }
-
-        if (paymentToToBe === 931440003 && concessionToBe === 931440000) {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
+        applyPattern3Visibility(formContext, state);
+        return;
     }
 
     if (pattern === 4 || pattern === 5) {
-        if (paymentToBe === 931440002 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_soassociation", true);
-        }
-
-        if (paymentToBe === 931440003) {
-            setFieldVisible(formContext, "proto_tel_wo_sow", true);
-            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
-
-            if (region === "EU") {
-                setFieldVisible(formContext, "proto_wo_installation", true);
-                setFieldVisible(formContext, "proto_wo_soassociation", true);
-            }
-        }
-
-        if (pattern === 4 && paymentToBe === 931440007 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
-
-        if (paymentToToBe === 931440002) {
-            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
-        }
-
-        if (paymentToToBe === 931440003 && concessionToBe === 931440000 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
+        applyPattern4And5Visibility(formContext, state, pattern);
+        return;
     }
 
     if (pattern === 6) {
-        if (paymentToBe === 931440002 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_soassociation", true);
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
-
-        if (paymentToBe === 931440003) {
-            setFieldVisible(formContext, "proto_tel_wo_sow", true);
-            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
-
-            if (region === "EU") {
-                setFieldVisible(formContext, "proto_wo_installation", true);
-                setFieldVisible(formContext, "proto_wo_soassociation", true);
-            }
-        }
-
-        if (paymentToToBe === 931440002) {
-            setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
-        }
-
-        if (paymentToToBe === 931440003 && concessionToBe === 931440000 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
+        applyPattern6Visibility(formContext, state);
+        return;
     }
 
     if (pattern === 7) {
-        if (paymentToBe === 931440002 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_soassociation", true);
-        }
-
-        if (paymentToBe === 931440003) {
-            setFieldVisible(formContext, "proto_tel_wo_sow", true);
-            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
-
-            if (region === "EU") {
-                setFieldVisible(formContext, "proto_wo_installation", true);
-                setFieldVisible(formContext, "proto_wo_soassociation", true);
-            }
-        }
-
-        if (paymentToBe === 931440004 && region === "EU") {
-            setFieldVisible(formContext, "proto_wo_installation", true);
-        }
+        applyPattern7Visibility(formContext, state);
     }
 }
 
+// 選択肢を絞り込み、不正な選択値をクリアする。
 function applyFilterByValues(formContext, fieldName, allowedValues) {
     const control = formContext.getControl(fieldName);
     const attr = formContext.getAttribute(fieldName);
     if (!control || !attr) return;
-    const source = attr.getOptions ? attr.getOptions() : control.getOptions();
 
+    const source = attr.getOptions ? attr.getOptions() : control.getOptions();
     const allowAll = !Array.isArray(allowedValues);
-    const allowedSet = new Set((allowedValues || []).map(function (v) { return Number(v); }));
+    const allowedSet = new Set((allowedValues || []).map(function (value) { return Number(value); }));
     const options = allowAll
         ? source
         : source.filter(function (opt) { return allowedSet.has(Number(opt.value)); });
 
     control.clearOptions();
-    options.forEach(function (opt) { control.addOption(opt); });
+    options.forEach(function (opt) {
+        control.addOption(opt);
+    });
     control.setDisabled(options.length === 0);
 
     const current = attr.getValue();
-    if (current != null && !options.some(function (opt) { return Number(opt.value) === Number(current); })) {
+    const hasCurrent = options.some(function (opt) {
+        return Number(opt.value) === Number(current);
+    });
+
+    if (current != null && !hasCurrent) {
         attr.setValue(null);
     }
 }
 
+// 選択肢適用前は支払関連コントロールを無効化する。
 function disablePaymentFields(formContext) {
-    PAYMENT_TARGET_FIELDS.forEach(function (name) {
-        const control = formContext.getControl(name);
+    PAYMENT_TARGET_FIELDS.forEach(function (fieldName) {
+        const control = formContext.getControl(fieldName);
         if (control) control.setDisabled(true);
     });
 }
 
+// WO種別からパターン情報とツリーを取得する。
+function getPaymentPatternInfo(formContext) {
+    const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
+    const pattern = detectPatternFromWoType(woTypeText);
+    return {
+        pattern: pattern,
+        tree: pattern ? PAYMENT_TYPE_TREE[pattern] : null
+    };
+}
+
+// 支払ツリーに基づいて選択肢の絞り込みを順に適用する。
+function applyPaymentTreeFilters(formContext, tree) {
+    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
+
+    const billableValue = getAttributeValue(formContext, "proto_billabletype");
+    const paymentTypeNode = getNodeByValue(tree, billableValue);
+    applyFilterByValues(formContext, "proto_payment_tobe", getChildKeys(paymentTypeNode));
+
+    const paymentTypeValue = getAttributeValue(formContext, "proto_payment_tobe");
+    const paymentToNode = getNodeByValue(paymentTypeNode, paymentTypeValue);
+    applyFilterByValues(formContext, "proto_paymentto_tobe", getChildKeys(paymentToNode));
+
+    const paymentToValue = getAttributeValue(formContext, "proto_paymentto_tobe");
+    const concessionNode = getNodeByValue(paymentToNode, paymentToValue);
+    applyFilterByValues(formContext, "proto_concession_tobe", getChildKeys(concessionNode));
+}
+
+// Retrofit FCN番号の入力有無で FCN/SI ID の表示を切り替える。
+function onChangeRetrofitFcnNo(context) {
+    const formContext = context?.getFormContext?.();
+    if (!formContext) return;
+
+    const value = getAttributeValue(formContext, "proto_tel_wo_retrofitfcnno");
+    const hasValue = Array.isArray(value) ? value.length > 0 : String(value || "").trim() !== "";
+    setFieldVisible(formContext, "proto_wo_fcnsiid", hasValue);
+}
+
+// フォーム読込時に支払選択肢と表示状態を初期化する。
 function onLoadPaymentType(context) {
     const formContext = context?.getFormContext?.();
     if (!formContext) return;
+
     disablePaymentFields(formContext);
 
-    const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
-    const pattern = detectPatternFromWoType(woTypeText);
-    const tree = pattern ? PAYMENT_TYPE_TREE[pattern] : null;
-    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
-    applyConditionalVisibility(formContext, pattern);
+    const info = getPaymentPatternInfo(formContext);
+    applyFilterByValues(formContext, "proto_billabletype", info.tree ? getChildKeys(info.tree) : []);
+    applyConditionalVisibility(formContext, info.pattern);
 }
 
+// 値変更時に支払選択肢と表示状態を再計算する。
 function onChangePaymentType(context) {
     const formContext = context?.getFormContext?.();
     if (!formContext) return;
 
-    const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
-    const pattern = detectPatternFromWoType(woTypeText);
-    const tree = pattern ? PAYMENT_TYPE_TREE[pattern] : null;
-
-    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
-
-    const billableValue = getAttributeValue(context, "proto_billabletype");
-    const paymentTypeNode = getNodeByValue(tree, billableValue);
-    applyFilterByValues(formContext, "proto_payment_tobe", getChildKeys(paymentTypeNode));
-
-    const paymentTypeValue = getAttributeValue(context, "proto_payment_tobe");
-    const paymentToNode = getNodeByValue(paymentTypeNode, paymentTypeValue);
-    applyFilterByValues(formContext, "proto_paymentto_tobe", getChildKeys(paymentToNode));
-
-    const paymentToValue = getAttributeValue(context, "proto_paymentto_tobe");
-    const concessionNode = getNodeByValue(paymentToNode, paymentToValue);
-    applyFilterByValues(formContext, "proto_concession_tobe", getChildKeys(concessionNode));
-
-    applyConditionalVisibility(formContext, pattern);
-}
-
-function filterPaymentType(context) {
-    onChangePaymentType(context);
+    const info = getPaymentPatternInfo(formContext);
+    applyPaymentTreeFilters(formContext, info.tree);
+    applyConditionalVisibility(formContext, info.pattern);
 }
