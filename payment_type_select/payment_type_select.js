@@ -276,6 +276,26 @@ function applyConditionalVisibility(formContext, pattern) {
             setFieldVisible(formContext, "proto_wo_installation", true);
         }
     }
+
+    if (pattern === 7) {
+        if (paymentToBe === 931440002 && region === "EU") {
+            setFieldVisible(formContext, "proto_wo_soassociation", true);
+        }
+
+        if (paymentToBe === 931440003) {
+            setFieldVisible(formContext, "proto_tel_wo_sow", true);
+            setFieldVisible(formContext, "proto_cnt_contractsummary", true);
+
+            if (region === "EU") {
+                setFieldVisible(formContext, "proto_wo_installation", true);
+                setFieldVisible(formContext, "proto_wo_soassociation", true);
+            }
+        }
+
+        if (paymentToBe === 931440004 && region === "EU") {
+            setFieldVisible(formContext, "proto_wo_installation", true);
+        }
+    }
 }
 
 function applyFilterByValues(formContext, fieldName, allowedValues) {
