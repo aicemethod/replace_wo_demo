@@ -1,3 +1,5 @@
+import { getMessages, type AppLocale } from './i18n'
+
 export type FilterOperatorKey =
   | 'equals'
   | 'notEquals'
@@ -10,21 +12,41 @@ export type FilterOperatorKey =
   | 'endsWith'
   | 'notEndsWith'
 
-export const filterOperatorOptions: { key: FilterOperatorKey; label: string }[] = [
-  { key: 'equals', label: '次の値と等しい' },
-  { key: 'notEquals', label: '次と等しくない' },
-  { key: 'isSet', label: '値が設定済' },
-  { key: 'isEmpty', label: 'データが含まれていません' },
-  { key: 'contains', label: '次を含む' },
-  { key: 'notContains', label: '次を含まない' },
-  { key: 'startsWith', label: '次で始まる' },
-  { key: 'notStartsWith', label: '次で始まらない' },
-  { key: 'endsWith', label: '次で終わる' },
-  { key: 'notEndsWith', label: '次で終わらない' },
+const filterOperatorKeys: FilterOperatorKey[] = [
+  'equals',
+  'notEquals',
+  'isSet',
+  'isEmpty',
+  'contains',
+  'notContains',
+  'startsWith',
+  'notStartsWith',
+  'endsWith',
+  'notEndsWith',
 ]
 
-export const getFilterOperatorLabel = (key: FilterOperatorKey) =>
-  filterOperatorOptions.find((option) => option.key === key)?.label ?? '次の値と等しい'
+export const getFilterOperatorLabel = (key: FilterOperatorKey, locale: AppLocale = 'ja') => {
+  const msg = getMessages(locale)
+  const labels: Record<FilterOperatorKey, string> = {
+    equals: msg.op_equals,
+    notEquals: msg.op_notEquals,
+    isSet: msg.op_isSet,
+    isEmpty: msg.op_isEmpty,
+    contains: msg.op_contains,
+    notContains: msg.op_notContains,
+    startsWith: msg.op_startsWith,
+    notStartsWith: msg.op_notStartsWith,
+    endsWith: msg.op_endsWith,
+    notEndsWith: msg.op_notEndsWith,
+  }
+  return labels[key] ?? msg.op_equals
+}
+
+export const getFilterOperatorOptions = (locale: AppLocale = 'ja') =>
+  filterOperatorKeys.map((key) => ({
+    key,
+    label: getFilterOperatorLabel(key, locale),
+  }))
 
 export const operatorNeedsValue = (key: FilterOperatorKey) =>
   !['isSet', 'isEmpty'].includes(key)

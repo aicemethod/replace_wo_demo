@@ -4,10 +4,11 @@ import { sortRows, type SortDirection } from './sortUtils'
 import {
   filterRows,
   type FilterOperatorKey,
-  filterOperatorOptions,
+  getFilterOperatorOptions,
   getFilterOperatorLabel,
   operatorNeedsValue,
 } from './filterUtils'
+import { getMessages, type AppLocale } from './i18n'
 import {
   getMainRows,
   type WorkGroupRow,
@@ -54,26 +55,31 @@ const columnKeyMap: Record<ColumnKey, keyof WorkGroupRow> = {
 
 const linkableColumns = new Set<ColumnKey>(['woNumber'])
 
-const columns: { key: ColumnKey; label: string }[] = [
-  { key: 'groupNumber', label: 'WOグループ番号' },
-  { key: 'groupTitle', label: 'WOグループタイトル' },
-  { key: 'woNumber', label: 'WO番号' },
-  { key: 'woTitle', label: 'WOタイトル' },
-  { key: 'endUser', label: 'End User' },
-  { key: 'bu', label: 'BU' },
-  { key: 'woType', label: 'WO Type' },
-  { key: 'equipmentSn', label: '装置S/N' },
-  { key: 'woStatus', label: 'WOステータス' },
-  { key: 'calcStatus', label: '計算ステータス' },
-  { key: 'customerPoNo', label: 'Customer PO No.' },
-  { key: 'customerPoNoText', label: 'Customer PO No.(テキスト)' },
-  { key: 'soNo', label: 'SO No.' },
-  { key: 'soNoText', label: 'SO No.(Text)' },
-  { key: 'primarySo', label: 'Primary SO' },
-  { key: 'status', label: 'ステータス' },
-]
+type WorkTableProps = {
+  locale: AppLocale
+}
 
-export default function WorkTable() {
+export default function WorkTable({ locale }: WorkTableProps) {
+  const msg = getMessages(locale)
+  const columns: { key: ColumnKey; label: string }[] = [
+    { key: 'groupNumber', label: msg.column_groupNumber },
+    { key: 'groupTitle', label: msg.column_groupTitle },
+    { key: 'woNumber', label: msg.column_woNumber },
+    { key: 'woTitle', label: msg.column_woTitle },
+    { key: 'endUser', label: msg.column_endUser },
+    { key: 'bu', label: msg.column_bu },
+    { key: 'woType', label: msg.column_woType },
+    { key: 'equipmentSn', label: msg.column_equipmentSn },
+    { key: 'woStatus', label: msg.column_woStatus },
+    { key: 'calcStatus', label: msg.column_calcStatus },
+    { key: 'customerPoNo', label: msg.column_customerPoNo },
+    { key: 'customerPoNoText', label: msg.column_customerPoNoText },
+    { key: 'soNo', label: msg.column_soNo },
+    { key: 'soNoText', label: msg.column_soNoText },
+    { key: 'primarySo', label: msg.column_primarySo },
+    { key: 'status', label: msg.column_status },
+  ]
+  const filterOperatorOptions = getFilterOperatorOptions(locale)
   const tableScrollRef = useRef<HTMLDivElement | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [openMenu, setOpenMenu] = useState<string | null>(null)
@@ -183,7 +189,7 @@ export default function WorkTable() {
     setOpenMenu(null)
   }
 
-  const operatorLabel = getFilterOperatorLabel(filterOperator)
+  const operatorLabel = getFilterOperatorLabel(filterOperator, locale)
 
   const applyFilter = () => {
     const value = filterValue.trim()
@@ -246,9 +252,9 @@ export default function WorkTable() {
     <section className={`panel ${menuFilterKey ? 'is-filter-open' : ''}`}>
       <header className="panel-header">
         <div className="panel-title">
-          <span>WOグループ候補リスト</span>
+          <span>{msg.workTableTitle}</span>
           <button className="top-btn" type="button" onClick={handleBindGroup}>
-            WOグループ化
+            {msg.bindGroup}
           </button>
         </div>
         <div className="panel-actions">
@@ -352,7 +358,7 @@ export default function WorkTable() {
                   type="checkbox"
                   checked={allSelected}
                   onChange={(event) => toggleAll(event.target.checked)}
-                  aria-label="select all"
+                  aria-label={msg.selectAll}
                 />
                 <span className="cb-box" aria-hidden="true">
                   <svg viewBox="0 0 12 10">
@@ -397,7 +403,7 @@ export default function WorkTable() {
                           <path d="M8 13V3M8 3l-3 3M8 3l3 3" />
                         </svg>
                       </span>
-                      昇順
+                      {msg.sortAsc}
                     </button>
                     <button
                       className="menu-item"
@@ -409,7 +415,7 @@ export default function WorkTable() {
                           <path d="M8 3v10M8 13l-3-3M8 13l3-3" />
                         </svg>
                       </span>
-                      降順
+                      {msg.sortDesc}
                     </button>
                     <button
                       className="menu-item"
@@ -423,28 +429,28 @@ export default function WorkTable() {
                           <path d="M2 3h12l-5 5v4l-2 1V8L2 3z" />
                         </svg>
                       </span>
-                      フィルター
+                      {msg.filter}
                     </button>
                     {menuFilterKey === col.key ? (
                       <div
                         className="filter-pop in-menu"
                         role="dialog"
-                        aria-label="フィルター"
+                        aria-label={msg.filter}
                         onClick={(event) => event.stopPropagation()}
                       >
                         <div className="filter-head">
-                          <span>フィルター</span>
+                          <span>{msg.filter}</span>
                           <button
                             className="filter-close"
                             type="button"
                             onClick={() => setMenuFilterKey(null)}
-                            aria-label="close"
+                            aria-label={msg.close}
                           >
                             ×
                           </button>
                         </div>
                         <div className="filter-body">
-                          <div className="filter-label">次の値と等しい</div>
+                          <div className="filter-label">{msg.op_equals}</div>
                           <div className="filter-select">
                             <button
                               className="select-button"
@@ -486,7 +492,7 @@ export default function WorkTable() {
                             />
                           </div>
                           <button className="filter-apply" type="button" onClick={applyFilter}>
-                            適用
+                            {msg.apply}
                           </button>
                         </div>
                       </div>
@@ -509,7 +515,7 @@ export default function WorkTable() {
                       type="checkbox"
                       checked={selectedIds.includes(row.id)}
                       onChange={(event) => toggleRow(row.id, event.target.checked)}
-                      aria-label="select row"
+                      aria-label={msg.selectRow}
                     />
                     <span className="cb-box" aria-hidden="true">
                       <svg viewBox="0 0 12 10">
@@ -556,13 +562,13 @@ export default function WorkTable() {
               setScrollLeft(Math.max(0, Math.min(next, currentMax)))
             }}
             disabled={scrollMax === 0}
-            aria-label="horizontal scroll"
+            aria-label={msg.horizontalScroll}
           />
         </div>
 
         {/* body: table rows */}
         {/* footer: XX行 */}
-        <div className="table-footer">行: {tableRows.length}</div>
+        <div className="table-footer">{msg.rows}: {tableRows.length}</div>
       </div>
     </section>
   )

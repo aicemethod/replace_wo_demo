@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import { getMessages, type AppLocale } from './i18n'
 import {
   getSameGroupRows,
   type WorkGroupRow,
@@ -11,15 +12,19 @@ type ColumnKey = 'woNumber' | 'woTitle' | 'status' | 'groupNumber' | 'groupTitle
 
 const linkableColumns = new Set<ColumnKey>(['woNumber'])
 
-const columns: { key: ColumnKey; label: string }[] = [
-  { key: 'woNumber', label: 'WO番号' },
-  { key: 'woTitle', label: 'WOタイトル' },
-  { key: 'status', label: 'ステータス' },
-  { key: 'groupNumber', label: 'WOグループ番号' },
-  { key: 'groupTitle', label: 'WOグループタイトル' },
-]
+type WorkSameGroupTableProps = {
+  locale: AppLocale
+}
 
-export default function WorkSameGroupTable() {
+export default function WorkSameGroupTable({ locale }: WorkSameGroupTableProps) {
+  const msg = getMessages(locale)
+  const columns: { key: ColumnKey; label: string }[] = [
+    { key: 'woNumber', label: msg.column_woNumber },
+    { key: 'woTitle', label: msg.column_woTitle },
+    { key: 'status', label: msg.column_status },
+    { key: 'groupNumber', label: msg.column_groupNumber },
+    { key: 'groupTitle', label: msg.column_groupTitle },
+  ]
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const allSelected = useMemo(
@@ -86,9 +91,9 @@ export default function WorkSameGroupTable() {
     <section className="panel">
       <header className="panel-header">
         <div className="panel-title">
-          <span>同一グループのWO</span>
+          <span>{msg.sameGroupTitle}</span>
           <button className="top-btn" type="button" onClick={handleClearGroup}>
-            グループ解除
+            {msg.unbindGroup}
           </button>
         </div>
       </header>
@@ -101,7 +106,7 @@ export default function WorkSameGroupTable() {
                 type="checkbox"
                 checked={allSelected}
                 onChange={(event) => toggleAll(event.target.checked)}
-                aria-label="select all"
+                aria-label={msg.selectAll}
               />
               <span className="cb-box" aria-hidden="true">
                 <svg viewBox="0 0 12 10">
@@ -129,7 +134,7 @@ export default function WorkSameGroupTable() {
                     type="checkbox"
                     checked={selectedIds.includes(row.id)}
                     onChange={(event) => toggleRow(row.id, event.target.checked)}
-                    aria-label="select row"
+                    aria-label={msg.selectRow}
                   />
                   <span className="cb-box" aria-hidden="true">
                     <svg viewBox="0 0 12 10">
@@ -153,7 +158,7 @@ export default function WorkSameGroupTable() {
           ))}
         </div>
 
-        <div className="table-footer">行: {tableRows.length}</div>
+        <div className="table-footer">{msg.rows}: {tableRows.length}</div>
       </div>
     </section>
   )

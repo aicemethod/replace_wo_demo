@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import { getMessages, type AppLocale } from './i18n'
 import {
   getWorkGroupRows,
   type WorkGroupRow,
@@ -11,12 +12,16 @@ type ColumnKey = 'groupNumber' | 'groupTitle'
 
 const linkableColumns = new Set<ColumnKey>(['groupNumber'])
 
-const columns: { key: ColumnKey; label: string }[] = [
-  { key: 'groupNumber', label: 'WOグループ番号' },
-  { key: 'groupTitle', label: 'WOグループタイトル' },
-]
+type WorkGroupTableProps = {
+  locale: AppLocale
+}
 
-export default function WorkGroupTable() {
+export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
+  const msg = getMessages(locale)
+  const columns: { key: ColumnKey; label: string }[] = [
+    { key: 'groupNumber', label: msg.column_groupNumber },
+    { key: 'groupTitle', label: msg.column_groupTitle },
+  ]
   const [tableRows, setTableRows] = useState<WorkGroupRow[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -83,7 +88,7 @@ export default function WorkGroupTable() {
     <section className="panel work-group">
       <header className="panel-header">
         <div className="panel-title">
-          <span>このWOが所属するWOグループ</span>
+          <span>{msg.currentGroupTitle}</span>
         </div>
       </header>
 
