@@ -13,6 +13,7 @@ declare namespace Xrm {
     function getGlobalContext(): {
       userSettings?: {
         userName?: string;
+        languageId?: number;
       };
     };
   }
@@ -56,4 +57,3 @@ declare namespace Xrm {
     ): Promise<void>;
   }
 }
-
