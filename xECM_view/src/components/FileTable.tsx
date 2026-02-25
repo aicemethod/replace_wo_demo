@@ -3,9 +3,15 @@ import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip, FiChevronDown } fro
 import type { FileData } from '../types';
 import { fetchFileData, saveFileAttachment, deleteFileAttachments } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
+import { getMessages, type AppLocale } from '../i18n';
 import './FileTable.css';
 
-export default function FileTable() {
+type FileTableProps = {
+  locale: AppLocale;
+};
+
+export default function FileTable({ locale }: FileTableProps) {
+  const msg = getMessages(locale);
   const [files, setFiles] = useState<FileData[]>([]);
   const [deleteSelectedIds, setDeleteSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -174,13 +180,13 @@ export default function FileTable() {
     setIsAddMenuOpen(true);
   }, [isAddMenuOpen]);
 
-  const selectableTypes = new Set(['TSR', '技術検収書(Technical Acceptance)']);
+  const selectableTypes = new Set(['TSR', '技術検収書(Technical Acceptance)', 'Technical Acceptance']);
   const deleteSelectedCount = files.filter((file) => deleteSelectedIds.has(file.id)).length;
   const addMenuOptions = [
     { value: 931440001, label: 'TSR' },
-    { value: 931440002, label: '技術検収書(Technical Acceptance)' },
+    { value: 931440002, label: msg.fileTypeTechnicalAcceptance },
     { value: 931440003, label: 'Technical Document' },
-    { value: 931440000, label: 'Other' }
+    { value: 931440000, label: msg.fileTypeOther }
   ];
 
   const handleAddOption = (value: number) => {
@@ -212,7 +218,7 @@ export default function FileTable() {
   };
 
   if (loading) {
-    return <div className="loading">読み込み中...</div>;
+    return <div className="loading">{msg.loading}</div>;
   }
 
   return (
@@ -224,10 +230,10 @@ export default function FileTable() {
               type="button"
               className={`action-button action-button-neutral action-button-menu ${isAddMenuOpen ? 'is-open' : ''}`}
               onClick={handleAddMenuToggle}
-              title="追加"
+              title={msg.add}
             >
               <FiPlus size={16} />
-              <span>追加</span>
+              <span>{msg.add}</span>
               <FiChevronDown size={14} className="action-button-menu-caret" />
             </button>
             {isAddMenuOpen && addMenuPosition && (
@@ -257,33 +263,33 @@ export default function FileTable() {
             className="action-button action-button-primary"
             onClick={handleSave}
             disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
-            title="保存"
+            title={msg.save}
           >
             <FiSave size={16} />
-            <span>保存</span>
+            <span>{msg.save}</span>
           </button>
           <button
             type="button"
             className="action-button action-button-neutral action-button-refresh"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            title="更新"
+            title={msg.refresh}
           >
             <FiRefreshCw
               size={16}
               className={isRefreshing ? 'action-button-icon-spin' : ''}
             />
-            <span>更新</span>
+            <span>{msg.refresh}</span>
           </button>
           {showAddRow ? (
             <button
               type="button"
               className="action-button action-button-danger"
               onClick={handleAddCancel}
-              title="キャンセル"
+              title={msg.cancel}
             >
               <FiTrash2 size={16} />
-              <span>キャンセル</span>
+              <span>{msg.cancel}</span>
             </button>
           ) : (
             <button
@@ -291,10 +297,10 @@ export default function FileTable() {
               className="action-button action-button-danger"
               onClick={handleDeleteSelected}
               disabled={deleteSelectedCount === 0 || isDeleting}
-              title="削除"
+              title={msg.delete}
             >
               <FiTrash2 size={16} />
-              <span>削除</span>
+              <span>{msg.delete}</span>
             </button>
           )}
         </div>
@@ -305,11 +311,11 @@ export default function FileTable() {
           <thead>
             <tr>
               <th className="col-delete"></th>
-              <th className="col-select">xECM連携対象</th>
-              <th className="col-filename">ファイル名</th>
-              <th className="col-type">ファイル種別</th>
-              <th className="col-created">保存日時</th>
-              <th className="col-sync">連携実行日</th>
+              <th className="col-select">{msg.headerTarget}</th>
+              <th className="col-filename">{msg.headerFilename}</th>
+              <th className="col-type">{msg.headerType}</th>
+              <th className="col-created">{msg.headerCreated}</th>
+              <th className="col-sync">{msg.headerSync}</th>
             </tr>
           </thead>
           <tbody>
@@ -317,13 +323,13 @@ export default function FileTable() {
               <tr className="file-table-add-row">
                 <td className="col-delete">
                   <label className="file-delete-checkbox file-delete-checkbox-disabled">
-                    <input type="checkbox" checked={false} disabled aria-label="削除選択不可" />
+                    <input type="checkbox" checked={false} disabled aria-label={msg.ariaDeleteDisabled} />
                     <span className="file-delete-checkbox-box"></span>
                   </label>
                 </td>
                 <td className="col-select">
                   <label className="toggle-switch toggle-switch-disabled">
-                    <input type="checkbox" checked={false} disabled aria-label="選択不可" />
+                    <input type="checkbox" checked={false} disabled aria-label={msg.ariaSelectDisabled} />
                     <span className="toggle-slider"></span>
                   </label>
                 </td>
@@ -334,7 +340,7 @@ export default function FileTable() {
                       className="file-table-input"
                       value={newFilename}
                       onChange={(e) => setNewFilename(e.target.value)}
-                      placeholder="ファイル名"
+                      placeholder={msg.placeholderFilename}
                     />
                     <input
                       ref={fileInputRef}
@@ -346,7 +352,7 @@ export default function FileTable() {
                       type="button"
                       className="file-table-attach-button"
                       onClick={() => fileInputRef.current?.click()}
-                      title="添付"
+                      title={msg.attach}
                     >
                       <FiPaperclip size={16} />
                     </button>
@@ -363,7 +369,7 @@ export default function FileTable() {
             {files.length === 0 && !showAddRow ? (
               <tr>
                 <td colSpan={6} className="no-data">
-                  データがありません
+                  {msg.noData}
                 </td>
               </tr>
             ) : (
@@ -375,7 +381,7 @@ export default function FileTable() {
                         type="checkbox"
                         checked={deleteSelectedIds.has(file.id)}
                         onChange={() => handleDeleteCheckToggle(file.id)}
-                        aria-label={deleteSelectedIds.has(file.id) ? '削除選択解除' : '削除選択'}
+                        aria-label={deleteSelectedIds.has(file.id) ? msg.ariaDeleteUnselect : msg.ariaDeleteSelect}
                       />
                       <span className="file-delete-checkbox-box"></span>
                     </label>
@@ -386,7 +392,7 @@ export default function FileTable() {
                         type="checkbox"
                         checked={file.selected}
                         onChange={() => handleToggleSelect(file.id)}
-                        aria-label={file.selected ? '選択解除' : '選択'}
+                        aria-label={file.selected ? msg.ariaUnselect : msg.ariaSelect}
                         disabled={!selectableTypes.has(file.Mimetype)}
                       />
                       <span className="toggle-slider"></span>
@@ -406,7 +412,7 @@ export default function FileTable() {
                     )}
                   </td>
                   <td className="col-type">{file.Mimetype}</td>
-                  <td className="col-created">{formatDate(file.createdon)}</td>
+                  <td className="col-created">{formatDate(file.createdon, locale)}</td>
                   <td className="col-sync">-</td>
                 </tr>
               ))
@@ -418,7 +424,7 @@ export default function FileTable() {
       {/* モバイル用カード表示 */}
       <div className="file-cards">
         {files.length === 0 ? (
-          <div className="no-data">データがありません</div>
+          <div className="no-data">{msg.noData}</div>
         ) : (
           files.map((file) => (
             <div key={file.id} className={`file-card ${file.selected ? 'selected' : ''}`}>
@@ -428,7 +434,7 @@ export default function FileTable() {
                     type="checkbox"
                     checked={file.selected}
                     onChange={() => handleToggleSelect(file.id)}
-                    aria-label={file.selected ? '選択解除' : '選択'}
+                    aria-label={file.selected ? msg.ariaUnselect : msg.ariaSelect}
                   />
                   <span className="toggle-slider"></span>
                 </label>
@@ -436,15 +442,15 @@ export default function FileTable() {
               </div>
               <div className="file-card-body">
                 <div className="file-card-row">
-                  <span className="file-card-label">ファイル種別:</span>
+                  <span className="file-card-label">{msg.mobileType}:</span>
                   <span className="file-card-value">{file.Mimetype}</span>
                 </div>
                 <div className="file-card-row">
-                  <span className="file-card-label">保存日時:</span>
-                  <span className="file-card-value">{formatDate(file.createdon)}</span>
+                  <span className="file-card-label">{msg.mobileCreated}:</span>
+                  <span className="file-card-value">{formatDate(file.createdon, locale)}</span>
                 </div>
                 <div className="file-card-row">
-                  <span className="file-card-label">連携実行日:</span>
+                  <span className="file-card-label">{msg.mobileSync}:</span>
                   <span className="file-card-value">-</span>
                 </div>
               </div>
