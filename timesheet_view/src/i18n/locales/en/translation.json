@@ -1,4 +1,8 @@
 {
+    "common": {
+        "selectPlaceholder": "Select",
+        "noData": "No data available"
+    },
     "header": {
         "title": "Time Sheet",
         "targetWO": "Target WO",
@@ -14,6 +18,13 @@
         "userTab": "User List",
         "indirectTab": "Indirect Task",
         "createNew": "Create Time Entry",
+        "copyOneDay": "Copy One Day of Time Entries",
+        "select": {
+            "loading": "Loading...",
+            "placeholder": "Select",
+            "searchPlaceholder": "Search...",
+            "empty": "No matching items"
+        },
         "viewMode": {
             "weekdays": "Mon-Fri",
             "week": "Week"
@@ -69,6 +80,7 @@
         "hourSuffix": "",
         "minuteSuffix": "",
         "location": "Location",
+        "endUser": "End User",
         "resource": "Resource",
         "selectResource": "Resource Select",
         "resourcePlaceholder": "Select Resource",
@@ -79,6 +91,11 @@
         "subCategory": "Subcategory",
         "auto": "Auto",
         "task": "Task",
+        "wisdomBu": "WISDOM BU",
+        "sapBu": "SAP BU",
+        "deviceSn": "Equipment S/N",
+        "mainCategoryLabel": "Main Category",
+        "workStatus": "Work Status",
         "comment": "Comment",
         "commentPlaceholder": "Enter comment",
         "sampleEndUser1": "ABC Corporation",
@@ -92,6 +109,12 @@
         "confirmDelete": "Delete selected information.",
         "deleteWarning": "Deleted data cannot be restored.",
         "deleteConfirm": "Are you sure?",
+        "workStatusOptions": {
+            "inProgress": "In Progress",
+            "completed": "Completed",
+            "onHold": "On Hold",
+            "cancelled": "Cancelled"
+        },
         "placeholders": {
             "selectWO": "Select Work Order No.",
             "selectTimeCategory": "Select Time Category",
@@ -101,7 +124,51 @@
             "selectTask": "Select category and then choose task",
             "selectEndUser": "Select EndUser",
             "selectLocation": "Select Location",
-            "enterComment": "Enter comment"
+            "enterComment": "Enter comment",
+            "selectWisdomBu": "Select WISDOM BU",
+            "selectSapBu": "Select SAP BU",
+            "selectDeviceSn": "Select Equipment S/N",
+            "selectMainCategory": "Select Main Category",
+            "selectWorkStatus": "Select Work Status"
+        }
+    },
+    "dayCopyModal": {
+        "title": "Execute One-Day Copy",
+        "cancel": "Cancel",
+        "execute": "Execute",
+        "source": "Source",
+        "target": "Target",
+        "entries": " entries",
+        "overwriteTitle": "Overwrite Warning",
+        "overwriteText": "If entries already exist on the specified date, they will all be deleted and overwritten."
+    },
+    "workTimeInfo": {
+        "total": "Total Work Time",
+        "hoursUnit": "h ",
+        "minutesUnit": "m",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "breakTime1": "Break Time 1",
+        "breakTime2": "Break Time 2",
+        "gapInsertPlaceholder": "Insert Gap Time",
+        "fixedInsertPlaceholder": "Insert Fixed Time",
+        "gapOptions": {
+            "gap1": "Insert Gap Time 1",
+            "gap2": "Insert Gap Time 2"
+        },
+        "fixedOptions": {
+            "fixed1": "Insert Break Time 1",
+            "fixed2": "Insert Break Time 2"
+        },
+        "breakEventTitles": {
+            "break1": "Break 1",
+            "break2": "Break 2"
+        },
+        "errors": {
+            "fixedInsert": "Failed to insert fixed time.",
+            "breakInsert": "Failed to insert break time."
         }
     },
     "confirmDeleteModal": {

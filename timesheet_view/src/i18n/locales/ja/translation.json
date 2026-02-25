@@ -1,4 +1,8 @@
 {
+    "common": {
+        "selectPlaceholder": "選択してください",
+        "noData": "データがありません"
+    },
     "header": {
         "title": "Time Sheet",
         "targetWO": "対象WO",
@@ -14,6 +18,13 @@
         "userTab": "ユーザー一覧",
         "indirectTab": "間接タスク",
         "createNew": "新しいタイムエントリを作成",
+        "copyOneDay": "1日分のタイムエントリをコピー",
+        "select": {
+            "loading": "取得中...",
+            "placeholder": "選択してください",
+            "searchPlaceholder": "検索...",
+            "empty": "該当する項目がありません"
+        },
         "viewMode": {
             "weekdays": "稼働日",
             "week": "週"
@@ -69,6 +80,7 @@
         "hourSuffix": "",
         "minuteSuffix": "",
         "location": "Location",
+        "endUser": "EndUser",
         "resource": "リソース",
         "selectResource": "リソース選択",
         "resourcePlaceholder": "リソースがここに表示されます",
@@ -79,6 +91,11 @@
         "subCategory": "サブカテゴリ",
         "auto": "自動設定",
         "task": "タスク",
+        "wisdomBu": "WISDOM BU",
+        "sapBu": "SAP BU",
+        "deviceSn": "装置S/N",
+        "mainCategoryLabel": "メインカテゴリ",
+        "workStatus": "作業ステータス",
         "comment": "コメント",
         "commentPlaceholder": "コメントを入力",
         "sampleEndUser1": "株式会社ABC",
@@ -92,6 +109,12 @@
         "confirmDelete": "選択した情報を削除します。",
         "deleteWarning": "削除したデータは復元ができません。",
         "deleteConfirm": "よろしいですか？",
+        "workStatusOptions": {
+            "inProgress": "進行中",
+            "completed": "完了",
+            "onHold": "保留",
+            "cancelled": "キャンセル"
+        },
         "placeholders": {
             "selectWO": "WO番号を選択",
             "selectTimeCategory": "タイムカテゴリを選択",
@@ -101,7 +124,51 @@
             "selectTask": "カテゴリを選択してタスクを選択",
             "selectEndUser": "EndUserを選択",
             "selectLocation": "Locationを選択",
-            "enterComment": "コメントを入力"
+            "enterComment": "コメントを入力",
+            "selectWisdomBu": "WISDOM BU を選択",
+            "selectSapBu": "SAP BU を選択",
+            "selectDeviceSn": "装置S/N を選択",
+            "selectMainCategory": "メインカテゴリを選択",
+            "selectWorkStatus": "作業ステータスを選択"
+        }
+    },
+    "dayCopyModal": {
+        "title": "1日コピーの実行",
+        "cancel": "キャンセル",
+        "execute": "実行",
+        "source": "コピー元（Source）",
+        "target": "コピー先（Target）",
+        "entries": "エントリ",
+        "overwriteTitle": "上書き注意",
+        "overwriteText": "指定した日付にすでにエントリが存在する場合、それらはすべて削除され、上書きされます。"
+    },
+    "workTimeInfo": {
+        "total": "工数合計",
+        "hoursUnit": "時",
+        "minutesUnit": "分",
+        "expand": "展開",
+        "collapse": "折りたたみ",
+        "startTime": "開始時間",
+        "endTime": "終了時間",
+        "breakTime1": "休憩時間1",
+        "breakTime2": "休憩時間2",
+        "gapInsertPlaceholder": "隙間時間挿入",
+        "fixedInsertPlaceholder": "固定時間挿入",
+        "gapOptions": {
+            "gap1": "隙間時間挿入1",
+            "gap2": "隙間時間挿入2"
+        },
+        "fixedOptions": {
+            "fixed1": "休憩時間挿入1",
+            "fixed2": "休憩時間挿入2"
+        },
+        "breakEventTitles": {
+            "break1": "休憩1",
+            "break2": "休憩2"
+        },
+        "errors": {
+            "fixedInsert": "固定時間の挿入に失敗しました。",
+            "breakInsert": "休憩時間の挿入に失敗しました。"
         }
     },
     "confirmDeleteModal": {

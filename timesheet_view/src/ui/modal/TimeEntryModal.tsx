@@ -141,10 +141,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     ];
 
     const workStatusOptions: Option[] = [
-        { value: "1", label: "進行中" },
-        { value: "2", label: "完了" },
-        { value: "3", label: "保留" },
-        { value: "4", label: "キャンセル" },
+        { value: "1", label: t("timeEntryModal.workStatusOptions.inProgress") },
+        { value: "2", label: t("timeEntryModal.workStatusOptions.completed") },
+        { value: "3", label: t("timeEntryModal.workStatusOptions.onHold") },
+        { value: "4", label: t("timeEntryModal.workStatusOptions.cancelled") },
     ];
 
     /* -------------------------------
@@ -627,7 +627,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 <Select options={minutes} value={endMinute} onChange={setEndMinute} />
                             </div>
 
-                            <label className="modal-label">EndUser</label>
+                            <label className="modal-label">{t("timeEntryModal.endUser")}</label>
                             {mode === "duplicate" || endUser ? (
                                 <div className="readonly-text">
                                     {(selectedEvent as any)?.endUserName || endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser || "-"}
@@ -670,7 +670,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 readOnly
                             />
 
-                            <label className="modal-label">WISDOM BU</label>
+                            <label className="modal-label">{t("timeEntryModal.wisdomBu")}</label>
                             {mode === "duplicate" ? (
                                 <div className="readonly-text">{wisdomBu || "-"}</div>
                             ) : (
@@ -678,11 +678,11 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     options={[]}
                                     value={wisdomBu || ""}
                                     onChange={setWisdomBu}
-                                    placeholder="WISDOM BU を選択"
+                                    placeholder={t("timeEntryModal.placeholders.selectWisdomBu")}
                                 />
                             )}
 
-                            <label className="modal-label">SAP BU</label>
+                            <label className="modal-label">{t("timeEntryModal.sapBu")}</label>
                             {mode === "duplicate" ? (
                                 <div className="readonly-text">{sapBu || "-"}</div>
                             ) : (
@@ -690,7 +690,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     options={[]}
                                     value={sapBu || ""}
                                     onChange={setSapBu}
-                                    placeholder="SAP BU を選択"
+                                    placeholder={t("timeEntryModal.placeholders.selectSapBu")}
                                 />
                             )}
                         </div>
@@ -710,7 +710,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">装置S/N</label>
+                            <label className="modal-label">{t("timeEntryModal.deviceSn")}</label>
                             {mode === "duplicate" || deviceSn ? (
                                 <div className="readonly-text">
                                     {(selectedEvent as any)?.deviceSnName || deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
@@ -720,7 +720,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     options={deviceSnOptions}
                                     value={deviceSn || ""}
                                     onChange={setDeviceSn}
-                                    placeholder="装置S/N を選択"
+                                    placeholder={t("timeEntryModal.placeholders.selectDeviceSn")}
                                 />
                             )}
 
@@ -752,7 +752,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">メインカテゴリ</label>
+                            <label className="modal-label">{t("timeEntryModal.mainCategoryLabel")}</label>
                             {mode === "duplicate" || mainCategory ? (
                                 <div className="readonly-text">
                                     {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory || "-"}
@@ -762,7 +762,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     options={maincategoryOptions}
                                     value={mainCategory || ""}
                                     onChange={setMainCategory}
-                                    placeholder={"メインカテゴリを選択"}
+                                    placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
                                 />
                             )}
 
@@ -780,7 +780,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">作業ステータス</label>
+                            <label className="modal-label">{t("timeEntryModal.workStatus")}</label>
                             {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {workStatusOptions.find(opt => opt.value === workStatus)?.label || workStatus || "-"}
@@ -790,7 +790,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     options={workStatusOptions}
                                     value={workStatus || ""}
                                     onChange={setWorkStatus}
-                                    placeholder="作業ステータスを選択"
+                                    placeholder={t("timeEntryModal.placeholders.selectWorkStatus")}
                                 />
                             )}
 

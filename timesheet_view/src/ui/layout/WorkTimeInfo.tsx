@@ -54,14 +54,14 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
 
     /** 隙間時間挿入オプション */
     const gapTimeOptions: Option[] = [
-        { value: "gap1", label: "隙間時間挿入1" },
-        { value: "gap2", label: "隙間時間挿入2" },
+        { value: "gap1", label: t("workTimeInfo.gapOptions.gap1") },
+        { value: "gap2", label: t("workTimeInfo.gapOptions.gap2") },
     ];
 
     /** 固定時間挿入オプション */
     const fixedTimeOptions: Option[] = [
-        { value: "fixed1", label: "休憩時間挿入1" },
-        { value: "fixed2", label: "休憩時間挿入2" },
+        { value: "fixed1", label: t("workTimeInfo.fixedOptions.fixed1") },
+        { value: "fixed2", label: t("workTimeInfo.fixedOptions.fixed2") },
     ];
 
     /** 現在表示されている期間の開始日と終了日を計算 */
@@ -106,13 +106,13 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
             await new Promise((resolve) => setTimeout(resolve, 1500));
 
             if (value === "fixed1" && onInsertBreakTime && breakTime1Start && breakTime1End) {
-                handleInsertBreakTime(breakTime1Start, breakTime1End, "休憩1");
+                handleInsertBreakTime(breakTime1Start, breakTime1End, t("workTimeInfo.breakEventTitles.break1"));
             } else if (value === "fixed2" && onInsertBreakTime && breakTime2Start && breakTime2End) {
-                handleInsertBreakTime(breakTime2Start, breakTime2End, "休憩2");
+                handleInsertBreakTime(breakTime2Start, breakTime2End, t("workTimeInfo.breakEventTitles.break2"));
             }
         } catch (error) {
             console.error("固定時間挿入エラー:", error);
-            alert("固定時間の挿入に失敗しました。");
+            alert(t("workTimeInfo.errors.fixedInsert"));
         } finally {
             setIsLoading(false);
             onLoadingChange?.(false);
@@ -197,7 +197,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
             onInsertBreakTime(breakEvents);
         } catch (error) {
             console.error("休憩時間挿入エラー:", error);
-            alert("休憩時間の挿入に失敗しました。");
+            alert(t("workTimeInfo.errors.breakInsert"));
         }
     };
 
@@ -236,15 +236,15 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
         <div className={`work-time-info ${isCollapsed ? "collapsed" : ""}`}>
             <div className="work-time-info-header">
                 <div className="work-time-info-header-left">
-                    <span className="time-label">工数合計</span>
+                    <span className="time-label">{t("workTimeInfo.total")}</span>
                     <span className="time-value">
-                        {totalTime.hours}時{totalTime.minutes}分
+                        {totalTime.hours}{t("workTimeInfo.hoursUnit")}{totalTime.minutes}{t("workTimeInfo.minutesUnit")}
                     </span>
                 </div>
                 <button
                     className="work-time-info-toggle"
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    aria-label={isCollapsed ? "展開" : "折りたたみ"}
+                    aria-label={isCollapsed ? t("workTimeInfo.expand") : t("workTimeInfo.collapse")}
                     aria-expanded={!isCollapsed}
                 >
                     {isCollapsed ? <FaChevronDown /> : <FaChevronUp />}
@@ -255,7 +255,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                     <div className="work-time-info-left">
                         <div className="time-item">
                             <Input
-                                label="開始時間"
+                                label={t("workTimeInfo.startTime")}
                                 type="time"
                                 value={startTime}
                                 onChange={setStartTime}
@@ -264,7 +264,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                         </div>
                         <div className="time-item">
                             <Input
-                                label="終了時間"
+                                label={t("workTimeInfo.endTime")}
                                 type="time"
                                 value={endTime}
                                 onChange={setEndTime}
@@ -272,7 +272,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                             />
                         </div>
                         <div className="time-item break-time-item">
-                            <span className="time-label">休憩時間1</span>
+                            <span className="time-label">{t("workTimeInfo.breakTime1")}</span>
                             <div className="break-time-inputs">
                                 <Input
                                     type="time"
@@ -290,7 +290,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                             </div>
                         </div>
                         <div className="time-item break-time-item">
-                            <span className="time-label">休憩時間2</span>
+                            <span className="time-label">{t("workTimeInfo.breakTime2")}</span>
                             <div className="break-time-inputs">
                                 <Input
                                     type="time"
@@ -308,9 +308,9 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                             </div>
                         </div>
                         <div className="time-item">
-                            <span className="time-label">工数合計</span>
+                            <span className="time-label">{t("workTimeInfo.total")}</span>
                             <span className="time-value">
-                                {totalTime.hours}時{totalTime.minutes}分
+                                {totalTime.hours}{t("workTimeInfo.hoursUnit")}{totalTime.minutes}{t("workTimeInfo.minutesUnit")}
                             </span>
                         </div>
                     </div>
@@ -321,7 +321,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                                 options={gapTimeOptions}
                                 value={gapTimeInsert}
                                 onChange={setGapTimeInsert}
-                                placeholder="隙間時間挿入"
+                                placeholder={t("workTimeInfo.gapInsertPlaceholder")}
                             />
                         </div>
                         <div className="select-group">
@@ -329,7 +329,7 @@ export const WorkTimeInfo: React.FC<WorkTimeInfoProps> = ({
                                 options={fixedTimeOptions}
                                 value={fixedTimeInsert}
                                 onChange={handleFixedTimeInsertChange}
-                                placeholder="固定時間挿入"
+                                placeholder={t("workTimeInfo.fixedInsertPlaceholder")}
                                 disabled={isLoading}
                             />
                         </div>

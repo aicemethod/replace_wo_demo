@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import * as FaIcons from "react-icons/fa";
 import "../styles/components/Select.css";
 import type { SelectProps } from "../../types/components";
+import { useTranslation } from "react-i18next";
 
 /**
  * 共通Selectコンポーネント
@@ -13,10 +14,11 @@ export const Select: React.FC<SelectProps> = ({
     options,
     value,
     onChange,
-    placeholder = "選択してください",
+    placeholder,
     disabled = false,
     className = "",
 }) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -53,6 +55,7 @@ export const Select: React.FC<SelectProps> = ({
     const textClass = ["select-text", !selectedLabel && "placeholder"]
         .filter(Boolean)
         .join(" ");
+    const resolvedPlaceholder = placeholder || t("common.selectPlaceholder");
 
     return (
         <div ref={wrapperRef} className={wrapperClass}>
@@ -66,7 +69,7 @@ export const Select: React.FC<SelectProps> = ({
                 tabIndex={disabled ? -1 : 0}
             >
                 <span className={textClass}>
-                    {selectedLabel || placeholder}
+                    {selectedLabel || resolvedPlaceholder}
                 </span>
                 <span className="select-icon">
                     <FaIcons.FaChevronDown />
@@ -90,7 +93,7 @@ export const Select: React.FC<SelectProps> = ({
                             </div>
                         ))
                     ) : (
-                        <div className="select-option empty">データがありません</div>
+                        <div className="select-option empty">{t("common.noData")}</div>
                     )}
                 </div>
             )}

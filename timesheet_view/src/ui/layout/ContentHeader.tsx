@@ -100,7 +100,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                         aria-expanded={selectOpen}
                     >
                         <span className={`header-select-text ${!selectedLabel ? "placeholder" : ""}`}>
-                            {isSelectLoading ? "取得中..." : (selectedLabel || "選択してください")}
+                            {isSelectLoading ? t("contentHeader.select.loading") : (selectedLabel || t("contentHeader.select.placeholder"))}
                         </span>
                         <span className="header-select-icon">
                             <FaIcons.FaChevronDown />
@@ -116,7 +116,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                                 <input
                                     type="text"
                                     className="search-input"
-                                    placeholder="検索..."
+                                    placeholder={t("contentHeader.select.searchPlaceholder")}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onClick={(e) => e.stopPropagation()}
@@ -137,7 +137,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="header-select-option empty">該当する項目がありません</div>
+                                    <div className="header-select-option empty">{t("contentHeader.select.empty")}</div>
                                 )}
                             </div>
                         </div>
@@ -145,7 +145,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                 </div>
 
                 <Button
-                    label="1日分のタイムエントリをコピー"
+                    label={t("contentHeader.copyOneDay")}
                     color="primary"
                     icon={<FaIcons.FaPlus />}
                     disabled={!isCopyEnabled}
