@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>xECM Attachment</title>
+  <script src="../../ClientGlobalContext.js.aspx"></script>
+  <link rel="stylesheet" href="../css/wo_attachment_xecm.css">
+</head>
+
+<body>
+  <div class="file-table-container">
+    <div class="file-table-header">
+      <div class="file-table-actions">
+        <div class="filetable-add-wrapper filetable-add-dropdown">
+          <button type="button" class="action-button action-button-neutral action-button-menu" title="追加">
+            <span class="action-button-icon">+</span>
+            <span>追加</span>
+            <span class="action-button-menu-caret">▾</span>
+          </button>
+          <div class="filetable-add-menu" hidden></div>
+        </div>
+        <button type="button" class="action-button action-button-primary" title="保存">
+          <span class="action-button-icon">💾</span>
+          <span>保存</span>
+        </button>
+        <button type="button" class="action-button action-button-neutral action-button-refresh" title="更新">
+          <span class="action-button-icon">↻</span>
+          <span>更新</span>
+        </button>
+        <button type="button" class="action-button action-button-danger" title="削除">
+          <span class="action-button-icon">🗑</span>
+          <span>削除</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="file-table-wrapper">
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th class="col-delete"></th>
+            <th class="col-select">対象</th>
+            <th class="col-filename">ファイル名</th>
+            <th class="col-type">種別</th>
+            <th class="col-created">作成日時</th>
+            <th class="col-sync">同期</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="file-table-add-row">
+            <td class="col-delete">
+              <label class="file-delete-checkbox file-delete-checkbox-disabled">
+                <input type="checkbox" disabled>
+                <span class="file-delete-checkbox-box"></span>
+              </label>
+            </td>
+            <td class="col-select">
+              <label class="toggle-switch toggle-switch-disabled">
+                <input type="checkbox" disabled>
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+            <td class="col-filename">
+              <div class="file-table-input-row">
+                <input type="text" class="file-table-input" value="見積書_20260226.pdf" placeholder="ファイル名">
+                <input type="file" class="file-table-file-input">
+                <button type="button" class="file-table-attach-button" title="添付">
+                  <span class="action-button-icon">📎</span>
+                </button>
+              </div>
+              <div class="file-table-file-preview">見積書_20260226.pdf</div>
+            </td>
+            <td class="col-type"><span class="file-table-type-text">TSR</span></td>
+            <td class="col-created">-</td>
+            <td class="col-sync">-</td>
+          </tr>
+          <tr>
+            <td class="col-delete">
+              <label class="file-delete-checkbox">
+                <input type="checkbox">
+                <span class="file-delete-checkbox-box"></span>
+              </label>
+            </td>
+            <td class="col-select">
+              <label class="toggle-switch">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+            <td class="col-filename">
+              <button type="button" class="file-table-link">TSR_Design_Spec_v1.pdf</button>
+            </td>
+            <td class="col-type">TSR</td>
+            <td class="col-created">2026/02/25 14:22</td>
+            <td class="col-sync">-</td>
+          </tr>
+          <tr>
+            <td class="col-delete">
+              <label class="file-delete-checkbox">
+                <input type="checkbox" checked>
+                <span class="file-delete-checkbox-box"></span>
+              </label>
+            </td>
+            <td class="col-select">
+              <label class="toggle-switch toggle-switch-disabled">
+                <input type="checkbox" disabled>
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+            <td class="col-filename">technical_acceptance_report.docx</td>
+            <td class="col-type">Technical Document</td>
+            <td class="col-created">2026/02/24 09:10</td>
+            <td class="col-sync">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="file-cards">
+      <div class="file-card selected">
+        <div class="file-card-header">
+          <label class="toggle-switch">
+            <input type="checkbox" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <div class="file-card-filename">TSR_Design_Spec_v1.pdf</div>
+        </div>
+        <div class="file-card-body">
+          <div class="file-card-row">
+            <span class="file-card-label">種別:</span>
+            <span class="file-card-value">TSR</span>
+          </div>
+          <div class="file-card-row">
+            <span class="file-card-label">作成日時:</span>
+            <span class="file-card-value">2026/02/25 14:22</span>
+          </div>
+          <div class="file-card-row">
+            <span class="file-card-label">同期:</span>
+            <span class="file-card-value">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../logic/wo_attachment_xecm.js"></script>
+</body>
+
+</html>
