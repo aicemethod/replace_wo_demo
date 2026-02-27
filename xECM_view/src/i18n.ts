@@ -15,7 +15,8 @@ const messages = {
     headerFilename: 'ファイル名',
     headerType: 'ファイル種別',
     headerCreated: '保存日時',
-    headerSync: '連携実行日',
+    headerSync: 'xECM連携実行日',
+    headerTccSync: 'TCC連携実行日',
     placeholderFilename: 'ファイル名',
     attach: '添付',
     ariaDeleteDisabled: '削除選択不可',
@@ -26,7 +27,7 @@ const messages = {
     ariaUnselect: '選択解除',
     mobileType: 'ファイル種別',
     mobileCreated: '保存日時',
-    mobileSync: '連携実行日',
+    mobileSync: 'xECM連携実行日',
     fileTypeTechnicalAcceptance: '技術検収書(Technical Acceptance)',
     fileTypeOther: 'Other'
   },
@@ -42,7 +43,8 @@ const messages = {
     headerFilename: 'File Name',
     headerType: 'File Type',
     headerCreated: 'Saved Date and Time',
-    headerSync: 'Integration Date',
+    headerSync: 'xECM Integration Date',
+    headerTccSync: 'TCC Integration Date',
     placeholderFilename: 'File name',
     attach: 'Attach',
     ariaDeleteDisabled: 'Delete selection disabled',
@@ -53,7 +55,7 @@ const messages = {
     ariaUnselect: 'Unselect',
     mobileType: 'File Type',
     mobileCreated: 'Saved At',
-    mobileSync: 'Sync Date',
+    mobileSync: 'SxECM ync Date',
     fileTypeTechnicalAcceptance: 'Technical Acceptance',
     fileTypeOther: 'Other'
   }
@@ -77,4 +79,3 @@ export function getAppLocaleFromXrm(): AppLocale {
 export function getMessages(locale: AppLocale) {
   return messages[locale];
 }
-
