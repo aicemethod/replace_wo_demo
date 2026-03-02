@@ -238,12 +238,11 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
       [`objectid_proto_activitymimeattachment@odata.bind`]: `/${attachmentSetName}(${attachmentId})`
     });
 
-    if (params.typeValue === 931440001 || params.typeLabel === 'TSR') {
+    if ((params.typeValue === 931440001 || params.typeLabel === 'TSR') && entityName) {
       const automaticLink = xrm?.Page?.getAttribute?.('proto_tcc_automatic_link_btn')?.getValue?.();
-      const customerApprovalType = xrm?.Page?.getAttribute?.('proto_customerapprovaltype');
-      if (customerApprovalType) {
-        customerApprovalType.setValue(automaticLink ? 931440002 : 931440000);
-      }
+      await xrm.WebApi.updateRecord(entityName, currentRecordId, {
+        proto_customerapprovaltype: automaticLink ? 931440002 : 931440000
+      });
     }
 
     return {
