@@ -238,6 +238,14 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
       [`objectid_proto_activitymimeattachment@odata.bind`]: `/${attachmentSetName}(${attachmentId})`
     });
 
+    if (params.typeValue === 931440001 || params.typeLabel === 'TSR') {
+      const automaticLink = xrm?.Page?.getAttribute?.('proto_tcc_automatic_link_btn')?.getValue?.();
+      const customerApprovalType = xrm?.Page?.getAttribute?.('proto_customerapprovaltype');
+      if (customerApprovalType) {
+        customerApprovalType.setValue(automaticLink ? 931440002 : 931440000);
+      }
+    }
+
     return {
       id: annotationResponse.id,
       filename: params.filename,
