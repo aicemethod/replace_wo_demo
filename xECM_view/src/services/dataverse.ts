@@ -243,6 +243,9 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
       await xrm.WebApi.updateRecord(entityName, currentRecordId, {
         proto_customerapprovaltype: automaticLink ? 931440002 : 931440000
       });
+      await xrm.WebApi.updateRecord(entityName, currentRecordId, {
+        proto_customerapprovaltype: new Date().toISOString()
+      });
     }
 
     return {
