@@ -240,12 +240,15 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
 
     if ((params.typeValue === 931440001 || params.typeLabel === 'TSR') && entityName) {
       const automaticLink = xrm?.Page?.getAttribute?.('proto_tcc_automatic_link_btn')?.getValue?.();
+      const customerApprovalType = xrm?.Page?.getAttribute?.('proto_customerapprovaltype')?.getValue?.();
       await xrm.WebApi.updateRecord(entityName, currentRecordId, {
         proto_customerapprovaltype: automaticLink ? 931440002 : 931440000
       });
-      await xrm.WebApi.updateRecord(entityName, currentRecordId, {
-        proto_wo_customersignreceivedon: new Date()
-      });
+      if (automaticLink && customerApprovalType === 931440000) {
+        await xrm.WebApi.updateRecord(entityName, currentRecordId, {
+          proto_wo_customersignreceivedon: new Date()
+        });
+      }
     }
 
     return {
