@@ -768,6 +768,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
+                            {/*
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
                             {mode === "duplicate" || paymentType ? (
                                 <div className="readonly-text">
@@ -781,6 +782,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
                                 />
                             )}
+                            */}
 
                             <label className="modal-label">{t("timeEntryModal.billableType")}</label>
                             {mode === "duplicate" || billableType ? (
