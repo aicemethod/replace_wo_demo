@@ -316,7 +316,7 @@ export default function FileTable({ locale }: FileTableProps) {
               <th className="col-type">{msg.headerType}</th>
               <th className="col-created">{msg.headerCreated}</th>
               <th className="col-sync">{msg.headerSync}</th>
-              <th className="col-sync">{msg.headerTccSync}</th>
+              {/* <th className="col-sync">{msg.headerTccSync}</th> */}
             </tr>
           </thead>
           <tbody>
