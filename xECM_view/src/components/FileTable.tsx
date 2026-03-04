@@ -186,6 +186,7 @@ export default function FileTable({ locale }: FileTableProps) {
   }, [isAddMenuOpen]);
 
   const selectableTypes = new Set(['TSR', '技術検収書(Technical Acceptance)', 'Technical Acceptance']);
+  const hasSelectedFiles = files.some((file) => file.selected);
   const deleteSelectedCount = files.filter((file) => deleteSelectedIds.has(file.id)).length;
   const addMenuOptions = [
     { value: 931440001, label: 'TSR' },
@@ -267,7 +268,7 @@ export default function FileTable({ locale }: FileTableProps) {
             type="button"
             className="action-button action-button-primary"
             onClick={handleSave}
-            disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
+            disabled={isSaving || !showAddRow}
             title={msg.saveFile}
           >
             <FiSave size={16} />
@@ -277,7 +278,7 @@ export default function FileTable({ locale }: FileTableProps) {
             type="button"
             className="action-button action-button-primary"
             onClick={handleFileLink}
-            disabled={showAddRow || files.filter((f) => f.selected).length === 0}
+            disabled={showAddRow || !hasSelectedFiles}
             title={msg.fileLink}
           >
             <FiSave size={16} />
