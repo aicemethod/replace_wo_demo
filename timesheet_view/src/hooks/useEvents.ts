@@ -25,6 +25,8 @@ export type EventData = {
     paymenttobe?: number;
     paymentto?: number;
     concessiontype?: number;
+    woSo?: string | null;
+    woSoName?: string | null;
     timezone?: string;
     extendedProps?: Record<string, any>;
 };
@@ -89,7 +91,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_timecategory,proto_timezone,` +
-        `_proto_enduser_value,_proto_wo_category_value;` +
+        `_proto_enduser_value,_proto_wo_category_value,_proto_wo_so_value;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
@@ -130,6 +132,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             paymenttobe: t.proto_payment_tobe,
             paymentto: t.proto_paymentto_tobe,
             concessiontype: t.proto_concession_tobe,
+            woSo: t._proto_wo_so_value?.replace(/[{}]/g, "") || null,
+            woSoName: t['_proto_wo_so_value@OData.Community.Display.V1.FormattedValue'] || null,
             timezone: t.proto_timezone ?? null,
             extendedProps: {
                 timezone: t.proto_timezone ?? null,
@@ -171,6 +175,8 @@ const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
         paymenttobe: event.paymenttobe?.toString(),
         paymentto: event.paymentto?.toString(),
         concessiontype: event.concessiontype?.toString(),
+        woSo: event.woSo || null,
+        woSoName: event.woSoName || null,
         timezone: event.timezone,
         workOrder: event.workOrderId,
     };
@@ -270,6 +276,7 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
                 paymentToBe: data.paymentToBe ?? null,
                 paymentTo: data.paymentTo ?? null,
                 concessionType: data.concessionType ?? null,
+                woSo: data.woSo ?? null,
                 timezone: data.timezone ?? null,
                 // Lookup（ID）
                 subcategory: data.subcategory || null,

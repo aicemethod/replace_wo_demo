@@ -21,6 +21,7 @@ export interface TimeEntryInput {
     paymentToBe?: string | number | null;
     paymentTo?: string | number | null;
     concessionType?: string | number | null;
+    woSo?: string | null;
     timezone?: string | number | null;
     start?: Date;
     end?: Date;
@@ -41,6 +42,7 @@ export interface TimeEntryRecord extends BaseEntity {
     paymentToBe: number | null;
     paymentTo: number | null;
     concessionType: number | null;
+    woSo: string | null;
     timezone: number | null;
     start: string;
     end: string;
@@ -72,6 +74,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                     'proto_payment_tobe',
                     'proto_paymentto_tobe',
                     'proto_concession_tobe',
+                    '_proto_wo_so_value',
                     'proto_timezone',
                     'proto_startdatetime',
                     'proto_enddatetime',
@@ -100,6 +103,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 paymentToBe: DataTransformer.toOptionSetNumber(data.paymentToBe),
                 paymentTo: DataTransformer.toOptionSetNumber(data.paymentTo),
                 concessionType: DataTransformer.toOptionSetNumber(data.concessionType),
+                woSo: data.woSo ?? null,
                 timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 start: DataTransformer.toIsoString(data.start),
                 end: DataTransformer.toIsoString(data.end),
@@ -142,6 +146,9 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.wo && data.wo !== "" && data.wo !== null) {
                 payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
             }
+            if (data.woSo && data.woSo !== "" && data.woSo !== null) {
+                payload['proto_wo_so@odata.bind'] = `/proto_com_serviceorderheaders(${data.woSo})`;
+            }
 
             console.log('TimeEntry作成ペイロード:', JSON.stringify(payload, null, 2));
 
@@ -159,6 +166,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                     paymentToBe: DataTransformer.toOptionSetNumber(data.paymentToBe),
                     paymentTo: DataTransformer.toOptionSetNumber(data.paymentTo),
                     concessionType: DataTransformer.toOptionSetNumber(data.concessionType),
+                    woSo: data.woSo ?? null,
                     timezone: DataTransformer.toOptionSetNumber(data.timezone),
                     start: DataTransformer.toIsoString(data.start),
                     end: DataTransformer.toIsoString(data.end),
@@ -217,6 +225,13 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                     payload['proto_wonumber@odata.bind'] = null;
                 }
             }
+            if (data.woSo !== undefined) {
+                if (data.woSo) {
+                    payload['proto_wo_so@odata.bind'] = `/proto_com_serviceorderheaders(${data.woSo})`;
+                } else {
+                    payload['proto_wo_so@odata.bind'] = null;
+                }
+            }
 
             await this.getXrm().WebApi.updateRecord(this.entityName, id, payload);
             return { id, name: data.title || '', title: data.title || '', ...data } as unknown as TimeEntryRecord;
@@ -243,6 +258,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             paymentToBe: (item as any).paymentToBe ?? null,
             paymentTo: (item as any).paymentTo ?? null,
             concessionType: (item as any).concessionType ?? null,
+            woSo: (item as any).woSo ?? null,
         }));
     }
 
@@ -260,6 +276,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             paymentToBe: record.proto_payment_tobe,
             paymentTo: record.proto_paymentto_tobe,
             concessionType: record.proto_concession_tobe,
+            woSo: record._proto_wo_so_value ?? null,
             timezone: record.proto_timezone,
             start: record.proto_startdatetime || '',
             end: record.proto_enddatetime || '',

@@ -23,6 +23,8 @@ export const createEventFromDuplicateData = (duplicateData: any): Event => {
         endUser: duplicateData.endUser,
         timezone: duplicateData.timezone,
         resource: duplicateData.resource,
+        woSo: duplicateData.woSo,
+        woSoName: duplicateData.woSoName || null,
         timecategory: duplicateData.timeCategory,
         maincategory: duplicateData.mainCategory,
         paymenttype: duplicateData.paymentType,

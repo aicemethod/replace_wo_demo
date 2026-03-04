@@ -97,6 +97,7 @@ function TimesheetApp() {
   const [deviceSnOptions, setDeviceSnOptions] = useState<Option[]>([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState<Option[]>([]);
   const [woTypeOptions, setWoTypeOptions] = useState<Option[]>([]);
+  const [woSoOptions, setWoSoOptions] = useState<Option[]>([]);
 
   /** ユーザーオプションを取得 */
   useEffect(() => {
@@ -209,6 +210,17 @@ function TimesheetApp() {
           label: item.proto_name || "",
         }));
         setWoTypeOptions(woTypeOpts);
+
+        // proto_com_serviceorderheader を取得
+        const woSoResult = await xrm.WebApi.retrieveMultipleRecords(
+          "proto_com_serviceorderheader",
+          "?$select=proto_com_serviceorderheaderid,proto_name&$orderby=proto_name"
+        );
+        const woSoOpts: Option[] = woSoResult.entities.map((item: any) => ({
+          value: item.proto_com_serviceorderheaderid?.replace(/[{}]/g, "") || "",
+          label: item.proto_name || "",
+        }));
+        setWoSoOptions(woSoOpts);
       } catch (err) {
         console.error("Lookupデータ取得エラー:", err);
       }
@@ -286,6 +298,8 @@ function TimesheetApp() {
         paymentToBe: detail?.paymenttobe ?? (event as any).paymenttobe ?? "",
         paymentTo: detail?.paymentto ?? (event as any).paymentto ?? "",
         concessionType: detail?.concessiontype ?? (event as any).concessiontype ?? "",
+        woSo: detail?.woSo ?? (event as any).woSo ?? "",
+        woSoName: detail?.woSoName ?? (event as any).woSoName ?? null,
         deviceSn: deviceSnId,
         woType: detail?.woType || (event as any).woType || "",
         subcategory: detail?.subcategory || (event as any).subcategory || "",
@@ -394,6 +408,7 @@ function TimesheetApp() {
         deviceSnOptions={deviceSnOptions}
         subcategoryOptions={subcategoryOptions}
         woTypeOptions={woTypeOptions}
+        woSoOptions={woSoOptions}
         isSubgrid={isSubgrid}
         selectedWO={selectedWO}
         selectedIndirectTask={selectedIndirectTask}

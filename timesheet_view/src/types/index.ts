@@ -45,6 +45,8 @@ export type Event = {
     paymenttobe?: string;
     paymentto?: string;
     concessiontype?: string;
+    woSo?: string | null;
+    woSoName?: string | null;
     task?: string;
     comment?: string;
     isDuplicate?: boolean;
@@ -124,6 +126,8 @@ export type TimeEntryData = {
     workStatus?: string;
     wisdomBu?: string;
     sapBu?: string;
+    woSo?: string;
+    woSoName?: string | null;
     woTypeName?: string | null;
     comment?: string;
     id?: string;

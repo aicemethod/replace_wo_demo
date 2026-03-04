@@ -42,6 +42,7 @@ export interface TimeEntryModalProps {
     deviceSnOptions: Option[];
     subcategoryOptions: Option[];
     woTypeOptions: Option[];
+    woSoOptions: Option[];
     isSubgrid?: boolean;
     selectedWO?: string;
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
@@ -68,6 +69,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     deviceSnOptions,
     subcategoryOptions,
     woTypeOptions,
+    woSoOptions,
     isSubgrid = false,
     selectedWO = "",
     selectedIndirectTask = null,
@@ -97,6 +99,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [resource, setResource] = useState("");
     const [wisdomBu, setWisdomBu] = useState("");
     const [sapBu, setSapBu] = useState("");
+    const [woSo, setWoSo] = useState("");
     const [deviceSn, setDeviceSn] = useState("");
     const [woType, setWoType] = useState("");
 
@@ -317,6 +320,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setResource(selectedEvent.resource ?? "");
             setWisdomBu(selectedEvent.wisdomBu ?? "");
             setSapBu(selectedEvent.sapBu ?? "");
+            setWoSo((selectedEvent as any).woSo ?? "");
             setWoType((selectedEvent as any).woType ?? "");
         } else if (selectedDateTime) {
             setMode("create");
@@ -375,6 +379,16 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 setPaymentToBe(protoFields.proto_payment_tobe !== undefined && protoFields.proto_payment_tobe !== null ? String(protoFields.proto_payment_tobe) : "");
                 setPaymentTo(protoFields.proto_paymentto_tobe !== undefined && protoFields.proto_paymentto_tobe !== null ? String(protoFields.proto_paymentto_tobe) : "");
                 setConcessionType(protoFields.proto_concession_tobe !== undefined && protoFields.proto_concession_tobe !== null ? String(protoFields.proto_concession_tobe) : "");
+                const woSoId = protoFields.proto_wo_so?.id || "";
+                const woSoName = protoFields.proto_wo_so?.name || "";
+                if (woSoId || woSoName) {
+                    const woSoOption = woSoOptions.find(
+                        (opt) => opt.value === woSoId || opt.label === woSoName
+                    );
+                    setWoSo(woSoOption?.value || woSoId || "");
+                } else {
+                    setWoSo("");
+                }
 
                 // proto_maincategory -> メインカテゴリ
                 setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
@@ -414,6 +428,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 setPaymentToBe("");
                 setPaymentTo("");
                 setConcessionType("");
+                setWoSo("");
                 setMainCategory("");
                 setSubcategory("");
                 setWoType("");
@@ -446,7 +461,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWisdomBu("");
             setSapBu("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions, woTypeOptions]);
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions, woTypeOptions, woSoOptions]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -526,6 +541,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             resource,
             wisdomBu,
             sapBu,
+            woSo,
+            woSoName: woSoOptions.find((opt) => opt.value === woSo || opt.label === woSo)?.label || null,
             timeCategory,
             mainCategory,
             paymentType,
@@ -577,6 +594,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             resource,
             wisdomBu,
             sapBu,
+            woSo,
             timeCategory,
             mainCategory,
             paymentType,
@@ -808,6 +826,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     value={sapBu || ""}
                                     onChange={setSapBu}
                                     placeholder={t("timeEntryModal.placeholders.selectSapBu")}
+                                />
+                            )}
+
+                            <label className="modal-label">SO (BaaN)</label>
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">
+                                    {(selectedEvent as any)?.woSoName || woSoOptions.find((opt) => opt.value === woSo || opt.label === woSo)?.label || woSo || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={woSoOptions}
+                                    value={woSo || ""}
+                                    onChange={setWoSo}
+                                    placeholder="SO (BaaN) を選択"
                                 />
                             )}
                         </div>

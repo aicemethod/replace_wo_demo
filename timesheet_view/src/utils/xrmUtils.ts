@@ -218,6 +218,7 @@ export const getWorkOrderProtoFields = (): {
     proto_payment_tobe?: number | null;
     proto_paymentto_tobe?: number | null;
     proto_concession_tobe?: number | null;
+    proto_wo_so?: { id: string; name: string } | null;
     proto_maincategory?: number | null;
     proto_subcategory?: { id: string; name: string } | null;
 } | null => {
@@ -277,6 +278,7 @@ export const getWorkOrderProtoFields = (): {
             proto_payment_tobe?: number | null;
             proto_paymentto_tobe?: number | null;
             proto_concession_tobe?: number | null;
+            proto_wo_so?: { id: string; name: string } | null;
             proto_maincategory?: number | null;
             proto_subcategory?: { id: string; name: string } | null;
         } = {
@@ -360,6 +362,18 @@ export const getWorkOrderProtoFields = (): {
             const concessionTypeValue = concessionTypeAttr.getValue();
             if (concessionTypeValue !== null && concessionTypeValue !== undefined) {
                 result.proto_concession_tobe = concessionTypeValue;
+            }
+        }
+
+        const woSoAttr = getAttr("proto_wo_so");
+        if (woSoAttr) {
+            const woSoValue = woSoAttr.getValue();
+            if (woSoValue && woSoValue.length > 0) {
+                const value = Array.isArray(woSoValue) ? woSoValue[0] : woSoValue;
+                result.proto_wo_so = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
             }
         }
 
