@@ -35,6 +35,40 @@
             flex-wrap: wrap;
         }
 
+        .filetable-add-wrapper {
+            position: relative;
+        }
+
+        .filetable-add-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 180px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .filetable-add-item {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filetable-add-item:hover {
+            background-color: #f5f5f5;
+        }
+
         .action-button {
             height: 32px;
             padding: 0 12px;
@@ -57,6 +91,51 @@
 
         .action-button-neutral {
             color: #333;
+        }
+
+        .action-button-primary {
+            color: #115ea3;
+            border-color: #b7d1ea;
+            background-color: #f6fbff;
+        }
+
+        .action-button-primary:hover {
+            background-color: #edf5fc;
+        }
+
+        .action-button-danger {
+            color: #d32f2f;
+            border-color: #efc3c3;
+            background-color: #fff8f8;
+        }
+
+        .action-button-danger:hover {
+            background-color: #ffefef;
+            border-color: #e6aaaa;
+        }
+
+        .action-button-refresh {
+            background-color: #f3f3f3;
+            border-color: #d9d9d9;
+        }
+
+        .action-button-refresh:hover {
+            background-color: #ececec;
+            border-color: #cfcfcf;
+        }
+
+        .action-button-menu {
+            padding-right: 10px;
+        }
+
+        .action-button-menu-caret {
+            display: inline-block;
+            font-size: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .action-button-menu.is-open .action-button-menu-caret {
+            transform: rotate(180deg);
         }
 
         .message-row {
@@ -116,6 +195,62 @@
             white-space: nowrap;
         }
 
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #f0f7ff;
+            border-color: #115ea3;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+            border-color: #115ea3;
+            background-color: #115ea3;
+        }
+
+        .toggle-switch:hover .toggle-slider {
+            border-color: #115ea3;
+        }
+
         #columnSelect {
             width: 100px;
         }
@@ -134,12 +269,25 @@
 
 <body>
     <div class="file-table-container">
-        <div class="file-table-header">
-            <div class="file-table-actions">
-                <button class="action-button action-button-neutral">aaa</button>
-                <button class="action-button action-button-neutral">bbb</button>
+    <div class="file-table-header">
+        <div class="file-table-actions">
+        <div class="filetable-add-wrapper">
+            <button id="addButton" class="action-button action-button-neutral action-button-menu" type="button">
+                <span>追加</span>
+                <span class="action-button-menu-caret">▼</span>
+            </button>
+            <div id="addMenu" class="filetable-add-menu">
+                <div class="filetable-add-item" data-value="931440001">TSR</div>
+                <div class="filetable-add-item" data-value="931440002">技術検収書(Technical Acceptance)</div>
+                <div class="filetable-add-item" data-value="931440003">Technical Document</div>
+                <div class="filetable-add-item" data-value="931440000">Other</div>
             </div>
         </div>
+        <button class="action-button action-button-primary" type="button">保存</button>
+        <button class="action-button action-button-neutral action-button-refresh" type="button">更新</button>
+        <button class="action-button action-button-danger" type="button">削除</button>
+        </div>
+    </div>
         <div class="message-row">
             <div>
                 <span id="errorMessage"></span>
@@ -202,10 +350,61 @@
 
                         </tr>
                     </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+                <tbody>
+                    <tr>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </td>
+                        <td>TSR_20260304.pdf</td>
+                        <td>TSR</td>
+                        <td>2026/03/01 10:30</td>
+                        <td>2026/03/04 09:15</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </td>
+                        <td>TechnicalAcceptance_20260303.pdf</td>
+                        <td>技術検収書(Technical Acceptance)</td>
+                        <td>2026/03/02 14:00</td>
+                        <td>2026/03/04 11:45</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
+    <script>
+        var $JQuery = JQuery.noConflict();
+
+        $JQuery(function () {
+            var $addButton = $JQuery('#addButton');
+            var $addMenu = $JQuery('#addMenu');
+
+            $addButton.on('click', function (event) {
+                event.stopPropagation();
+                $addMenu.toggle();
+                $addButton.toggleClass('is-open', $addMenu.is(':visible'));
+            });
+
+            $JQuery(document).on('click', function (event) {
+                if (!$JQuery(event.target).closest('.filetable-add-wrapper').length) {
+                    $addMenu.hide();
+                    $addButton.removeClass('is-open');
+                }
+            });
+
+            $addMenu.on('click', '.filetable-add-item', function () {
+                $addMenu.hide();
+                $addButton.removeClass('is-open');
+            });
+        });
+    </script>
     </div>
 </body>
 
