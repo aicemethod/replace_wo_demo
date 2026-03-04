@@ -1,6 +1,7 @@
 import './App.css'
 import type { JSX } from 'react'
 import { useDataverseQuery } from './hooks/useDataverseQuery'
+import { Header } from './components'
 
 type Account = {
   accountid: string
@@ -9,17 +10,22 @@ type Account = {
 }
 
 function App(): JSX.Element {
-  const { data, isLoading, error } = useDataverseQuery<Account>(
+  const { data } = useDataverseQuery<Account>(
     'account',
     '?$select=accountid,name,accountnumber&$top=10'
   )
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>{error.message}</div>
-
   return (
     <div className="app">
-      <h2>Accounts</h2>
+      <Header
+        options={
+          data?.map((account) => ({
+            value: account.accountid,
+            label: account.name,
+          })) ?? []
+        }
+      />
+      {/* <h2>Accounts</h2>
 
       <ul className="account-list">
         {data?.map((account) => (
@@ -28,7 +34,7 @@ function App(): JSX.Element {
             <p>{account.accountnumber ?? '-'}</p>
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   )
 }
