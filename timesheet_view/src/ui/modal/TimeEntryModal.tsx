@@ -57,7 +57,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     selectedEvent,
     woOptions,
     maincategoryOptions,
-    paymenttypeOptions,
+    // paymenttypeOptions,
     timecategoryOptions,
     timezoneOptions,
     endUserOptions,
@@ -422,7 +422,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             const found = subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory);
             return found?.value || subcategory;
         };
-        
+
         const getWoTypeId = () => {
             if (!woType) return "";
             const found = woTypeOptions.find(opt => opt.value === woType || opt.label === woType);
