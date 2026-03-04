@@ -6,6 +6,8 @@ const messages = {
   ja: {
     add: '追加',
     save: '保存',
+    saveFile: 'ファイルを保存',
+    fileLink: 'xECMに連携',
     refresh: '更新',
     cancel: 'キャンセル',
     delete: '削除',
@@ -34,6 +36,8 @@ const messages = {
   en: {
     add: 'Add',
     save: 'Submit',
+    saveFile: 'Save File',
+    fileLink: 'File Link',
     refresh: 'Refresh List',
     cancel: 'Cancel',
     delete: 'Delete',

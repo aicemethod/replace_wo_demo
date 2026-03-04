@@ -145,6 +145,11 @@ export default function FileTable({ locale }: FileTableProps) {
     }
   };
 
+  const handleFileLink = () => {
+    const selectedFiles = files.filter((file) => file.selected);
+    console.log('ファイル連携:', selectedFiles);
+  };
+
   const handleDownload = (file: FileData) => {
     if (!file.documentbody) {
       return;
@@ -263,10 +268,20 @@ export default function FileTable({ locale }: FileTableProps) {
             className="action-button action-button-primary"
             onClick={handleSave}
             disabled={isSaving || (!showAddRow && files.filter((f) => f.selected).length === 0)}
-            title={msg.save}
+            title={msg.saveFile}
           >
             <FiSave size={16} />
-            <span>{msg.save}</span>
+            <span>{msg.saveFile}</span>
+          </button>
+          <button
+            type="button"
+            className="action-button action-button-primary"
+            onClick={handleFileLink}
+            disabled={showAddRow || files.filter((f) => f.selected).length === 0}
+            title={msg.fileLink}
+          >
+            <FiSave size={16} />
+            <span>{msg.fileLink}</span>
           </button>
           <button
             type="button"
