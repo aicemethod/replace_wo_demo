@@ -19,10 +19,13 @@ export const Header: React.FC<HeaderProps> = ({
     const params = getUrlParams();
     const dataParam = params.data || params.recordid || params.value || "";
     const paramLabel = dataParam.includes("\u0001") ? (dataParam.split("\u0001")[1] || "") : "";
+    const matchedWorkOrder = workOrders.find((wo) => wo.id === selectedWO);
 
     const woOptions = [
         { value: "all", label: t("header.all") },
-        ...(paramLabel && selectedWO && selectedWO !== "all" ? [{ value: selectedWO, label: paramLabel }] : []),
+        ...(!matchedWorkOrder && paramLabel && selectedWO && selectedWO !== "all"
+            ? [{ value: selectedWO, label: paramLabel }]
+            : []),
         ...workOrders.map((wo) => ({
             value: wo.id,
             label: wo.name || t("header.noName"),
