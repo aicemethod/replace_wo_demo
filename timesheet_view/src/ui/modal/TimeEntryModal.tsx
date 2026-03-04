@@ -10,7 +10,7 @@ import { ResourceSelectModal } from "./ResourceSelectModal";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import "../styles/modal/TimeEntryModal.css";
 import { useTranslation } from "react-i18next";
-import { getWorkOrderProtoFields, logWorkOrderFormFields } from "../../utils/xrmUtils";
+import { getWorkOrderProtoFields, getXrm, logWorkOrderFormFields } from "../../utils/xrmUtils";
 import {
     BILLABLE_TYPE_OPTIONS,
     CONCESSION_TYPE_OPTIONS,
@@ -227,6 +227,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         return `${y}-${m}-${d}`;
     };
 
+    const directTimeCategoryValue = useMemo(
+        () =>
+            timecategoryOptions.find((opt) =>
+                opt.label.includes("直接") || opt.label.toLowerCase().includes("direct")
+            )?.value || "",
+        [timecategoryOptions]
+    );
+
     /* -------------------------------
        🪄 初期化処理
     ------------------------------- */
@@ -235,6 +243,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
         // proto_workorder フォームのフィールド値を取得してログ出力
         logWorkOrderFormFields();
+
+        let isCancelled = false;
 
         if (selectedEvent) {
             // 複製フラグをチェック
@@ -333,110 +343,118 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndHour(String(end.getHours()).padStart(2, "0"));
             setEndMinute(String(end.getMinutes()).padStart(2, "0"));
 
-            // サブグリッドの場合、selectedWOを自動設定
-            setWo(isSubgrid && selectedWO ? selectedWO : "");
+            // 選択中WOを初期セット
+            setWo(selectedWO && selectedWO !== "all" ? selectedWO : "");
             setTimezone("235");
+            setTimeCategory(directTimeCategoryValue);
 
-            // 現在開いている proto_workorder から値を取得して反映
-            const protoFields = getWorkOrderProtoFields();
-            if (protoFields) {
-                // proto_wo_fab -> EndUser (nameからIDを検索)
-                const endUserName = protoFields.proto_wo_fab?.name || "";
-                console.log("proto_workorderから取得したEndUser:", endUserName);
-                if (endUserName) {
-                    const endUserOption = endUserOptions.find(opt => opt.label === endUserName || opt.value === endUserName);
-                    setEndUser(endUserOption?.value || endUserName);
+            const applyFallbackFields = () => {
+                const protoFields = getWorkOrderProtoFields();
+                if (protoFields) {
+                    const endUserName = (protoFields as any).proto_enduser?.name || protoFields.proto_wo_fab?.name || "";
+                    if (endUserName) {
+                        const endUserOption = endUserOptions.find((opt) => opt.label === endUserName || opt.value === endUserName);
+                        setEndUser(endUserOption?.value || endUserName);
+                    } else {
+                        setEndUser("");
+                    }
+
+                    const deviceSnName = protoFields.proto_devicesearch?.name || "";
+                    if (deviceSnName) {
+                        const deviceSnOption = deviceSnOptions.find((opt) => opt.label === deviceSnName || opt.value === deviceSnName);
+                        setDeviceSn(deviceSnOption?.value || deviceSnName);
+                    } else {
+                        setDeviceSn("");
+                    }
+
+                    const woTypeName = protoFields.proto_wotype?.name || "";
+                    const woTypeId = protoFields.proto_wotype?.id || "";
+                    if (woTypeId || woTypeName) {
+                        const woTypeOption = woTypeOptions.find(
+                            (opt) => opt.value === woTypeId || opt.label === woTypeName || opt.value === woTypeName
+                        );
+                        setWoType(woTypeOption?.value || woTypeId || woTypeName);
+                    } else {
+                        setWoType("");
+                    }
+
+                    setBillableType(protoFields.proto_billabletype != null ? String(protoFields.proto_billabletype) : "");
+                    setPaymentToBe(protoFields.proto_payment_tobe != null ? String(protoFields.proto_payment_tobe) : "");
+                    setPaymentTo(protoFields.proto_paymentto_tobe != null ? String(protoFields.proto_paymentto_tobe) : "");
+                    setConcessionType(protoFields.proto_concession_tobe != null ? String(protoFields.proto_concession_tobe) : "");
+                    setMainCategory(protoFields.proto_maincategory != null ? String(protoFields.proto_maincategory) : "");
+                    setSubcategory(protoFields.proto_subcategory?.id || "");
                 } else {
                     setEndUser("");
-                }
-
-                // proto_devicesearch -> 装置S/N (nameからIDを検索)
-                const deviceSnName = protoFields.proto_devicesearch?.name || "";
-                console.log("proto_workorderから取得した装置SN:", deviceSnName);
-                if (deviceSnName) {
-                    const deviceSnOption = deviceSnOptions.find(opt => opt.label === deviceSnName || opt.value === deviceSnName);
-                    setDeviceSn(deviceSnOption?.value || deviceSnName);
-                } else {
                     setDeviceSn("");
-                }
-
-                // proto_wotype -> WO種別 (nameまたはIDから検索)
-                const woTypeName = protoFields.proto_wotype?.name || "";
-                const woTypeId = protoFields.proto_wotype?.id || "";
-                console.log("proto_workorderから取得したWO種別:", woTypeName || woTypeId);
-                if (woTypeId || woTypeName) {
-                    const woTypeOption = woTypeOptions.find(
-                        opt => opt.value === woTypeId || opt.label === woTypeName || opt.value === woTypeName
-                    );
-                    setWoType(woTypeOption?.value || woTypeId || woTypeName);
-                } else {
+                    setBillableType("");
+                    setPaymentToBe("");
+                    setPaymentTo("");
+                    setConcessionType("");
+                    setMainCategory("");
+                    setSubcategory("");
                     setWoType("");
                 }
+            };
 
-                // proto_paymenttype -> PaymentType
-                setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
-                setBillableType(protoFields.proto_billabletype !== undefined && protoFields.proto_billabletype !== null ? String(protoFields.proto_billabletype) : "");
-                setPaymentToBe(protoFields.proto_payment_tobe !== undefined && protoFields.proto_payment_tobe !== null ? String(protoFields.proto_payment_tobe) : "");
-                setPaymentTo(protoFields.proto_paymentto_tobe !== undefined && protoFields.proto_paymentto_tobe !== null ? String(protoFields.proto_paymentto_tobe) : "");
-                setConcessionType(protoFields.proto_concession_tobe !== undefined && protoFields.proto_concession_tobe !== null ? String(protoFields.proto_concession_tobe) : "");
-                const woSoId = protoFields.proto_wo_so?.id || "";
-                const woSoName = protoFields.proto_wo_so?.name || "";
-                if (woSoId || woSoName) {
-                    const woSoOption = woSoOptions.find(
-                        (opt) => opt.value === woSoId || opt.label === woSoName
+            const loadSelectedWorkOrder = async () => {
+                if (!selectedWO || selectedWO === "all") {
+                    applyFallbackFields();
+                    return;
+                }
+
+                const xrm = getXrm();
+                if (!xrm?.WebApi) {
+                    applyFallbackFields();
+                    return;
+                }
+
+                try {
+                    const record = await xrm.WebApi.retrieveRecord(
+                        "proto_workorder",
+                        selectedWO,
+                        "?$select=proto_wonumber,proto_startdatetime,proto_enddatetime,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_maincategory,_proto_enduser_value,_proto_devicesearch_value,_proto_wotype_value,_proto_subcategory_value"
                     );
-                    setWoSo(woSoOption?.value || woSoId || "");
-                } else {
-                    setWoSo("");
-                }
 
-                // proto_maincategory -> メインカテゴリ
-                setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
+                    if (isCancelled) return;
 
-                // proto_subcategory -> サブカテゴリ (IDまたはnameから検索)
-                const subcategoryId = protoFields.proto_subcategory?.id || "";
-                const subcategoryName = protoFields.proto_subcategory?.name || "";
-                console.log("proto_workorderから取得したサブカテゴリ ID:", subcategoryId, "Name:", subcategoryName);
+                    setWo(selectedWO);
 
-                if (subcategoryId || subcategoryName) {
-                    // まずIDで検索、見つからない場合はnameで検索
-                    let subcategoryOption = subcategoryId
-                        ? subcategoryOptions.find(opt => opt.value === subcategoryId)
-                        : null;
-
-                    if (!subcategoryOption && subcategoryName) {
-                        subcategoryOption = subcategoryOptions.find(opt => opt.label === subcategoryName);
+                    if (record.proto_startdatetime) {
+                        const woStart = new Date(record.proto_startdatetime);
+                        setStartDate(formatLocalDate(woStart));
+                        setStartHour(String(woStart.getHours()).padStart(2, "0"));
+                        setStartMinute(String(woStart.getMinutes()).padStart(2, "0"));
                     }
 
-                    if (subcategoryOption) {
-                        setSubcategory(subcategoryOption.value);
-                    } else if (subcategoryId) {
-                        // IDが見つからない場合でも、IDをそのまま使用
-                        setSubcategory(subcategoryId);
-                    } else {
-                        setSubcategory("");
+                    if (record.proto_enddatetime) {
+                        const woEnd = new Date(record.proto_enddatetime);
+                        setEndDate(formatLocalDate(woEnd));
+                        setEndHour(String(woEnd.getHours()).padStart(2, "0"));
+                        setEndMinute(String(woEnd.getMinutes()).padStart(2, "0"));
                     }
-                } else {
-                    setSubcategory("");
+
+                    setEndUser(record._proto_enduser_value?.replace(/[{}]/g, "") || "");
+                    setDeviceSn(record._proto_devicesearch_value?.replace(/[{}]/g, "") || "");
+                    setWoType(record._proto_wotype_value?.replace(/[{}]/g, "") || "");
+                    setBillableType(record.proto_billabletype != null ? String(record.proto_billabletype) : "");
+                    setPaymentToBe(record.proto_payment_tobe != null ? String(record.proto_payment_tobe) : "");
+                    setPaymentTo(record.proto_paymentto_tobe != null ? String(record.proto_paymentto_tobe) : "");
+                    setConcessionType(record.proto_concession_tobe != null ? String(record.proto_concession_tobe) : "");
+                    setMainCategory(record.proto_maincategory != null ? String(record.proto_maincategory) : "");
+                    setSubcategory(record._proto_subcategory_value?.replace(/[{}]/g, "") || "");
+                } catch (error) {
+                    console.error("selectedWO から proto_workorder の取得に失敗:", error);
+                    if (!isCancelled) {
+                        applyFallbackFields();
+                    }
                 }
-            } else {
-                // 取得できない場合は空で初期化
-                setEndUser("");
-                setDeviceSn("");
-                setPaymentType("");
-                setBillableType("");
-                setPaymentToBe("");
-                setPaymentTo("");
-                setConcessionType("");
-                setWoSo("");
-                setMainCategory("");
-                setSubcategory("");
-                setWoType("");
-            }
+            };
+
+            loadSelectedWorkOrder();
 
             // 間接タスクが選択されている場合の処理
             if (selectedIndirectTask) {
-                // タイムカテゴリを「間接工数」にセット（値は931440002を想定、実際の値に合わせて調整）
                 const indirectTimeCategory = timecategoryOptions.find(opt =>
                     opt.label.includes("間接") || opt.value === "931440002"
                 );
@@ -461,7 +479,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setWisdomBu("");
             setSapBu("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions, woTypeOptions, woSoOptions]);
+        return () => {
+            isCancelled = true;
+        };
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions, woTypeOptions, woSoOptions, directTimeCategoryValue]);
 
     useEffect(() => {
         if (!isOpen) return;
