@@ -132,7 +132,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 payload['proto_subcategory@odata.bind'] = `/proto_subcategories(${data.subcategory})`;
             }
             if (data.endUser && data.endUser !== "" && data.endUser !== null) {
-                payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
+                payload['proto_account_proto_timeentry_125@odata.bind'] = `/accounts(${data.endUser})`;
             }
             if (data.deviceSn && data.deviceSn !== "" && data.deviceSn !== null) {
                 // proto_devicesearch フィールドは proto_nonyudevice エンティティへの Lookup
@@ -206,9 +206,9 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             }
             if (data.endUser !== undefined) {
                 if (data.endUser) {
-                    payload['proto_enduser@odata.bind'] = `/accounts(${data.endUser})`;
+                    payload['proto_account_proto_timeentry_125@odata.bind'] = `/accounts(${data.endUser})`;
                 } else {
-                    payload['proto_enduser@odata.bind'] = null;
+                    payload['proto_account_proto_timeentry_125@odata.bind'] = null;
                 }
             }
             if (data.deviceSn !== undefined && data.deviceSn !== null && data.deviceSn !== "") {
