@@ -15,7 +15,11 @@ import {
     BILLABLE_TYPE_OPTIONS,
     CONCESSION_TYPE_OPTIONS,
     PAYMENT_TO_OPTIONS,
+    PAYMENT_TYPE_TREE,
     PAYMENT_TYPE_OPTIONS,
+    detectPatternFromWoType,
+    getChildKeys,
+    getNodeByValue,
 } from "../../constants/timeEntryChoices";
 
 /* =========================================================
@@ -125,6 +129,59 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         () => woOptions.filter((opt) => opt.value !== "all"),
         [woOptions]
     );
+
+    const woTypeLabel = useMemo(
+        () =>
+            (selectedEvent as any)?.woTypeName ||
+            woTypeOptions.find((opt) => opt.value === woType || opt.label === woType)?.label ||
+            "",
+        [selectedEvent, woType, woTypeOptions]
+    );
+
+    const paymentTree = useMemo(() => {
+        const pattern = detectPatternFromWoType(woTypeLabel);
+        return pattern ? PAYMENT_TYPE_TREE[pattern] ?? null : null;
+    }, [woTypeLabel]);
+
+    const billableTypeOptions = useMemo(
+        () => BILLABLE_TYPE_OPTIONS.filter((opt) => getChildKeys(paymentTree).includes(opt.value)),
+        [paymentTree]
+    );
+
+    const paymentToBeNode = useMemo(
+        () => getNodeByValue(paymentTree, billableType),
+        [paymentTree, billableType]
+    );
+
+    const paymentToBeOptions = useMemo(
+        () => PAYMENT_TYPE_OPTIONS.filter((opt) => getChildKeys(paymentToBeNode).includes(opt.value)),
+        [paymentToBeNode]
+    );
+
+    const paymentToNode = useMemo(
+        () => getNodeByValue(paymentToBeNode, paymentToBe),
+        [paymentToBeNode, paymentToBe]
+    );
+
+    const paymentToOptions = useMemo(
+        () => PAYMENT_TO_OPTIONS.filter((opt) => getChildKeys(paymentToNode).includes(opt.value)),
+        [paymentToNode]
+    );
+
+    const concessionNode = useMemo(
+        () => getNodeByValue(paymentToNode, paymentTo),
+        [paymentToNode, paymentTo]
+    );
+
+    const concessionTypeOptions = useMemo(
+        () => CONCESSION_TYPE_OPTIONS.filter((opt) => getChildKeys(concessionNode).includes(opt.value)),
+        [concessionNode]
+    );
+
+    const isBillableTypeDisabled = billableTypeOptions.length === 0;
+    const isPaymentToBeDisabled = !billableType || paymentToBeOptions.length === 0;
+    const isPaymentToDisabled = !paymentToBe || paymentToOptions.length === 0;
+    const isConcessionTypeDisabled = !paymentTo || concessionTypeOptions.length === 0;
 
     const hours = useMemo<Option[]>(
         () =>
@@ -396,6 +453,36 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         if (selectedEvent) return;
         setResource(selectedResourcesText);
     }, [isOpen, selectedEvent, selectedResourcesText]);
+
+    useEffect(() => {
+        if (billableType && !billableTypeOptions.some((opt) => opt.value === billableType)) {
+            setBillableType("");
+            setPaymentToBe("");
+            setPaymentTo("");
+            setConcessionType("");
+        }
+    }, [billableType, billableTypeOptions]);
+
+    useEffect(() => {
+        if (paymentToBe && !paymentToBeOptions.some((opt) => opt.value === paymentToBe)) {
+            setPaymentToBe("");
+            setPaymentTo("");
+            setConcessionType("");
+        }
+    }, [paymentToBe, paymentToBeOptions]);
+
+    useEffect(() => {
+        if (paymentTo && !paymentToOptions.some((opt) => opt.value === paymentTo)) {
+            setPaymentTo("");
+            setConcessionType("");
+        }
+    }, [paymentTo, paymentToOptions]);
+
+    useEffect(() => {
+        if (concessionType && !concessionTypeOptions.some((opt) => opt.value === concessionType)) {
+            setConcessionType("");
+        }
+    }, [concessionType, concessionTypeOptions]);
 
     /* -------------------------------
        💾 保存処理
@@ -785,58 +872,62 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             */}
 
                             <label className="modal-label">{t("timeEntryModal.billableType")}</label>
-                            {mode === "duplicate" || billableType ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {BILLABLE_TYPE_OPTIONS.find((opt) => opt.value === billableType)?.label || billableType || "-"}
                                 </div>
                             ) : (
                                 <Select
-                                    options={BILLABLE_TYPE_OPTIONS}
+                                    options={billableTypeOptions}
                                     value={billableType || ""}
                                     onChange={setBillableType}
                                     placeholder={t("timeEntryModal.placeholders.selectBillableType")}
+                                    disabled={isBillableTypeDisabled}
                                 />
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.paymentToBe")}</label>
-                            {mode === "duplicate" || paymentToBe ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {PAYMENT_TYPE_OPTIONS.find((opt) => opt.value === paymentToBe)?.label || paymentToBe || "-"}
                                 </div>
                             ) : (
                                 <Select
-                                    options={PAYMENT_TYPE_OPTIONS}
+                                    options={paymentToBeOptions}
                                     value={paymentToBe || ""}
                                     onChange={setPaymentToBe}
                                     placeholder={t("timeEntryModal.placeholders.selectPaymentToBe")}
+                                    disabled={isPaymentToBeDisabled}
                                 />
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.paymentTo")}</label>
-                            {mode === "duplicate" || paymentTo ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {PAYMENT_TO_OPTIONS.find((opt) => opt.value === paymentTo)?.label || paymentTo || "-"}
                                 </div>
                             ) : (
                                 <Select
-                                    options={PAYMENT_TO_OPTIONS}
+                                    options={paymentToOptions}
                                     value={paymentTo || ""}
                                     onChange={setPaymentTo}
                                     placeholder={t("timeEntryModal.placeholders.selectPaymentTo")}
+                                    disabled={isPaymentToDisabled}
                                 />
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.concessionType")}</label>
-                            {mode === "duplicate" || concessionType ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {CONCESSION_TYPE_OPTIONS.find((opt) => opt.value === concessionType)?.label || concessionType || "-"}
                                 </div>
                             ) : (
                                 <Select
-                                    options={CONCESSION_TYPE_OPTIONS}
+                                    options={concessionTypeOptions}
                                     value={concessionType || ""}
                                     onChange={setConcessionType}
                                     placeholder={t("timeEntryModal.placeholders.selectConcessionType")}
+                                    disabled={isConcessionTypeDisabled}
                                 />
                             )}
 

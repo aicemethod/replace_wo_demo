@@ -59,3 +59,247 @@ export const CONCESSION_TYPE_OPTIONS: Option[] = [
     { value: String(CONCESSION_TYPE.STRATEGIC), label: "Strategic" },
     { value: String(CONCESSION_TYPE.NON_STRATEGIC), label: "Non-Strategic" },
 ];
+
+interface PaymentTreeMap {
+    [key: string]: PaymentTreeMap | null;
+}
+
+type PaymentTreeNode = PaymentTreeMap | null;
+
+export const PAYMENT_TYPE_TREE: Record<number, PaymentTreeNode> = {
+    1: {
+        [BILLABLE_TYPE.STARTUP]: {
+            [PAYMENT_TYPE.STARTUP]: null,
+            [PAYMENT_TYPE.PRE_WARRANTY]: null,
+        },
+        [BILLABLE_TYPE.BILLABLE]: {
+            [PAYMENT_TYPE.PAID]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONTRACT]: null,
+        },
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.BU]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.FACTORY]: {
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+            },
+        },
+    },
+    2: {
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.FCN_SI]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.DSS]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.BU]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.FACTORY]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.GENPO]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+            },
+        },
+    },
+    3: {
+        [BILLABLE_TYPE.BILLABLE]: {
+            [PAYMENT_TYPE.PAID]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONTRACT]: null,
+        },
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.DSS]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.BU]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.FACTORY]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.GENPO]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+            },
+        },
+    },
+    4: {
+        [BILLABLE_TYPE.STARTUP]: {
+            [PAYMENT_TYPE.PRE_WARRANTY]: null,
+        },
+        [BILLABLE_TYPE.BILLABLE]: {
+            [PAYMENT_TYPE.PAID]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONTRACT]: null,
+        },
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.EQUIPMENT_WARRANTY]: null,
+            [PAYMENT_TYPE.MOD_WARRANTY]: null,
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.DSS]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.BU]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.FACTORY]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.GENPO]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+            },
+        },
+    },
+    5: {
+        [BILLABLE_TYPE.STARTUP]: {
+            [PAYMENT_TYPE.PRE_WARRANTY]: null,
+        },
+        [BILLABLE_TYPE.BILLABLE]: {
+            [PAYMENT_TYPE.PAID]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONTRACT]: null,
+        },
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.EQUIPMENT_WARRANTY]: null,
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.DSS]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.BU]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.FACTORY]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.GENPO]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+            },
+        },
+    },
+    6: {
+        [BILLABLE_TYPE.STARTUP]: {
+            [PAYMENT_TYPE.PRE_WARRANTY]: null,
+        },
+        [BILLABLE_TYPE.BILLABLE]: {
+            [PAYMENT_TYPE.PAID]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONTRACT]: null,
+        },
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.DSS]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.BU]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.FACTORY]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+                [PAYMENT_TO.GENPO]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                    [CONCESSION_TYPE.NON_STRATEGIC]: null,
+                },
+            },
+        },
+    },
+    7: {
+        [BILLABLE_TYPE.BILLABLE]: {
+            [PAYMENT_TYPE.PAID]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONTRACT]: null,
+        },
+        [BILLABLE_TYPE.NON_BILLABLE]: {
+            [PAYMENT_TYPE.CREDIT]: {
+                [PAYMENT_TO.DSS]: null,
+                [PAYMENT_TO.BU]: null,
+            },
+            [PAYMENT_TYPE.CONCESSION]: {
+                [PAYMENT_TO.GENPO]: {
+                    [CONCESSION_TYPE.STRATEGIC]: null,
+                },
+            },
+        },
+    },
+};
+
+const normalizeText = (text: string) =>
+    String(text || "").toLowerCase().replace(/\s+/g, " ").trim();
+
+export const detectPatternFromWoType = (woTypeText: string): number | null => {
+    const text = normalizeText(woTypeText);
+
+    if (text.includes("startup") || text.includes("新規・中古機再販")) return 1;
+    if (text.includes("fcn/si")) return 2;
+    if (text.includes("troubleshooting")) return 4;
+    if (
+        text.includes("modification") ||
+        text.includes("relocation") ||
+        text.includes("decommission") ||
+        text.includes("re-installation") ||
+        text === "oh" ||
+        text === "pm" ||
+        text.includes("装置の立ち下げ作業") ||
+        text.includes("装置の再立ち上げ作業") ||
+        text.includes("repair")
+    ) return 3;
+    if (text.includes("process / application") || text.includes("consulting / analysis")) return 5;
+    if (text.includes("software installation")) return 6;
+    if (text.includes("customer training")) return 7;
+
+    return null;
+};
+
+export const getChildKeys = (node: PaymentTreeNode): string[] => {
+    if (!node || typeof node !== "object") return [];
+    return Object.keys(node);
+};
+
+export const getNodeByValue = (node: PaymentTreeNode, selectedValue: string) => {
+    if (!node || !selectedValue) return null;
+    return node[selectedValue] ?? null;
+};
