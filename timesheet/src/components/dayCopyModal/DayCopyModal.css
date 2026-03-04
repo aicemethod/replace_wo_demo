@@ -1,0 +1,76 @@
+.day-copy-modal .modal-body {
+  display: grid;
+  gap: 20px;
+}
+
+.copy-section {
+  display: grid;
+  gap: 10px;
+}
+
+.copy-section-label {
+  color: var(--main-color);
+  font-weight: 600;
+}
+
+.copy-required {
+  margin-left: 4px;
+  color: #d92d20;
+}
+
+.copy-source-card,
+.copy-date-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--surface-color);
+}
+
+.copy-source-card {
+  color: var(--main-color);
+}
+
+.copy-source-date,
+.copy-source-count {
+  font-weight: 600;
+}
+
+.copy-date-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--font-family);
+}
+
+.copy-date-icon,
+.copy-source-icon,
+.copy-warning-icon,
+.copy-arrow {
+  color: var(--main-color);
+}
+
+.copy-arrow {
+  display: flex;
+  justify-content: center;
+}
+
+.copy-warning {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(0, 137, 186, 0.08);
+}
+
+.copy-warning-title {
+  font-weight: 700;
+}
+
+.copy-warning-text {
+  color: #555;
+  font-size: 0.9rem;
+}

@@ -5,9 +5,11 @@ import { useDataverseQuery } from './hooks/useDataverseQuery'
 import {
   CalendarController,
   CalendarView,
+  DayCopyModal,
   Footer,
   Header,
   Sidebar,
+  TimeEntryModal,
   UserListModal,
 } from './components'
 import { useState } from 'react'
@@ -21,6 +23,9 @@ type Account = {
 function App(): JSX.Element {
   const [isUserListModalOpen, setIsUserListModalOpen] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [isDayCopyModalOpen, setIsDayCopyModalOpen] = useState(false)
+  const [isTimeEntryModalOpen, setIsTimeEntryModalOpen] = useState(false)
+  const [selectedDateTime, setSelectedDateTime] = useState<{ start: Date; end: Date } | null>(null)
   const { data } = useDataverseQuery<Account>(
     'account',
     '?$select=accountid,name,accountnumber&$top=10'
@@ -64,6 +69,12 @@ function App(): JSX.Element {
         onPrev={handlePrev}
         onNext={handleNext}
         onToday={handleToday}
+        onCreate={() => {
+          setSelectedDateTime({ start: currentDate, end: currentDate })
+          setIsTimeEntryModalOpen(true)
+        }}
+        onCopy={() => setIsDayCopyModalOpen(true)}
+        isCopyEnabled
       />
       <div className="content-middle">
         <Sidebar
@@ -74,6 +85,10 @@ function App(): JSX.Element {
           <CalendarView
             currentDate={currentDate}
             onDateChange={setCurrentDate}
+            onDateClick={(range) => {
+              setSelectedDateTime(range)
+              setIsTimeEntryModalOpen(true)
+            }}
             events={calendarEvents}
           />
         </div>
@@ -83,6 +98,20 @@ function App(): JSX.Element {
         isOpen={isUserListModalOpen}
         onClose={() => setIsUserListModalOpen(false)}
         users={users}
+      />
+      <DayCopyModal
+        isOpen={isDayCopyModalOpen}
+        onClose={() => setIsDayCopyModalOpen(false)}
+        sourceDate={currentDate}
+        sourceEntryCount={calendarEvents.length}
+        onExecute={() => setIsDayCopyModalOpen(false)}
+      />
+      <TimeEntryModal
+        isOpen={isTimeEntryModalOpen}
+        onClose={() => setIsTimeEntryModalOpen(false)}
+        selectedDateTime={selectedDateTime}
+        woOptions={options}
+        resources={users}
       />
       {/* <h2>Accounts</h2>
 
