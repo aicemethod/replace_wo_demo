@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Select } from "../components/Select";
 import "../styles/layout/Header.css";
 import { useTranslation } from "react-i18next";
@@ -18,14 +19,22 @@ export const Header: React.FC<HeaderProps> = ({
     const { t } = useTranslation();
     const params = getUrlParams();
     const dataParam = params.data || params.recordid || params.value || "";
-    const paramLabel = dataParam.includes("\u0001") ? (dataParam.split("\u0001")[1] || "") : "";
-    const matchedWorkOrder = workOrders.find((wo) => wo.id === selectedWO);
+    const paramWoId = dataParam.includes("\u0001") ? (dataParam.split("\u0001")[0] || "") : dataParam;
+
+    useEffect(() => {
+        if (!paramWoId || !workOrders.length) return;
+
+        const matchedWorkOrder = workOrders.find(
+            (wo) => wo.id.toLowerCase() === paramWoId.toLowerCase()
+        );
+
+        if (matchedWorkOrder && matchedWorkOrder.id !== selectedWO) {
+            setSelectedWO(matchedWorkOrder.id);
+        }
+    }, [paramWoId, workOrders, selectedWO, setSelectedWO]);
 
     const woOptions = [
         { value: "all", label: t("header.all") },
-        ...(!matchedWorkOrder && paramLabel && selectedWO && selectedWO !== "all"
-            ? [{ value: selectedWO, label: paramLabel }]
-            : []),
         ...workOrders.map((wo) => ({
             value: wo.id,
             label: wo.name || t("header.noName"),
