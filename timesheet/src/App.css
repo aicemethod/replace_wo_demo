@@ -6,3 +6,18 @@
   --text-color: #1f2937;
   --muted-text-color: #6b7280;
 }
+
+.app {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-middle {
+  display: flex;
+  min-height: 600px;
+}
+
+.content-main {
+  flex: 1;
+  min-height: 600px;
+}
