@@ -1,7 +1,8 @@
 import './App.css'
 import type { JSX } from 'react'
 import { useDataverseQuery } from './hooks/useDataverseQuery'
-import { CalendarController, Header, Sidebar } from './components'
+import { CalendarController, Footer, Header, Sidebar, UserListModal } from './components'
+import { useState } from 'react'
 
 type Account = {
   accountid: string
@@ -10,6 +11,7 @@ type Account = {
 }
 
 function App(): JSX.Element {
+  const [isUserListModalOpen, setIsUserListModalOpen] = useState(false)
   const { data } = useDataverseQuery<Account>(
     'account',
     '?$select=accountid,name,accountnumber&$top=10'
@@ -38,6 +40,12 @@ function App(): JSX.Element {
         />
         <div className="content-main" />
       </div>
+      <Footer onOpenUserList={() => setIsUserListModalOpen(true)} />
+      <UserListModal
+        isOpen={isUserListModalOpen}
+        onClose={() => setIsUserListModalOpen(false)}
+        users={users}
+      />
       {/* <h2>Accounts</h2>
 
       <ul className="account-list">
