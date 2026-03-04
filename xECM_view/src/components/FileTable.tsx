@@ -365,7 +365,7 @@ export default function FileTable({ locale }: FileTableProps) {
                 </td>
                 <td className="col-created">-</td>
                 <td className="col-sync">-</td>
-                <td className="col-sync">-</td>
+                {/* <td className="col-sync">-</td> */}
               </tr>
             )}
             {files.length === 0 && !showAddRow ? (
@@ -416,7 +416,7 @@ export default function FileTable({ locale }: FileTableProps) {
                   <td className="col-type">{file.Mimetype}</td>
                   <td className="col-created">{formatDate(file.createdon, locale)}</td>
                   <td className="col-sync">-</td>
-                  <td className="col-sync">-</td>
+                  {/* <td className="col-sync">-</td> */}
                 </tr>
               ))
             )}
