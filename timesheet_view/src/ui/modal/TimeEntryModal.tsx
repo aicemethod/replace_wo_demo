@@ -340,8 +340,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             // 現在開いている proto_workorder から値を取得して反映
             const protoFields = getWorkOrderProtoFields();
             if (protoFields) {
-                // proto_enduser -> EndUser (nameからIDを検索)
-                const endUserName = protoFields.proto_enduser?.name || "";
+                // proto_wo_fab -> EndUser (nameからIDを検索)
+                const endUserName = protoFields.proto_wo_fab?.name || "";
                 console.log("proto_workorderから取得したEndUser:", endUserName);
                 if (endUserName) {
                     const endUserOption = endUserOptions.find(opt => opt.label === endUserName || opt.value === endUserName);

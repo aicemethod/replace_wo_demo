@@ -91,7 +91,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_timecategory,proto_timezone,` +
-        `_proto_enduser_value,_proto_wo_category_value,_proto_wo_so_value;` +
+        `_proto_wo_fab_value,_proto_wo_category_value,_proto_wo_so_value;` +
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
@@ -121,8 +121,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             timecategory: t.proto_timecategory,
             subcategory: t._proto_subcategory_value?.replace(/[{}]/g, "") || t.proto_subcategory?.proto_subcategoryid?.replace(/[{}]/g, "") || null,
             subcategoryName: t.proto_subcategory?.proto_name || null,
-            endUser: t._proto_enduser_value?.replace(/[{}]/g, "") || null,
-            endUserName: t['_proto_enduser_value@OData.Community.Display.V1.FormattedValue'] || null,
+            endUser: t._proto_wo_fab_value?.replace(/[{}]/g, "") || null,
+            endUserName: t['_proto_wo_fab_value@OData.Community.Display.V1.FormattedValue'] || null,
             deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
             deviceSnName: t.proto_devicesearch?.proto_name || null,
             woType: t._proto_wo_category_value?.replace(/[{}]/g, "") || t.proto_wo_category?.proto_workordertypeid?.replace(/[{}]/g, "") || null,

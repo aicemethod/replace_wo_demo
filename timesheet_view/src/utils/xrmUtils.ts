@@ -140,8 +140,8 @@ export const getWorkOrderFormValues = (): {
 
         const result: any = {};
 
-        // proto_enduser (Lookup)
-        const endUserAttr = getAttr("proto_enduser");
+        // proto_wo_fab (Lookup)
+        const endUserAttr = getAttr("proto_wo_fab");
         if (endUserAttr) {
             const endUserValue = endUserAttr.getValue();
             if (endUserValue && endUserValue.length > 0) {
@@ -210,7 +210,7 @@ export const getWorkOrderFormValues = (): {
  */
 export const getWorkOrderProtoFields = (): {
     proto_workorderid: string | null;
-    proto_enduser?: { id: string; name: string } | null;
+    proto_wo_fab?: { id: string; name: string } | null;
     proto_devicesearch?: { id: string; name: string } | null;
     proto_wotype?: { id: string; name: string } | null;
     proto_paymenttype?: number | null;
@@ -270,7 +270,7 @@ export const getWorkOrderProtoFields = (): {
         // 各フィールドを取得
         const result: {
             proto_workorderid: string | null;
-            proto_enduser?: { id: string; name: string } | null;
+            proto_wo_fab?: { id: string; name: string } | null;
             proto_devicesearch?: { id: string; name: string } | null;
             proto_wotype?: { id: string; name: string } | null;
             proto_paymenttype?: number | null;
@@ -285,13 +285,13 @@ export const getWorkOrderProtoFields = (): {
             proto_workorderid: workOrderId,
         };
 
-        // proto_enduser (Lookup)
-        const endUserAttr = getAttr("proto_enduser");
+        // proto_wo_fab (Lookup)
+        const endUserAttr = getAttr("proto_wo_fab");
         if (endUserAttr) {
             const endUserValue = endUserAttr.getValue();
             if (endUserValue && endUserValue.length > 0) {
                 const value = Array.isArray(endUserValue) ? endUserValue[0] : endUserValue;
-                result.proto_enduser = {
+                result.proto_wo_fab = {
                     id: value.id?.replace(/[{}]/g, "") || "",
                     name: value.name || "",
                 };
