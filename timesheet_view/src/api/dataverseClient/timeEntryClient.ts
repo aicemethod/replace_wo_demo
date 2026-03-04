@@ -17,6 +17,10 @@ export interface TimeEntryInput {
     timeCategory?: string | number | null;
     subcategory?: string | null; // Lookup ID
     paymentType?: string | number | null;
+    billableType?: string | number | null;
+    paymentToBe?: string | number | null;
+    paymentTo?: string | number | null;
+    concessionType?: string | number | null;
     timezone?: string | number | null;
     start?: Date;
     end?: Date;
@@ -33,6 +37,10 @@ export interface TimeEntryRecord extends BaseEntity {
     timeCategory: number | null;
     subcategory: number | null;
     paymentType: number | null;
+    billableType: number | null;
+    paymentToBe: number | null;
+    paymentTo: number | null;
+    concessionType: number | null;
     timezone: number | null;
     start: string;
     end: string;
@@ -60,6 +68,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                     'proto_timecategory',
                     'proto_subcategory',
                     'proto_paymenttype',
+                    'proto_billabletype',
+                    'proto_payment_tobe',
+                    'proto_paymentto_tobe',
+                    'proto_concession_tobe',
                     'proto_timezone',
                     'proto_startdatetime',
                     'proto_enddatetime',
@@ -84,6 +96,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
                 subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
                 paymentType: DataTransformer.toOptionSetNumber(data.paymentType),
+                billableType: DataTransformer.toOptionSetNumber(data.billableType),
+                paymentToBe: DataTransformer.toOptionSetNumber(data.paymentToBe),
+                paymentTo: DataTransformer.toOptionSetNumber(data.paymentTo),
+                concessionType: DataTransformer.toOptionSetNumber(data.concessionType),
                 timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 start: DataTransformer.toIsoString(data.start),
                 end: DataTransformer.toIsoString(data.end),
@@ -98,6 +114,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 proto_maincategory: DataTransformer.toOptionSetNumber(data.mainCategory),
                 proto_timecategory: DataTransformer.toOptionSetNumber(data.timeCategory),
                 proto_paymenttype: DataTransformer.toOptionSetNumber(data.paymentType),
+                proto_billabletype: DataTransformer.toOptionSetNumber(data.billableType),
+                proto_payment_tobe: DataTransformer.toOptionSetNumber(data.paymentToBe),
+                proto_paymentto_tobe: DataTransformer.toOptionSetNumber(data.paymentTo),
+                proto_concession_tobe: DataTransformer.toOptionSetNumber(data.concessionType),
                 proto_timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 proto_startdatetime: DataTransformer.toIsoString(data.start),
                 proto_enddatetime: DataTransformer.toIsoString(data.end)
@@ -135,6 +155,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                     timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
                     subcategory: data.subcategory ? (typeof data.subcategory === 'string' ? null : Number(data.subcategory)) : null,
                     paymentType: DataTransformer.toOptionSetNumber(data.paymentType),
+                    billableType: DataTransformer.toOptionSetNumber(data.billableType),
+                    paymentToBe: DataTransformer.toOptionSetNumber(data.paymentToBe),
+                    paymentTo: DataTransformer.toOptionSetNumber(data.paymentTo),
+                    concessionType: DataTransformer.toOptionSetNumber(data.concessionType),
                     timezone: DataTransformer.toOptionSetNumber(data.timezone),
                     start: DataTransformer.toIsoString(data.start),
                     end: DataTransformer.toIsoString(data.end),
@@ -162,6 +186,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             if (data.mainCategory !== undefined) payload.proto_maincategory = DataTransformer.toOptionSetNumber(data.mainCategory);
             if (data.timeCategory !== undefined) payload.proto_timecategory = DataTransformer.toOptionSetNumber(data.timeCategory);
             if (data.paymentType !== undefined) payload.proto_paymenttype = DataTransformer.toOptionSetNumber(data.paymentType);
+            if (data.billableType !== undefined) payload.proto_billabletype = DataTransformer.toOptionSetNumber(data.billableType);
+            if (data.paymentToBe !== undefined) payload.proto_payment_tobe = DataTransformer.toOptionSetNumber(data.paymentToBe);
+            if (data.paymentTo !== undefined) payload.proto_paymentto_tobe = DataTransformer.toOptionSetNumber(data.paymentTo);
+            if (data.concessionType !== undefined) payload.proto_concession_tobe = DataTransformer.toOptionSetNumber(data.concessionType);
             if (data.timezone !== undefined) payload.proto_timezone = DataTransformer.toOptionSetNumber(data.timezone);
             if (data.start !== undefined) payload.proto_startdatetime = DataTransformer.toIsoString(data.start);
             if (data.end !== undefined) payload.proto_enddatetime = DataTransformer.toIsoString(data.end);
@@ -209,7 +237,13 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
 
     /** モックデータ取得 */
     protected getMockData(): TimeEntryRecord[] {
-        return MOCK_TIME_ENTRIES;
+        return MOCK_TIME_ENTRIES.map((item) => ({
+            ...item,
+            billableType: (item as any).billableType ?? null,
+            paymentToBe: (item as any).paymentToBe ?? null,
+            paymentTo: (item as any).paymentTo ?? null,
+            concessionType: (item as any).concessionType ?? null,
+        }));
     }
 
     /** レコード変換 */
@@ -222,6 +256,10 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             timeCategory: record.proto_timecategory,
             subcategory: record.proto_subcategory,
             paymentType: record.proto_paymenttype,
+            billableType: record.proto_billabletype,
+            paymentToBe: record.proto_payment_tobe,
+            paymentTo: record.proto_paymentto_tobe,
+            concessionType: record.proto_concession_tobe,
             timezone: record.proto_timezone,
             start: record.proto_startdatetime || '',
             end: record.proto_enddatetime || '',

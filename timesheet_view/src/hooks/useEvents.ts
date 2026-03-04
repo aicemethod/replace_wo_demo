@@ -21,6 +21,10 @@ export type EventData = {
     woType?: string | null;
     woTypeName?: string | null;
     paymenttype?: number;
+    billabletype?: number;
+    paymenttobe?: number;
+    paymentto?: number;
+    concessiontype?: number;
     timezone?: string;
     extendedProps?: Record<string, any>;
 };
@@ -84,7 +88,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `&$expand=${navigationName}(` +
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone,` +
+        `proto_maincategory,proto_paymenttype,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_timecategory,proto_timezone,` +
         `_proto_enduser_value,_proto_wo_category_value;` +
         `$expand=` +
         `proto_subcategory(` +
@@ -122,6 +126,10 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             woType: t._proto_wo_category_value?.replace(/[{}]/g, "") || t.proto_wo_category?.proto_workordertypeid?.replace(/[{}]/g, "") || null,
             woTypeName: t.proto_wo_category?.proto_name || t['_proto_wo_category_value@OData.Community.Display.V1.FormattedValue'] || null,
             paymenttype: t.proto_paymenttype,
+            billabletype: t.proto_billabletype,
+            paymenttobe: t.proto_payment_tobe,
+            paymentto: t.proto_paymentto_tobe,
+            concessiontype: t.proto_concession_tobe,
             timezone: t.proto_timezone ?? null,
             extendedProps: {
                 timezone: t.proto_timezone ?? null,
@@ -159,6 +167,10 @@ const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
         woType: event.woType || null,
         woTypeName: event.woTypeName || null,
         paymenttype: event.paymenttype?.toString(),
+        billabletype: event.billabletype?.toString(),
+        paymenttobe: event.paymenttobe?.toString(),
+        paymentto: event.paymentto?.toString(),
+        concessiontype: event.concessiontype?.toString(),
         timezone: event.timezone,
         workOrder: event.workOrderId,
     };
@@ -254,6 +266,10 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
                 mainCategory: data.mainCategory ?? null,
                 timeCategory: data.timeCategory ?? null,
                 paymentType: data.paymentType ?? null,
+                billableType: data.billableType ?? null,
+                paymentToBe: data.paymentToBe ?? null,
+                paymentTo: data.paymentTo ?? null,
+                concessionType: data.concessionType ?? null,
                 timezone: data.timezone ?? null,
                 // Lookup（ID）
                 subcategory: data.subcategory || null,

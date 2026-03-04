@@ -41,6 +41,10 @@ export type Event = {
     timecategory?: string;
     maincategory?: string;
     paymenttype?: string;
+    billabletype?: string;
+    paymenttobe?: string;
+    paymentto?: string;
+    concessiontype?: string;
     task?: string;
     comment?: string;
     isDuplicate?: boolean;
@@ -109,6 +113,10 @@ export type TimeEntryData = {
     timeCategory?: string;
     mainCategory?: string;
     paymentType?: string;
+    billableType?: string;
+    paymentToBe?: string;
+    paymentTo?: string;
+    concessionType?: string;
     deviceSn?: string;
     subcategory?: string;
     woType?: string;

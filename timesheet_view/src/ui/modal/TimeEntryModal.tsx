@@ -11,6 +11,12 @@ import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import "../styles/modal/TimeEntryModal.css";
 import { useTranslation } from "react-i18next";
 import { getWorkOrderProtoFields, logWorkOrderFormFields } from "../../utils/xrmUtils";
+import {
+    BILLABLE_TYPE_OPTIONS,
+    CONCESSION_TYPE_OPTIONS,
+    PAYMENT_TO_OPTIONS,
+    PAYMENT_TYPE_OPTIONS,
+} from "../../constants/timeEntryChoices";
 
 /* =========================================================
    型定義
@@ -77,6 +83,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [timeCategory, setTimeCategory] = useState("");
     const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
+    const [billableType, setBillableType] = useState("");
+    const [paymentToBe, setPaymentToBe] = useState("");
+    const [paymentTo, setPaymentTo] = useState("");
+    const [concessionType, setConcessionType] = useState("");
     const [task, setTask] = useState("");
     const [subcategory, setSubcategory] = useState("");
     const [workStatus, setWorkStatus] = useState("");
@@ -183,6 +193,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setMainCategory(String(selectedEvent.maincategory ?? ""));
             setTimeCategory(String(selectedEvent.timecategory ?? ""));
             setPaymentType(String(selectedEvent.paymenttype ?? ""));
+            setBillableType(String((selectedEvent as any).billabletype ?? ""));
+            setPaymentToBe(String((selectedEvent as any).paymenttobe ?? ""));
+            setPaymentTo(String((selectedEvent as any).paymentto ?? ""));
+            setConcessionType(String((selectedEvent as any).concessiontype ?? ""));
             setComment(selectedEvent.comment ?? "");
             // EndUser（IDまたはnameから検索）
             if (selectedEvent.endUser) {
@@ -300,6 +314,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                 // proto_paymenttype -> PaymentType
                 setPaymentType(protoFields.proto_paymenttype !== undefined && protoFields.proto_paymenttype !== null ? String(protoFields.proto_paymenttype) : "");
+                setBillableType(protoFields.proto_billabletype !== undefined && protoFields.proto_billabletype !== null ? String(protoFields.proto_billabletype) : "");
+                setPaymentToBe(protoFields.proto_payment_tobe !== undefined && protoFields.proto_payment_tobe !== null ? String(protoFields.proto_payment_tobe) : "");
+                setPaymentTo(protoFields.proto_paymentto_tobe !== undefined && protoFields.proto_paymentto_tobe !== null ? String(protoFields.proto_paymentto_tobe) : "");
+                setConcessionType(protoFields.proto_concession_tobe !== undefined && protoFields.proto_concession_tobe !== null ? String(protoFields.proto_concession_tobe) : "");
 
                 // proto_maincategory -> メインカテゴリ
                 setMainCategory(protoFields.proto_maincategory !== undefined && protoFields.proto_maincategory !== null ? String(protoFields.proto_maincategory) : "");
@@ -335,6 +353,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 setEndUser("");
                 setDeviceSn("");
                 setPaymentType("");
+                setBillableType("");
+                setPaymentToBe("");
+                setPaymentTo("");
+                setConcessionType("");
                 setMainCategory("");
                 setSubcategory("");
                 setWoType("");
@@ -420,6 +442,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             timeCategory,
             mainCategory,
             paymentType,
+            billableType,
+            paymentToBe,
+            paymentTo,
+            concessionType,
             deviceSn: getDeviceSnId(),
             woType: getWoTypeId(),
             subcategory: getSubcategoryId(),
@@ -467,6 +493,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             timeCategory,
             mainCategory,
             paymentType,
+            billableType,
+            paymentToBe,
+            paymentTo,
+            concessionType,
             deviceSn,
             deviceSnName: deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || null,
             subcategory,
@@ -749,6 +779,62 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     value={paymentType || ""}
                                     onChange={setPaymentType}
                                     placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
+                                />
+                            )}
+
+                            <label className="modal-label">{t("timeEntryModal.billableType")}</label>
+                            {mode === "duplicate" || billableType ? (
+                                <div className="readonly-text">
+                                    {BILLABLE_TYPE_OPTIONS.find((opt) => opt.value === billableType)?.label || billableType || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={BILLABLE_TYPE_OPTIONS}
+                                    value={billableType || ""}
+                                    onChange={setBillableType}
+                                    placeholder={t("timeEntryModal.placeholders.selectBillableType")}
+                                />
+                            )}
+
+                            <label className="modal-label">{t("timeEntryModal.paymentToBe")}</label>
+                            {mode === "duplicate" || paymentToBe ? (
+                                <div className="readonly-text">
+                                    {PAYMENT_TYPE_OPTIONS.find((opt) => opt.value === paymentToBe)?.label || paymentToBe || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={PAYMENT_TYPE_OPTIONS}
+                                    value={paymentToBe || ""}
+                                    onChange={setPaymentToBe}
+                                    placeholder={t("timeEntryModal.placeholders.selectPaymentToBe")}
+                                />
+                            )}
+
+                            <label className="modal-label">{t("timeEntryModal.paymentTo")}</label>
+                            {mode === "duplicate" || paymentTo ? (
+                                <div className="readonly-text">
+                                    {PAYMENT_TO_OPTIONS.find((opt) => opt.value === paymentTo)?.label || paymentTo || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={PAYMENT_TO_OPTIONS}
+                                    value={paymentTo || ""}
+                                    onChange={setPaymentTo}
+                                    placeholder={t("timeEntryModal.placeholders.selectPaymentTo")}
+                                />
+                            )}
+
+                            <label className="modal-label">{t("timeEntryModal.concessionType")}</label>
+                            {mode === "duplicate" || concessionType ? (
+                                <div className="readonly-text">
+                                    {CONCESSION_TYPE_OPTIONS.find((opt) => opt.value === concessionType)?.label || concessionType || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={CONCESSION_TYPE_OPTIONS}
+                                    value={concessionType || ""}
+                                    onChange={setConcessionType}
+                                    placeholder={t("timeEntryModal.placeholders.selectConcessionType")}
                                 />
                             )}
 

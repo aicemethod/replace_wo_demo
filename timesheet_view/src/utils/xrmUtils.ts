@@ -214,6 +214,10 @@ export const getWorkOrderProtoFields = (): {
     proto_devicesearch?: { id: string; name: string } | null;
     proto_wotype?: { id: string; name: string } | null;
     proto_paymenttype?: number | null;
+    proto_billabletype?: number | null;
+    proto_payment_tobe?: number | null;
+    proto_paymentto_tobe?: number | null;
+    proto_concession_tobe?: number | null;
     proto_maincategory?: number | null;
     proto_subcategory?: { id: string; name: string } | null;
 } | null => {
@@ -269,6 +273,10 @@ export const getWorkOrderProtoFields = (): {
             proto_devicesearch?: { id: string; name: string } | null;
             proto_wotype?: { id: string; name: string } | null;
             proto_paymenttype?: number | null;
+            proto_billabletype?: number | null;
+            proto_payment_tobe?: number | null;
+            proto_paymentto_tobe?: number | null;
+            proto_concession_tobe?: number | null;
             proto_maincategory?: number | null;
             proto_subcategory?: { id: string; name: string } | null;
         } = {
@@ -320,6 +328,38 @@ export const getWorkOrderProtoFields = (): {
             const paymentTypeValue = paymentTypeAttr.getValue();
             if (paymentTypeValue !== null && paymentTypeValue !== undefined) {
                 result.proto_paymenttype = paymentTypeValue;
+            }
+        }
+
+        const billableTypeAttr = getAttr("proto_billabletype");
+        if (billableTypeAttr) {
+            const billableTypeValue = billableTypeAttr.getValue();
+            if (billableTypeValue !== null && billableTypeValue !== undefined) {
+                result.proto_billabletype = billableTypeValue;
+            }
+        }
+
+        const paymentToBeAttr = getAttr("proto_payment_tobe");
+        if (paymentToBeAttr) {
+            const paymentToBeValue = paymentToBeAttr.getValue();
+            if (paymentToBeValue !== null && paymentToBeValue !== undefined) {
+                result.proto_payment_tobe = paymentToBeValue;
+            }
+        }
+
+        const paymentToAttr = getAttr("proto_paymentto_tobe");
+        if (paymentToAttr) {
+            const paymentToValue = paymentToAttr.getValue();
+            if (paymentToValue !== null && paymentToValue !== undefined) {
+                result.proto_paymentto_tobe = paymentToValue;
+            }
+        }
+
+        const concessionTypeAttr = getAttr("proto_concession_tobe");
+        if (concessionTypeAttr) {
+            const concessionTypeValue = concessionTypeAttr.getValue();
+            if (concessionTypeValue !== null && concessionTypeValue !== undefined) {
+                result.proto_concession_tobe = concessionTypeValue;
             }
         }
 
