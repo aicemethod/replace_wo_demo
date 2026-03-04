@@ -6,12 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>xECM</title>
     <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
         .file-table-container {
             width: 100%;
+            height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         .file-table-wrapper {
