@@ -235,7 +235,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             )?.value || "",
         [timecategoryOptions]
     );
-    const shouldHideWoSo = useMemo(
+    const shouldShowWoSo = useMemo(
         () => ["EU", "CN", "KR"].includes(regionLabel.toUpperCase()),
         [regionLabel]
     );
@@ -528,10 +528,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     }, [concessionType, concessionTypeOptions]);
 
     useEffect(() => {
-        if (shouldHideWoSo && woSo) {
+        if (!shouldShowWoSo && woSo) {
             setWoSo("");
         }
-    }, [shouldHideWoSo, woSo]);
+    }, [shouldShowWoSo, woSo]);
 
     /* -------------------------------
        💾 保存処理
@@ -863,7 +863,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            {!shouldHideWoSo && (
+                            {shouldShowWoSo && (
                                 <>
                                     <label className="modal-label">SO (BaaN)</label>
                                     {mode === "duplicate" ? (
