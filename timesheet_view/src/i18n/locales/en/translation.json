@@ -18,7 +18,7 @@
         "userTab": "User List",
         "indirectTab": "Indirect Task",
         "createNew": "Create Time Entry",
-        "copyOneDay": "Copy One Day of Time Entries",
+        "copyOneDay": "Copy 1 Day of Time Entries",
         "select": {
             "loading": "Loading...",
             "placeholder": "Select",
@@ -93,7 +93,7 @@
         "task": "Task",
         "wisdomBu": "WISDOM BU",
         "sapBu": "SAP BU",
-        "deviceSn": "Equipment S/N",
+        "deviceSn": "Machine Search",
         "mainCategoryLabel": "Main Category",
         "workStatus": "Work Status",
         "comment": "Comment",
