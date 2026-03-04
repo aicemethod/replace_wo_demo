@@ -150,7 +150,7 @@ export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
     `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value` +
     `&$filter=_proto_project_value eq ${projectId}` +
     (currentWorkorderId ? ` and proto_workorderid ne ${currentWorkorderId}` : '') +
-    `&$expand=proto_project($select=proto_name)`
+    `&$expand=proto_project($select=proto_name,proto_wo_group_num)`
 
   const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
   const rows = (result?.entities ?? []) as any[]
@@ -160,7 +160,7 @@ export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
     woNumber: row.proto_wonumber ?? '',
     woTitle: row.proto_wotitle ?? '',
     status: row['_proto_workordersubstatus_value@OData.Community.Display.V1.FormattedValue'] ?? '',
-    groupNumber: row['_proto_project_value@OData.Community.Display.V1.FormattedValue'] ?? '',
+    groupNumber: row.proto_project?.proto_wo_group_num ?? '',
     groupTitle: row.proto_project?.proto_name ?? '',
     projectId: normalizeId(row._proto_project_value),
   }))
