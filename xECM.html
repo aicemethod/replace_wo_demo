@@ -5,77 +5,206 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .file-table-container {
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-table-header {
+            display: flex;
+            justify-content: flex-start;
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .file-table-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #333;
+            font-size: 14px;
+            font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .action-button:hover {
+            border-color: #115ea3;
+        }
+
+        .action-button-neutral {
+            color: #333;
+        }
+
+        .message-row {
+            padding: 8px 12px 0;
+            font-size: 14px;
+        }
+
+        #errorMessage {
+            color: #d32f2f;
+        }
+
+        #infoMessage {
+            color: #115ea3;
+        }
+
+        .note-row {
+            padding: 12px;
+        }
+
+        #note {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .file-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 12px 12px;
+        }
+
+        #Table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
+        }
+
+        #Table thead {
+            background-color: transparent;
+        }
+
+        #Table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        #Table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        #columnSelect {
+            width: 100px;
+        }
+
+        #columnFileName,
+        #columnFileType {
+            width: 25%;
+        }
+
+        #columnSubmitDate,
+        #columnDate {
+            width: 20%;
+        }
+    </style>
 </head>
 
 <body>
-    <div>
-        <button>aaa</button>
-        <button>bbb</button>
-    </div>
-    <div>
-        <div>
-            <span id="errorMessage"></span>
+    <div class="file-table-container">
+        <div class="file-table-header">
+            <div class="file-table-actions">
+                <button class="action-button action-button-neutral">aaa</button>
+                <button class="action-button action-button-neutral">bbb</button>
+            </div>
         </div>
-    </div>
-    <div>
-        <div>
-            <span id="infoMessage"></span>
+        <div class="message-row">
+            <div>
+                <span id="errorMessage"></span>
+            </div>
         </div>
-    </div>
-    <div>
-        <div>
-            <strong id="note">連携ファイルを選んでください</strong>
+        <div class="message-row">
+            <div>
+                <span id="infoMessage"></span>
+            </div>
         </div>
-    </div>
-    <div>
-        <div>
-            <table id="Table">
-                <thead>
-                    <tr>
-                        <th>
-                            <div>
-                                <div id="columnSelect">
-                                    選択
+        <div class="note-row">
+            <div>
+                <strong id="note">連携ファイルを選んでください</strong>
+            </div>
+        </div>
+        <div class="file-table-wrapper">
+            <div>
+                <table id="Table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div>
+                                    <div id="columnSelect">
+                                        選択
+                                    </div>
                                 </div>
-                            </div>
-                        </th>
+                            </th>
 
-                        <th>
-                            <div>
-                                <div id="columnFileName">
-                                    ファイル名
+                            <th>
+                                <div>
+                                    <div id="columnFileName">
+                                        ファイル名
+                                    </div>
                                 </div>
-                            </div>
-                        </th>
+                            </th>
 
-                        <th>
-                            <div>
-                                <div id="columnFileType">
-                                    ファイル種類
+                            <th>
+                                <div>
+                                    <div id="columnFileType">
+                                        ファイル種類
+                                    </div>
                                 </div>
-                            </div>
-                        </th>
+                            </th>
 
-                        <th>
-                            <div>
-                                <div id="columnSubmitDate">
-                                    提出医
+                            <th>
+                                <div>
+                                    <div id="columnSubmitDate">
+                                        提出医
+                                    </div>
                                 </div>
-                            </div>
-                        </th>
+                            </th>
 
-                        <th>
-                            <div>
-                                <div id="columnDate">
-                                    連携日
+                            <th>
+                                <div>
+                                    <div id="columnDate">
+                                        連携日
+                                    </div>
                                 </div>
-                            </div>
-                        </th>
+                            </th>
 
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
