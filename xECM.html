@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>xECM</title>
     <style>
         .file-table-container {
             width: 100%;
@@ -115,6 +115,66 @@
         .col-sync {
             width: 20%;
         }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background-color: #f0f7ff;
+            border-color: #115ea3;
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(20px);
+            border-color: #115ea3;
+            background-color: #115ea3;
+        }
+
+        .toggle-switch:hover .toggle-slider {
+            border-color: #115ea3;
+        }
+
+        .toggle-switch input:focus+.toggle-slider {
+            box-shadow: 0 0 0 2px rgba(17, 94, 163, 0.2);
+        }
     </style>
 </head>
 
@@ -186,7 +246,20 @@
 
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        <tr>
+                            <td class="col-select">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" aria-label="選択">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </td>
+                            <td class="col-filename"></td>
+                            <td class="col-type"></td>
+                            <td class="col-created"></td>
+                            <td class="col-sync"></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
