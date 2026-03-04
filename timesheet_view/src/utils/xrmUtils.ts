@@ -211,6 +211,7 @@ export const getWorkOrderFormValues = (): {
 export const getWorkOrderProtoFields = (): {
     proto_workorderid: string | null;
     proto_wo_fab?: { id: string; name: string } | null;
+    proto_region?: { id: string; name: string } | null;
     proto_devicesearch?: { id: string; name: string } | null;
     proto_wotype?: { id: string; name: string } | null;
     proto_paymenttype?: number | null;
@@ -271,6 +272,7 @@ export const getWorkOrderProtoFields = (): {
         const result: {
             proto_workorderid: string | null;
             proto_wo_fab?: { id: string; name: string } | null;
+            proto_region?: { id: string; name: string } | null;
             proto_devicesearch?: { id: string; name: string } | null;
             proto_wotype?: { id: string; name: string } | null;
             proto_paymenttype?: number | null;
@@ -292,6 +294,18 @@ export const getWorkOrderProtoFields = (): {
             if (endUserValue && endUserValue.length > 0) {
                 const value = Array.isArray(endUserValue) ? endUserValue[0] : endUserValue;
                 result.proto_wo_fab = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
+            }
+        }
+
+        const regionAttr = getAttr("proto_region");
+        if (regionAttr) {
+            const regionValue = regionAttr.getValue();
+            if (regionValue && regionValue.length > 0) {
+                const value = Array.isArray(regionValue) ? regionValue[0] : regionValue;
+                result.proto_region = {
                     id: value.id?.replace(/[{}]/g, "") || "",
                     name: value.name || "",
                 };

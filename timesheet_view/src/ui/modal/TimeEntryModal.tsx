@@ -102,6 +102,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [woSo, setWoSo] = useState("");
     const [deviceSn, setDeviceSn] = useState("");
     const [woType, setWoType] = useState("");
+    const [regionLabel, setRegionLabel] = useState("");
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -234,6 +235,10 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             )?.value || "",
         [timecategoryOptions]
     );
+    const shouldHideWoSo = useMemo(
+        () => ["EU", "CN", "KR"].includes(regionLabel.toUpperCase()),
+        [regionLabel]
+    );
 
     /* -------------------------------
        🪄 初期化処理
@@ -332,6 +337,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setSapBu(selectedEvent.sapBu ?? "");
             setWoSo((selectedEvent as any).woSo ?? "");
             setWoType((selectedEvent as any).woType ?? "");
+            setRegionLabel("");
         } else if (selectedDateTime) {
             setMode("create");
             const { start, end } = selectedDateTime;
@@ -351,6 +357,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             const applyFallbackFields = () => {
                 const protoFields = getWorkOrderProtoFields();
                 if (protoFields) {
+                    setRegionLabel(protoFields.proto_region?.name || "");
                     const endUserName = (protoFields as any).proto_enduser?.name || protoFields.proto_wo_fab?.name || "";
                     if (endUserName) {
                         const endUserOption = endUserOptions.find((opt) => opt.label === endUserName || opt.value === endUserName);
@@ -385,6 +392,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     setMainCategory(protoFields.proto_maincategory != null ? String(protoFields.proto_maincategory) : "");
                     setSubcategory(protoFields.proto_subcategory?.id || "");
                 } else {
+                    setRegionLabel("");
                     setEndUser("");
                     setDeviceSn("");
                     setBillableType("");
@@ -413,12 +421,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     const record = await xrm.WebApi.retrieveRecord(
                         "proto_workorder",
                         selectedWO,
-                        "?$select=proto_wonumber,proto_startdatetime,proto_enddatetime,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_maincategory,_proto_enduser_value,_proto_devicesearch_value,_proto_wotype_value,_proto_subcategory_value"
+                        "?$select=proto_wonumber,proto_startdatetime,proto_enddatetime,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_maincategory,_proto_enduser_value,_proto_devicesearch_value,_proto_wotype_value,_proto_subcategory_value,_proto_region_value"
                     );
 
                     if (isCancelled) return;
 
                     setWo(selectedWO);
+                    setRegionLabel(record["_proto_region_value@OData.Community.Display.V1.FormattedValue"] || "");
 
                     if (record.proto_startdatetime) {
                         const woStart = new Date(record.proto_startdatetime);
@@ -467,9 +476,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 setSubcategory(indirectSubcategoryOption?.value || selectedIndirectTask.subcategoryName);
                 setTask(selectedIndirectTask.taskName);
             } else {
-                // selectedIndirectTaskがない場合、protoFieldsから取得した値は保持する
-                // （サブカテゴリは既に上で設定されているため、ここでは空にしない）
-                setTimeCategory("");
+                setTimeCategory(directTimeCategoryValue);
                 setTask("");
             }
 
@@ -519,6 +526,12 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setConcessionType("");
         }
     }, [concessionType, concessionTypeOptions]);
+
+    useEffect(() => {
+        if (shouldHideWoSo && woSo) {
+            setWoSo("");
+        }
+    }, [shouldHideWoSo, woSo]);
 
     /* -------------------------------
        💾 保存処理
@@ -850,18 +863,22 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">SO (BaaN)</label>
-                            {mode === "duplicate" ? (
-                                <div className="readonly-text">
-                                    {(selectedEvent as any)?.woSoName || woSoOptions.find((opt) => opt.value === woSo || opt.label === woSo)?.label || woSo || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={woSoOptions}
-                                    value={woSo || ""}
-                                    onChange={setWoSo}
-                                    placeholder="SO (BaaN) を選択"
-                                />
+                            {!shouldHideWoSo && (
+                                <>
+                                    <label className="modal-label">SO (BaaN)</label>
+                                    {mode === "duplicate" ? (
+                                        <div className="readonly-text">
+                                            {(selectedEvent as any)?.woSoName || woSoOptions.find((opt) => opt.value === woSo || opt.label === woSo)?.label || woSo || "-"}
+                                        </div>
+                                    ) : (
+                                        <Select
+                                            options={woSoOptions}
+                                            value={woSo || ""}
+                                            onChange={setWoSo}
+                                            placeholder="SO (BaaN) を選択"
+                                        />
+                                    )}
+                                </>
                             )}
                         </div>
 
