@@ -33,6 +33,44 @@
             flex-wrap: wrap;
         }
 
+        .filetable-add-wrapper {
+            position: relative;
+        }
+
+        .filetable-add-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 180px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .filetable-add-menu.is-open {
+            display: block;
+        }
+
+        .filetable-add-item {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filetable-add-item:hover {
+            background-color: #f5f5f5;
+        }
+
         .action-button {
             height: 32px;
             padding: 0 12px;
@@ -86,6 +124,20 @@
         .action-button-danger:hover {
             background-color: #ffefef;
             border-color: #e6aaaa;
+        }
+
+        .action-button-menu {
+            padding-right: 10px;
+        }
+
+        .action-button-menu-caret {
+            margin-left: 2px;
+            transition: transform 0.2s ease;
+            font-size: 12px;
+        }
+
+        .action-button-menu.is-open .action-button-menu-caret {
+            transform: rotate(180deg);
         }
 
         .file-table {
@@ -207,7 +259,21 @@
             </div>
         </div>
         <div class="file-table-header file-table-actions">
-            <button class="action-button action-button-neutral">追加</button>
+            <div class="filetable-add-wrapper">
+                <button id="addButton" class="action-button action-button-neutral action-button-menu" type="button"
+                    aria-haspopup="true" aria-expanded="false">
+                    追加
+                    <span class="action-button-menu-caret">▼</span>
+                </button>
+                <div id="addMenu" class="filetable-add-menu" role="menu">
+                    <div class="filetable-add-item" role="menuitem" data-value="TSR">TSR</div>
+                    <div class="filetable-add-item" role="menuitem" data-value="技術検収書(Technical Acceptance)">
+                        技術検収書(Technical Acceptance)</div>
+                    <div class="filetable-add-item" role="menuitem" data-value="Technical Document">Technical Document
+                    </div>
+                    <div class="filetable-add-item" role="menuitem" data-value="Other">Other</div>
+                </div>
+            </div>
             <button class="action-button action-button-primary">ファイルを保存</button>
             <button class="action-button action-button-primary">xECMに連携</button>
             <button class="action-button action-button-neutral action-button-refresh">更新</button>
@@ -288,6 +354,52 @@
             </div>
         </div>
     </div>
+    <script>
+        (function () {
+            const addButton = document.getElementById('addButton');
+            const addMenu = document.getElementById('addMenu');
+            const infoMessage = document.getElementById('infoMessage');
+
+            if (!addButton || !addMenu) {
+                return;
+            }
+
+            const closeMenu = function () {
+                addMenu.classList.remove('is-open');
+                addButton.classList.remove('is-open');
+                addButton.setAttribute('aria-expanded', 'false');
+            };
+
+            const openMenu = function () {
+                addMenu.classList.add('is-open');
+                addButton.classList.add('is-open');
+                addButton.setAttribute('aria-expanded', 'true');
+            };
+
+            addButton.addEventListener('click', function (event) {
+                event.stopPropagation();
+                if (addMenu.classList.contains('is-open')) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            });
+
+            addMenu.addEventListener('click', function (event) {
+                const item = event.target.closest('.filetable-add-item');
+                if (!item) {
+                    return;
+                }
+                closeMenu();
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!event.target.closest('.filetable-add-wrapper')) {
+                    closeMenu();
+                }
+            });
+        }());
+    </script>
 </body>
 
 </html>
