@@ -212,6 +212,7 @@ export const getWorkOrderProtoFields = (): {
     proto_workorderid: string | null;
     proto_wo_fab?: { id: string; name: string } | null;
     proto_region?: { id: string; name: string } | null;
+    proto_wo_soassociation?: { id: string; name: string } | null;
     proto_devicesearch?: { id: string; name: string } | null;
     proto_wotype?: { id: string; name: string } | null;
     proto_paymenttype?: number | null;
@@ -273,6 +274,7 @@ export const getWorkOrderProtoFields = (): {
             proto_workorderid: string | null;
             proto_wo_fab?: { id: string; name: string } | null;
             proto_region?: { id: string; name: string } | null;
+            proto_wo_soassociation?: { id: string; name: string } | null;
             proto_devicesearch?: { id: string; name: string } | null;
             proto_wotype?: { id: string; name: string } | null;
             proto_paymenttype?: number | null;
@@ -306,6 +308,18 @@ export const getWorkOrderProtoFields = (): {
             if (regionValue && regionValue.length > 0) {
                 const value = Array.isArray(regionValue) ? regionValue[0] : regionValue;
                 result.proto_region = {
+                    id: value.id?.replace(/[{}]/g, "") || "",
+                    name: value.name || "",
+                };
+            }
+        }
+
+        const woSoAssociationAttr = getAttr("proto_wo_soassociation");
+        if (woSoAssociationAttr) {
+            const woSoAssociationValue = woSoAssociationAttr.getValue();
+            if (woSoAssociationValue && woSoAssociationValue.length > 0) {
+                const value = Array.isArray(woSoAssociationValue) ? woSoAssociationValue[0] : woSoAssociationValue;
+                result.proto_wo_soassociation = {
                     id: value.id?.replace(/[{}]/g, "") || "",
                     name: value.name || "",
                 };

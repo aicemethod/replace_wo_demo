@@ -97,6 +97,7 @@
         "task": "タスク",
         "wisdomBu": "WISDOM BU",
         "sapBu": "SAP BU",
+        "soBaan": "SO",
         "deviceSn": "装置検索",
         "mainCategoryLabel": "メインカテゴリ",
         "workStatus": "作業ステータス",
@@ -135,6 +136,7 @@
             "enterComment": "コメントを入力",
             "selectWisdomBu": "WISDOM BU を選択",
             "selectSapBu": "SAP BU を選択",
+            "selectSoBaan": "SO を選択",
             "selectDeviceSn": "装置S/N を選択",
             "selectMainCategory": "メインカテゴリを選択",
             "selectWorkStatus": "作業ステータスを選択"

@@ -97,6 +97,7 @@
         "task": "Task",
         "wisdomBu": "WISDOM BU",
         "sapBu": "SAP BU",
+        "soBaan": "SO (Baan)",
         "deviceSn": "Machine Search",
         "mainCategoryLabel": "Main Category",
         "workStatus": "Work Status",
@@ -135,6 +136,7 @@
             "enterComment": "Enter comment",
             "selectWisdomBu": "Select WISDOM BU",
             "selectSapBu": "Select SAP BU",
+            "selectSoBaan": "Select SO (Baan)",
             "selectDeviceSn": "Select Equipment S/N",
             "selectMainCategory": "Select Main Category",
             "selectWorkStatus": "Select Work Status"

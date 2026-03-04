@@ -391,6 +391,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     setConcessionType(protoFields.proto_concession_tobe != null ? String(protoFields.proto_concession_tobe) : "");
                     setMainCategory(protoFields.proto_maincategory != null ? String(protoFields.proto_maincategory) : "");
                     setSubcategory(protoFields.proto_subcategory?.id || "");
+                    const woSoId = protoFields.proto_wo_soassociation?.id || "";
+                    const woSoName = protoFields.proto_wo_soassociation?.name || "";
+                    if (woSoId || woSoName) {
+                        const woSoOption = woSoOptions.find((opt) => opt.value === woSoId || opt.label === woSoName);
+                        setWoSo(woSoOption?.value || woSoId || "");
+                    } else {
+                        setWoSo("");
+                    }
                 } else {
                     setRegionLabel("");
                     setEndUser("");
@@ -399,6 +407,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     setPaymentToBe("");
                     setPaymentTo("");
                     setConcessionType("");
+                    setWoSo("");
                     setMainCategory("");
                     setSubcategory("");
                     setWoType("");
@@ -421,7 +430,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     const record = await xrm.WebApi.retrieveRecord(
                         "proto_workorder",
                         selectedWO,
-                        "?$select=proto_wonumber,proto_startdatetime,proto_enddatetime,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_maincategory,_proto_enduser_value,_proto_devicesearch_value,_proto_wotype_value,_proto_subcategory_value,_proto_region_value"
+                        "?$select=proto_wonumber,proto_startdatetime,proto_enddatetime,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_maincategory,_proto_enduser_value,_proto_devicesearch_value,_proto_wotype_value,_proto_subcategory_value,_proto_region_value,_proto_wo_soassociation_value"
                     );
 
                     if (isCancelled) return;
@@ -452,6 +461,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     setConcessionType(record.proto_concession_tobe != null ? String(record.proto_concession_tobe) : "");
                     setMainCategory(record.proto_maincategory != null ? String(record.proto_maincategory) : "");
                     setSubcategory(record._proto_subcategory_value?.replace(/[{}]/g, "") || "");
+                    setWoSo(record._proto_wo_soassociation_value?.replace(/[{}]/g, "") || "");
                 } catch (error) {
                     console.error("selectedWO から proto_workorder の取得に失敗:", error);
                     if (!isCancelled) {
@@ -865,7 +875,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                             {shouldShowWoSo && (
                                 <>
-                                    <label className="modal-label">SO (BaaN)</label>
+                                    <label className="modal-label">{t("timeEntryModal.soBaan")}</label>
                                     {mode === "duplicate" ? (
                                         <div className="readonly-text">
                                             {(selectedEvent as any)?.woSoName || woSoOptions.find((opt) => opt.value === woSo || opt.label === woSo)?.label || woSo || "-"}
@@ -875,7 +885,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                             options={woSoOptions}
                                             value={woSo || ""}
                                             onChange={setWoSo}
-                                            placeholder="SO (BaaN) を選択"
+                                            placeholder={t("timeEntryModal.placeholders.selectSoBaan")}
                                         />
                                     )}
                                 </>
