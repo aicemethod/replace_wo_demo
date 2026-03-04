@@ -1,7 +1,15 @@
 import './App.css'
+import type { EventInput } from '@fullcalendar/core'
 import type { JSX } from 'react'
 import { useDataverseQuery } from './hooks/useDataverseQuery'
-import { CalendarController, Footer, Header, Sidebar, UserListModal } from './components'
+import {
+  CalendarController,
+  CalendarView,
+  Footer,
+  Header,
+  Sidebar,
+  UserListModal,
+} from './components'
 import { useState } from 'react'
 
 type Account = {
@@ -12,6 +20,7 @@ type Account = {
 
 function App(): JSX.Element {
   const [isUserListModalOpen, setIsUserListModalOpen] = useState(false)
+  const [currentDate, setCurrentDate] = useState(new Date())
   const { data } = useDataverseQuery<Account>(
     'account',
     '?$select=accountid,name,accountnumber&$top=10'
@@ -27,18 +36,47 @@ function App(): JSX.Element {
       number: account.accountnumber ?? '',
       name: account.name,
     })) ?? []
-  const formattedDate = new Intl.DateTimeFormat('ja-JP').format(new Date())
+  const formattedDate = new Intl.DateTimeFormat('ja-JP').format(currentDate)
+  const calendarEvents: EventInput[] = []
+
+  const handlePrev = () => {
+    const nextDate = new Date(currentDate)
+    nextDate.setDate(nextDate.getDate() - 7)
+    setCurrentDate(nextDate)
+  }
+
+  const handleNext = () => {
+    const nextDate = new Date(currentDate)
+    nextDate.setDate(nextDate.getDate() + 7)
+    setCurrentDate(nextDate)
+  }
+
+  const handleToday = () => {
+    setCurrentDate(new Date())
+  }
 
   return (
     <div className="app">
       <Header options={options} />
-      <CalendarController formattedDate={formattedDate} options={options} />
+      <CalendarController
+        formattedDate={formattedDate}
+        options={options}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onToday={handleToday}
+      />
       <div className="content-middle">
         <Sidebar
           users={users}
           selfUser={users[0] ?? { id: 'self', number: '', name: '' }}
         />
-        <div className="content-main" />
+        <div className="content-main">
+          <CalendarView
+            currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            events={calendarEvents}
+          />
+        </div>
       </div>
       <Footer onOpenUserList={() => setIsUserListModalOpen(true)} />
       <UserListModal
