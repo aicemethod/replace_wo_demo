@@ -36,6 +36,13 @@ export const Header: React.FC<HeaderProps> = ({
         setSelectedWO(resolvedParamWoId);
     }, [resolvedParamWoId, selectedWO, setSelectedWO]);
 
+    useEffect(() => {
+        if (!matchedWorkOrder || !selectedWO) return;
+        if (selectedWO.toLowerCase() !== matchedWorkOrder.id.toLowerCase()) return;
+        if (selectedWO === matchedWorkOrder.id) return;
+        setSelectedWO(matchedWorkOrder.id);
+    }, [matchedWorkOrder, selectedWO, setSelectedWO]);
+
     const woOptions = [
         { value: "all", label: t("header.all") },
         ...(!matchedWorkOrder && paramWoId
