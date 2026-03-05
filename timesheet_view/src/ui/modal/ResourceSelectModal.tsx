@@ -5,10 +5,10 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useResources } from "../../hooks/useResources";
-import { useAllowedUsers } from "../../context/UserListContext";
 import type { Resource } from "../../hooks/useResources";
 import "../styles/modal/ResourceSelectModal.css";
 import { useTranslation } from "react-i18next";
+import { FIXED_USER_NAMES } from "../../constants/fixedUsers";
 
 interface ResourceSelectModalProps {
     isOpen: boolean;
@@ -33,29 +33,30 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
 
     const displaySelf = useMemo(() => {
         if (isUserLoading) {
-            return { number: t("resource.loadingId"), fullName: t("resource.loadingName") };
+            return { fullName: t("resource.loadingName") };
         }
         if (!currentUser) {
-            return { number: t("resource.noEmployeeId"), fullName: t("resource.noUserInfo") };
+            return { fullName: t("resource.noUserInfo") };
         }
 
-        const number = currentUser.employeeid ?? t("resource.unregisteredId");
         const fullName = `${currentUser.lastName ?? ""} ${currentUser.firstName ?? ""}`.trim();
 
-        return { number, fullName };
+        return { fullName };
     }, [currentUser, isUserLoading, t]);
 
     /* =========================================================
        ▼ Dataverse リソース一覧
     ========================================================= */
     const { resources, isLoading: isResourcesLoading } = useResources();
-    const { allowedUsers } = useAllowedUsers();
 
-    //  許可されたユーザーのみ抽出
+    // 固定ユーザーのみ抽出
     const visibleResources = useMemo(() => {
         if (isResourcesLoading) return [];
-        return resources.filter((r) => allowedUsers.includes(r.id));
-    }, [resources, allowedUsers, isResourcesLoading]);
+        return FIXED_USER_NAMES.map((name, index) => {
+            const found = resources.find((r) => r.name === name);
+            return found ?? { id: `fixed-user-${index + 1}`, name, number: "" };
+        });
+    }, [resources, isResourcesLoading]);
 
     /* =========================================================
        ▼ 検索・ソート設定
@@ -94,23 +95,8 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     const displayUsers: Resource[] = [
         {
             id: "self",
-            number: `${displaySelf.number}${t("resource.selfTag")}`,
+            number: "",
             name: displaySelf.fullName,
-        },
-        {
-            id: "general-resource-1",
-            number: "General resource1",
-            name: "",
-        },
-        {
-            id: "general-resource-2",
-            number: "General resource2",
-            name: "",
-        },
-        {
-            id: "general-resource-3",
-            number: "General resource3",
-            name: "",
         },
         ...filteredUsers,
     ];
@@ -135,7 +121,9 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             .filter((u) => selectedUsers.includes(u.id))
             .map((u) => ({
                 id: u.id,
-                label: `${u.number ?? t("resource.unknownId")} ${u.name ?? t("resource.noName")}`,
+                label: u.id === "self"
+                    ? `${u.name ?? t("resource.noName")}${t("resource.selfTag")}`
+                    : (u.name ?? t("resource.noName")),
             }));
 
         console.log(" 選択されたリソース:", selectedResources);
@@ -242,9 +230,6 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                                 className="resource-checkbox"
                             />
                             <div className="resource-text">
-                                <span className="resource-number">
-                                    {u.number ?? t("resource.unknownId")}
-                                </span>
                                 <span className="resource-name">
                                     {u.name ?? t("resource.noName")}
                                 </span>

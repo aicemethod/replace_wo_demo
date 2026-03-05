@@ -188,6 +188,40 @@ textarea {
     opacity: 0.8;
 }
 
+.resource-display {
+    width: 100%;
+    min-height: 80px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: #fff;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resource-line {
+    width: fit-content;
+    max-width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.resource-line.other {
+    background-color: #cbe0e6;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
+.resource-empty {
+    color: #aaa;
+    font-size: 0.875rem;
+}
+
 .char-count {
     text-align: right;
     font-size: 0.75rem;

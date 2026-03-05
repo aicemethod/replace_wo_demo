@@ -4,11 +4,11 @@ import { Input } from "../components/Input";
 import "../styles/layout/Sidebar.css";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useResources } from "../../hooks/useResources";
-import { useAllowedUsers } from "../../context/UserListContext";
 import { useFavoriteTasks } from "../../context/FavoriteTaskContext"; //  追加
 import { useTranslation } from "react-i18next";
 import type { SidebarProps } from "../../types/components";
 import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
+import { FIXED_USER_NAMES } from "../../constants/fixedUsers";
 
 /**
  * Sidebar コンポーネント
@@ -39,18 +39,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     /** Dataverse: リソース一覧 */
     const { resources, isLoading: isResourceLoading } = useResources();
 
-    /** コンテキスト: 許可ユーザー一覧 */
-    const { allowedUsers } = useAllowedUsers();
-
     /** ログイン中ユーザー表示用 */
     const displaySelf = useMemo(() => {
         if (isUserLoading)
-            return { number: t("sidebar.loadingNumber"), fullName: t("sidebar.loadingUser") };
+            return { fullName: t("sidebar.loadingUser") };
         if (!currentUser)
-            return { number: t("sidebar.noEmpId"), fullName: t("sidebar.noUserInfo") };
+            return { fullName: t("sidebar.noUserInfo") };
 
         return {
-            number: currentUser.employeeid || t("sidebar.noEmpId"),
             fullName: `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim(),
         };
     }, [currentUser, isUserLoading, t]);
@@ -58,40 +54,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
     useEffect(() => {
         if (!onResourceSelectionChange) return;
 
+        const fixedUsers = FIXED_USER_NAMES.map((name, index) => {
+            const found = resources.find((r) => r.name === name);
+            return found ?? { id: `fixed-user-${index + 1}`, name, number: "" };
+        });
         const selectedResources = selectedUsers.map((userId) => {
             if (userId === "self") {
-                const number = `${displaySelf.number}${t("resource.selfTag")}`;
                 const name = displaySelf.fullName || t("resource.noName");
                 return {
                     id: "self",
-                    label: `${number} ${name}`,
+                    label: `${name}${t("resource.selfTag")}`,
                 };
             }
 
-            const user = resources.find((r) => r.id === userId);
+            const user = fixedUsers.find((r) => r.id === userId);
             if (!user) {
                 return {
                     id: userId,
-                    label: `${t("resource.unknownId")} ${t("resource.noName")}`,
+                    label: t("resource.noName"),
                 };
             }
 
-            const number = user.number ?? t("resource.unknownId");
             const name = user.name ?? t("resource.noName");
             return {
                 id: user.id,
-                label: `${number} ${name}`,
+                label: name,
             };
         });
 
         onResourceSelectionChange(selectedResources);
     }, [displaySelf, onResourceSelectionChange, resources, selectedUsers, t]);
 
-    /** 表示対象ユーザー（許可済みのみ） */
+    /** 表示対象ユーザー（固定2名のみ） */
     const visibleUsers = useMemo(() => {
         if (isResourceLoading) return [];
-        return resources.filter((r) => allowedUsers.includes(r.id));
-    }, [resources, allowedUsers, isResourceLoading]);
+        return FIXED_USER_NAMES.map((name, index) => {
+            const found = resources.find((r) => r.name === name);
+            return found ?? { id: `fixed-user-${index + 1}`, name, number: "" };
+        });
+    }, [resources, isResourceLoading]);
 
     /** 検索・ソート適用後のユーザー一覧 */
     const filteredUsers = useMemo(() => {
@@ -186,9 +187,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             onChange={() => toggleSelect("self")}
                         />
                         <div className="sidebar-self-text">
-                            <span className="sidebar-self-number">
-                                {`${displaySelf.number}（${t("sidebar.self")}）`}
-                            </span>
                             <span className="sidebar-self-roman">{displaySelf.fullName}</span>
                         </div>
                     </label>
@@ -234,7 +232,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                         onChange={() => toggleSelect(user.id)}
                                     />
                                     <span className="sidebar-result-text">
-                                        {(user.number || t("sidebar.unknownNumber"))}{" "}
                                         {(user.name || t("sidebar.unknownName"))}
                                     </span>
                                 </label>

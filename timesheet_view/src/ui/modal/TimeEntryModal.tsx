@@ -235,6 +235,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             )?.value || "",
         [timecategoryOptions]
     );
+    const resourceLines = useMemo(
+        () => (resource || "").split("\n").map((line) => line.trim()).filter(Boolean),
+        [resource]
+    );
+    const isSelfResourceLine = (line: string) => {
+        const lower = line.toLowerCase();
+        return line.includes(t("resource.selfTag")) || lower.includes("(self)") || line.includes("(自分)");
+    };
     const shouldShowWoSo = useMemo(
         () => ["EU", "CN", "KR"].includes(regionLabel.toUpperCase()),
         [regionLabel]
@@ -841,13 +849,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 </a>
                             </div>
 
-                            <Textarea
-                                placeholder={t("timeEntryModal.resourcePlaceholder")}
-                                value={resource}
-                                onChange={setResource}
-                                rows={4}
-                                readOnly
-                            />
+                            <div className="resource-display">
+                                {resourceLines.length > 0 ? (
+                                    resourceLines.map((line, idx) => (
+                                        <div
+                                            key={`${line}-${idx}`}
+                                            className={`resource-line ${isSelfResourceLine(line) ? "self" : "other"}`}
+                                        >
+                                            {line}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="resource-empty">{t("timeEntryModal.resourcePlaceholder")}</div>
+                                )}
+                            </div>
 
                             <label className="modal-label">{t("timeEntryModal.wisdomBu")}</label>
                             {mode === "duplicate" ? (
