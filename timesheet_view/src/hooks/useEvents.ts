@@ -84,69 +84,15 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
     const navigationName = "proto_timeentry_wonumber_proto_workorder";
     const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
-    // workOrderClient と同条件で対象WOを特定（proto_resource -> proto_bookableresource -> proto_systemuser）
-    const resourceQuery =
-        `?$select=_proto_workorder_value,_proto_resource1_value` +
-        `&$filter=_proto_resource1_value ne null and _proto_workorder_value ne null`;
-    const resourceResult = await xrm.WebApi.retrieveMultipleRecords("proto_resource", resourceQuery);
-
-    type ResourceRow = { workOrderId: string; bookableResourceId: string };
-    const resourceRows: ResourceRow[] = resourceResult.entities
-        .map((record: any): ResourceRow => ({
-            workOrderId: String(record._proto_workorder_value || "").replace(/[{}]/g, ""),
-            bookableResourceId: String(record._proto_resource1_value || "").replace(/[{}]/g, ""),
-        }))
-        .filter((row: ResourceRow) => row.workOrderId.length > 0 && row.bookableResourceId.length > 0);
-
-    if (resourceRows.length === 0) {
-        return [];
-    }
-
-    const bookableResourceIds = Array.from(new Set(resourceRows.map((row: ResourceRow) => row.bookableResourceId)));
-    const bookableResourceFilter = bookableResourceIds
-        .map((id) => `proto_bookableresourceid eq ${id}`)
-        .join(" or ");
-    const matchedBookableResourceQuery =
-        `?$select=proto_bookableresourceid,_proto_systemuser_value` +
-        `&$filter=(${bookableResourceFilter}) and _proto_systemuser_value eq ${userId}`;
-    const matchedBookableResourceResult = await xrm.WebApi.retrieveMultipleRecords(
-        "proto_bookableresource",
-        matchedBookableResourceQuery
-    );
-    const matchedBookableResourceIds = new Set(
-        matchedBookableResourceResult.entities
-            .map((record: any) => String(record.proto_bookableresourceid || "").replace(/[{}]/g, ""))
-            .filter((id: string) => id.length > 0)
-    );
-
-    if (matchedBookableResourceIds.size === 0) {
-        return [];
-    }
-
-    let targetWorkOrderIds = Array.from(
-        new Set(
-            resourceRows
-                .filter((row: ResourceRow) => matchedBookableResourceIds.has(row.bookableResourceId))
-                .map((row: ResourceRow) => row.workOrderId)
-        )
-    );
-
+    // 以前どおり: proto_workorder の作成者ベースで取得
+    let filter = `_createdby_value eq ${userId}`;
     if (workOrderId) {
-        const targetId = normalizeEntityId(workOrderId);
-        targetWorkOrderIds = targetWorkOrderIds.filter((id) => normalizeEntityId(id) === targetId);
+        filter = `proto_workorderid eq ${workOrderId}`;
     }
-
-    if (targetWorkOrderIds.length === 0) {
-        return [];
-    }
-
-    const filter = targetWorkOrderIds
-        .map((id) => `proto_workorderid eq ${id}`)
-        .join(" or ");
 
     const query =
         `?$select=proto_workorderid,proto_wonumber` +
-        `&$filter=(${filter})` +
+        `&$filter=${filter}` +
         `&$expand=${navigationName}(` +
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
