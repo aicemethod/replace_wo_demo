@@ -36,18 +36,58 @@ export class WorkOrderClient extends BaseClient<WorkOrder, WorkOrderInput> {
             const xrm = this.getXrm();
             const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
-            // proto_resource からログインユーザーに紐づく proto_workorder(lookup) を取得
+            // proto_resource から proto_workorder(lookup) と proto_resource1(lookup) を取得
             const resourceQuery = this.buildQueryString({
-                select: ['_proto_workorder_value'],
-                filter: `_proto_resource1_value eq ${userId} and _proto_workorder_value ne null`,
+                select: ['_proto_workorder_value', '_proto_resource1_value'],
+                filter: `_proto_resource1_value ne null and _proto_workorder_value ne null`,
             });
-
             const resourceResult = await xrm.WebApi.retrieveMultipleRecords("proto_resource", resourceQuery);
+
+            type ResourceRow = { workOrderId: string; bookableResourceId: string };
+            const resourceRows: ResourceRow[] = resourceResult.entities
+                .map((record: any): ResourceRow => ({
+                    workOrderId: (record._proto_workorder_value || "").replace(/[{}]/g, ""),
+                    bookableResourceId: (record._proto_resource1_value || "").replace(/[{}]/g, ""),
+                }))
+                .filter((row: ResourceRow) => row.workOrderId.length > 0 && row.bookableResourceId.length > 0);
+
+            if (resourceRows.length === 0) {
+                return [];
+            }
+
+            // proto_bookableresource から proto_systemuser がログインユーザーと一致するレコードを取得
+            const bookableResourceIds = Array.from(
+                new Set(
+                    resourceRows.map((row: ResourceRow) => row.bookableResourceId)
+                )
+            );
+
+            const bookableResourceFilter = bookableResourceIds
+                .map((id) => `proto_bookableresourceid eq ${id}`)
+                .join(" or ");
+            const matchedBookableResourceQuery = this.buildQueryString({
+                select: ['proto_bookableresourceid', '_proto_systemuser_value'],
+                filter: `(${bookableResourceFilter}) and _proto_systemuser_value eq ${userId}`,
+            });
+            const matchedBookableResourceResult = await xrm.WebApi.retrieveMultipleRecords(
+                "proto_bookableresource",
+                matchedBookableResourceQuery
+            );
+            const matchedBookableResourceIds = new Set(
+                matchedBookableResourceResult.entities
+                    .map((record: any) => (record.proto_bookableresourceid || "").replace(/[{}]/g, ""))
+                    .filter((id: string) => id.length > 0)
+            );
+
+            if (matchedBookableResourceIds.size === 0) {
+                return [];
+            }
+
             const workOrderIds = Array.from(
                 new Set(
-                    resourceResult.entities
-                        .map((record: any) => (record._proto_workorder_value || "").replace(/[{}]/g, ""))
-                        .filter((id: string) => id.length > 0)
+                    resourceRows
+                        .filter((row: ResourceRow) => matchedBookableResourceIds.has(row.bookableResourceId))
+                        .map((row: ResourceRow) => row.workOrderId)
                 )
             );
 
