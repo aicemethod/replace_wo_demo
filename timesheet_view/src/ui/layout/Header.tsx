@@ -19,22 +19,24 @@ export const Header: React.FC<HeaderProps> = ({
     const { t } = useTranslation();
     const params = getUrlParams();
     const dataParam = params.data || params.recordid || params.value || "";
-    const paramWoId = dataParam.includes("\u0001") ? (dataParam.split("\u0001")[0] || "") : dataParam;
+    const [rawParamWoId = "", rawParamWoLabel = ""] = dataParam.split("\u0001");
+    const paramWoId = rawParamWoId.trim();
+    const paramWoLabel = rawParamWoLabel.trim();
 
     useEffect(() => {
-        if (!paramWoId || !workOrders.length) return;
+        if (!paramWoId || paramWoId === selectedWO) return;
+        setSelectedWO(paramWoId);
+    }, [paramWoId, selectedWO, setSelectedWO]);
 
-        const matchedWorkOrder = workOrders.find(
-            (wo) => wo.id.toLowerCase() === paramWoId.toLowerCase()
-        );
-
-        if (matchedWorkOrder && matchedWorkOrder.id !== selectedWO) {
-            setSelectedWO(matchedWorkOrder.id);
-        }
-    }, [paramWoId, workOrders, selectedWO, setSelectedWO]);
+    const hasParamOption = !!paramWoId && workOrders.some(
+        (wo) => wo.id.toLowerCase() === paramWoId.toLowerCase()
+    );
 
     const woOptions = [
         { value: "all", label: t("header.all") },
+        ...(!hasParamOption && paramWoId
+            ? [{ value: paramWoId, label: paramWoLabel || paramWoId }]
+            : []),
         ...workOrders.map((wo) => ({
             value: wo.id,
             label: wo.name || t("header.noName"),
