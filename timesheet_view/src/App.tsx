@@ -6,6 +6,7 @@ import { UserListProvider } from "./context/UserListContext";
 import { FavoriteTaskProvider, useFavoriteTasks } from "./context/FavoriteTaskContext";
 import { formatToday } from "./utils/dateFormatter";
 import { convertWorkOrdersToOptions } from "./utils/modalHelpers";
+import { getUrlParams } from "./utils/url";
 import { getXrm } from "./utils/xrmUtils";
 import type { Option } from "./types";
 import "./App.css";
@@ -84,6 +85,12 @@ function TimesheetApp() {
   const [isDayCopyModalOpen, setIsDayCopyModalOpen] = useState(false);
   /** 1日コピー用のコピー元日付 */
   const [dayCopySourceDate, setDayCopySourceDate] = useState<Date | null>(null);
+  /** URLパラメータ由来のWO(id\u0001label) */
+  const params = getUrlParams();
+  const dataParam = params.data || params.recordid || params.value || "";
+  const [rawParamWoId = "", rawParamWoLabel = ""] = dataParam.split("\u0001");
+  const paramWoId = rawParamWoId.trim();
+  const paramWoLabel = rawParamWoLabel.trim();
 
   /** 選択されているタスク情報を取得（最初の1つを使用） */
   const { favoriteTasks } = useFavoriteTasks();
@@ -91,6 +98,19 @@ function TimesheetApp() {
     if (selectedSidebarTask.length === 0 || mainTab !== "indirect") return null;
     return favoriteTasks.find(task => task.id === selectedSidebarTask[0]) || null;
   }, [selectedSidebarTask, favoriteTasks, mainTab]);
+
+  /** TimeEntryModal 用WO選択肢（URLパラメータ由来のWOを不足時に補完） */
+  const modalWoOptions = useMemo(() => {
+    const baseOptions = convertWorkOrdersToOptions(workOrders);
+    if (!paramWoId) return baseOptions;
+
+    const hasParamOption = baseOptions.some(
+      (opt) => opt.value.toLowerCase() === paramWoId.toLowerCase()
+    );
+    if (hasParamOption) return baseOptions;
+
+    return [{ value: paramWoId, label: paramWoLabel || paramWoId }, ...baseOptions];
+  }, [workOrders, paramWoId, paramWoLabel]);
 
   /** Lookupデータの状態 */
   const [endUserOptions, setEndUserOptions] = useState<Option[]>([]);
@@ -399,7 +419,7 @@ function TimesheetApp() {
         onDuplicate={handleDuplicate}
         selectedDateTime={selectedDateTime}
         selectedEvent={selectedEvent}
-        woOptions={convertWorkOrdersToOptions(workOrders)}
+        woOptions={modalWoOptions}
         maincategoryOptions={optionSets?.maincategory ?? []}
         timecategoryOptions={optionSets?.timecategory ?? []}
         paymenttypeOptions={optionSets?.paymenttype ?? []}
