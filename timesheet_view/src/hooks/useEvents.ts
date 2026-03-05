@@ -31,6 +31,10 @@ export type EventData = {
     extendedProps?: Record<string, any>;
 };
 
+/** GUID比較用にID形式を正規化 */
+const normalizeEntityId = (id?: string | null): string =>
+    String(id || "").replace(/[{}]/g, "").toLowerCase();
+
 /**
  * Dataverse またはローカルモックからイベント一覧を取得
  * @param workOrderId 特定のWorkOrderのID（サブグリッドの場合に指定）
@@ -44,7 +48,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         if (localMock.length > 0) {
             // workOrderIdが指定されている場合、フィルタリング
             if (workOrderId) {
-                return localMock.filter((e: EventData) => e.workOrderId === workOrderId);
+                const targetId = normalizeEntityId(workOrderId);
+                return localMock.filter((e: EventData) => normalizeEntityId(e.workOrderId) === targetId);
             }
             return localMock;
         }
@@ -68,7 +73,8 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
 
         // workOrderIdが指定されている場合、フィルタリング
         if (workOrderId) {
-            return mockEvents.filter((e) => e.workOrderId === workOrderId);
+            const targetId = normalizeEntityId(workOrderId);
+            return mockEvents.filter((e) => normalizeEntityId(e.workOrderId) === targetId);
         }
         return mockEvents;
     }
@@ -78,15 +84,69 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
     const navigationName = "proto_timeentry_wonumber_proto_workorder";
     const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
-    // workOrderIdが指定されている場合（サブグリッド）、特定のWorkOrderのみを取得
-    let filter = `_createdby_value eq ${userId}`;
-    if (workOrderId) {
-        filter = `proto_workorderid eq ${workOrderId}`;
+    // workOrderClient と同条件で対象WOを特定（proto_resource -> proto_bookableresource -> proto_systemuser）
+    const resourceQuery =
+        `?$select=_proto_workorder_value,_proto_resource1_value` +
+        `&$filter=_proto_resource1_value ne null and _proto_workorder_value ne null`;
+    const resourceResult = await xrm.WebApi.retrieveMultipleRecords("proto_resource", resourceQuery);
+
+    type ResourceRow = { workOrderId: string; bookableResourceId: string };
+    const resourceRows: ResourceRow[] = resourceResult.entities
+        .map((record: any): ResourceRow => ({
+            workOrderId: String(record._proto_workorder_value || "").replace(/[{}]/g, ""),
+            bookableResourceId: String(record._proto_resource1_value || "").replace(/[{}]/g, ""),
+        }))
+        .filter((row: ResourceRow) => row.workOrderId.length > 0 && row.bookableResourceId.length > 0);
+
+    if (resourceRows.length === 0) {
+        return [];
     }
+
+    const bookableResourceIds = Array.from(new Set(resourceRows.map((row: ResourceRow) => row.bookableResourceId)));
+    const bookableResourceFilter = bookableResourceIds
+        .map((id) => `proto_bookableresourceid eq ${id}`)
+        .join(" or ");
+    const matchedBookableResourceQuery =
+        `?$select=proto_bookableresourceid,_proto_systemuser_value` +
+        `&$filter=(${bookableResourceFilter}) and _proto_systemuser_value eq ${userId}`;
+    const matchedBookableResourceResult = await xrm.WebApi.retrieveMultipleRecords(
+        "proto_bookableresource",
+        matchedBookableResourceQuery
+    );
+    const matchedBookableResourceIds = new Set(
+        matchedBookableResourceResult.entities
+            .map((record: any) => String(record.proto_bookableresourceid || "").replace(/[{}]/g, ""))
+            .filter((id: string) => id.length > 0)
+    );
+
+    if (matchedBookableResourceIds.size === 0) {
+        return [];
+    }
+
+    let targetWorkOrderIds = Array.from(
+        new Set(
+            resourceRows
+                .filter((row: ResourceRow) => matchedBookableResourceIds.has(row.bookableResourceId))
+                .map((row: ResourceRow) => row.workOrderId)
+        )
+    );
+
+    if (workOrderId) {
+        const targetId = normalizeEntityId(workOrderId);
+        targetWorkOrderIds = targetWorkOrderIds.filter((id) => normalizeEntityId(id) === targetId);
+    }
+
+    if (targetWorkOrderIds.length === 0) {
+        return [];
+    }
+
+    const filter = targetWorkOrderIds
+        .map((id) => `proto_workorderid eq ${id}`)
+        .join(" or ");
 
     const query =
         `?$select=proto_workorderid,proto_wonumber` +
-        `&$filter=${filter}` +
+        `&$filter=(${filter})` +
         `&$expand=${navigationName}(` +
         `$select=` +
         `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
@@ -116,7 +176,7 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
             title: t.proto_name || "作業",
             start: t.proto_startdatetime,
             end: t.proto_enddatetime,
-            workOrderId: wo.proto_workorderid,
+            workOrderId: normalizeEntityId(wo.proto_workorderid),
             maincategory: t.proto_maincategory,
             timecategory: t.proto_timecategory,
             subcategory: t._proto_subcategory_value?.replace(/[{}]/g, "") || t.proto_subcategory?.proto_subcategoryid?.replace(/[{}]/g, "") || null,
@@ -190,7 +250,8 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
     const xrm = getXrm();
 
     /** サブグリッドの場合、特定のWorkOrderのイベントのみを取得 */
-    const workOrderIdForQuery = isSubgrid && selectedWO !== "all" ? selectedWO : undefined;
+    const normalizedSelectedWO = normalizeEntityId(selectedWO);
+    const workOrderIdForQuery = isSubgrid && selectedWO !== "all" ? normalizedSelectedWO : undefined;
 
     /** イベント一覧取得 */
     const {
@@ -251,7 +312,7 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
             extendedProps: {
                 ...e.extendedProps,
                 deviceSn: e.deviceSn ?? e.extendedProps?.deviceSn ?? null,
-                isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
+                isTargetWO: selectedWO === "all" || normalizeEntityId(e.workOrderId) === normalizedSelectedWO,
             },
         };
     });
