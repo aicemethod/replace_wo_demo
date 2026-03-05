@@ -33,15 +33,43 @@ export class WorkOrderClient extends BaseClient<WorkOrder, WorkOrderInput> {
         }
 
         return await this.executeDataverseOperation(async () => {
-            const userId = this.getXrm().Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
+            const xrm = this.getXrm();
+            const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
-            const query = this.buildQueryString({
-                select: ['proto_workorderid', 'proto_wonumber'],
-                filter: `_createdby_value eq ${userId}`,
-                ...queryOptions
+            // proto_resource からログインユーザーに紐づく proto_workorder(lookup) を取得
+            const resourceQuery = this.buildQueryString({
+                select: ['_proto_workorder_value'],
+                filter: `_proto_resource1_value eq ${userId} and _proto_workorder_value ne null`,
             });
 
-            const result = await this.getXrm().WebApi.retrieveMultipleRecords(this.entityName, query);
+            const resourceResult = await xrm.WebApi.retrieveMultipleRecords("proto_resource", resourceQuery);
+            const workOrderIds = Array.from(
+                new Set(
+                    resourceResult.entities
+                        .map((record: any) => (record._proto_workorder_value || "").replace(/[{}]/g, ""))
+                        .filter((id: string) => id.length > 0)
+                )
+            );
+
+            if (workOrderIds.length === 0) {
+                return [];
+            }
+
+            const workOrderFilter = workOrderIds
+                .map((id) => `proto_workorderid eq ${id}`)
+                .join(" or ");
+            const mergedFilter = queryOptions?.filter
+                ? `(${workOrderFilter}) and (${queryOptions.filter})`
+                : workOrderFilter;
+
+            const query = this.buildQueryString({
+                ...queryOptions,
+                select: queryOptions?.select ?? ['proto_workorderid', 'proto_wonumber'],
+                filter: mergedFilter,
+                orderBy: queryOptions?.orderBy ?? "proto_wonumber",
+            });
+
+            const result = await xrm.WebApi.retrieveMultipleRecords(this.entityName, query);
             return DataTransformer.mapRecords(result.entities, this.transformRecord);
         }, 'getEntities');
     }
