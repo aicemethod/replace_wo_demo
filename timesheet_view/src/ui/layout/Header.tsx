@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Select } from "../components/Select";
 import "../styles/layout/Header.css";
 import { useTranslation } from "react-i18next";
@@ -22,19 +22,23 @@ export const Header: React.FC<HeaderProps> = ({
     const [rawParamWoId = "", rawParamWoLabel = ""] = dataParam.split("\u0001");
     const paramWoId = rawParamWoId.trim();
     const paramWoLabel = rawParamWoLabel.trim();
+    const hasAppliedParamRef = useRef(false);
+
+    const matchedWorkOrder = paramWoId
+        ? workOrders.find((wo) => wo.id.toLowerCase() === paramWoId.toLowerCase())
+        : undefined;
+    const resolvedParamWoId = matchedWorkOrder?.id || paramWoId;
 
     useEffect(() => {
-        if (!paramWoId || paramWoId === selectedWO) return;
-        setSelectedWO(paramWoId);
-    }, [paramWoId, selectedWO, setSelectedWO]);
-
-    const hasParamOption = !!paramWoId && workOrders.some(
-        (wo) => wo.id.toLowerCase() === paramWoId.toLowerCase()
-    );
+        if (hasAppliedParamRef.current) return;
+        hasAppliedParamRef.current = true;
+        if (!resolvedParamWoId || resolvedParamWoId === selectedWO) return;
+        setSelectedWO(resolvedParamWoId);
+    }, [resolvedParamWoId, selectedWO, setSelectedWO]);
 
     const woOptions = [
         { value: "all", label: t("header.all") },
-        ...(!hasParamOption && paramWoId
+        ...(!matchedWorkOrder && paramWoId
             ? [{ value: paramWoId, label: paramWoLabel || paramWoId }]
             : []),
         ...workOrders.map((wo) => ({
