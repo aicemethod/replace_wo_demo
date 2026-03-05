@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip, FiChevronDown } from 'react-icons/fi';
+import { FaCloudUploadAlt } from "react-icons/fa";
 import type { FileData } from '../types';
 import { fetchFileData, saveFileAttachment, deleteFileAttachments } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
@@ -281,7 +282,7 @@ export default function FileTable({ locale }: FileTableProps) {
             disabled={showAddRow || !hasSelectedFiles}
             title={msg.fileLink}
           >
-            <FiSave size={16} />
+            <FaCloudUploadAlt size={16} />
             <span>{msg.fileLink}</span>
           </button>
           <button
