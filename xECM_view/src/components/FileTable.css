@@ -73,7 +73,8 @@
 }
 
 .action-button:hover {
-  border-color: #115ea3;
+  border-color: #d0d0d0;
+  background-color: #f5f5f5;
 }
 
 .action-button:disabled {
@@ -90,7 +91,8 @@
 }
 
 .action-button-primary:hover:not(:disabled) {
-  background-color: #edf5fc;
+  background-color: #dceefe;
+  border-color: #b7d1ea;
 }
 
 .action-button-danger {
@@ -100,8 +102,8 @@
 }
 
 .action-button-danger:hover:not(:disabled) {
-  background-color: #ffefef;
-  border-color: #e6aaaa;
+  background-color: #ffe2e2;
+  border-color: #efc3c3;
 }
 
 .action-button-neutral {

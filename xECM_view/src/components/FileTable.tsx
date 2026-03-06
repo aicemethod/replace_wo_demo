@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { FiSave, FiRefreshCw, FiPlus, FiTrash2, FiPaperclip, FiChevronDown } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiPaperclip, FiChevronDown } from 'react-icons/fi';
 import { FaCloudUploadAlt } from "react-icons/fa";
 import type { FileData } from '../types';
 import { fetchFileData, saveFileAttachment, deleteFileAttachments } from '../services/dataverse';
@@ -16,7 +16,6 @@ export default function FileTable({ locale }: FileTableProps) {
   const [files, setFiles] = useState<FileData[]>([]);
   const [deleteSelectedIds, setDeleteSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
@@ -37,7 +36,6 @@ export default function FileTable({ locale }: FileTableProps) {
       console.error('データの取得に失敗しました:', error);
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -68,11 +66,6 @@ export default function FileTable({ locale }: FileTableProps) {
         file.id === id ? { ...file, selected: !file.selected } : file
       )
     );
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await loadData();
   };
 
   const handleDeleteCheckToggle = (id: string) => {
@@ -285,7 +278,7 @@ export default function FileTable({ locale }: FileTableProps) {
             <FaCloudUploadAlt size={16} />
             <span>{msg.fileLink}</span>
           </button>
-          <button
+          {/* <button
             type="button"
             className="action-button action-button-neutral action-button-refresh"
             onClick={handleRefresh}
@@ -297,7 +290,7 @@ export default function FileTable({ locale }: FileTableProps) {
               className={isRefreshing ? 'action-button-icon-spin' : ''}
             />
             <span>{msg.refresh}</span>
-          </button>
+          </button> */}
           {showAddRow ? (
             <button
               type="button"
