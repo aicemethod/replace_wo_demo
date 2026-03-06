@@ -446,20 +446,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     setWo(selectedWO);
                     setRegionLabel(record["_proto_region_value@OData.Community.Display.V1.FormattedValue"] || "");
 
-                    if (record.proto_startdatetime) {
-                        const woStart = new Date(record.proto_startdatetime);
-                        setStartDate(formatLocalDate(woStart));
-                        setStartHour(String(woStart.getHours()).padStart(2, "0"));
-                        setStartMinute(String(woStart.getMinutes()).padStart(2, "0"));
-                    }
-
-                    if (record.proto_enddatetime) {
-                        const woEnd = new Date(record.proto_enddatetime);
-                        setEndDate(formatLocalDate(woEnd));
-                        setEndHour(String(woEnd.getHours()).padStart(2, "0"));
-                        setEndMinute(String(woEnd.getMinutes()).padStart(2, "0"));
-                    }
-
                     setEndUser(record._proto_enduser_value?.replace(/[{}]/g, "") || "");
                     setDeviceSn(record._proto_devicesearch_value?.replace(/[{}]/g, "") || "");
                     setWoType(record._proto_wotype_value?.replace(/[{}]/g, "") || "");
