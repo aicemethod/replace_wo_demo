@@ -4,6 +4,7 @@ const JA_LCID = 1041;
 
 const messages = {
   ja: {
+    tableTitle: '添付ファイル一覧',
     add: '追加',
     save: '保存',
     saveFile: 'ファイルを保存',
@@ -34,6 +35,7 @@ const messages = {
     fileTypeOther: 'Other'
   },
   en: {
+    tableTitle: 'Attachment List',
     add: 'Add',
     save: 'Submit',
     saveFile: 'Save File',

@@ -224,6 +224,7 @@ export default function FileTable({ locale }: FileTableProps) {
   return (
     <div className="file-table-container">
       <div className="file-table-header">
+        <div className="file-table-title">{msg.tableTitle}</div>
         <div className="file-table-actions">
           <div className="filetable-add-wrapper filetable-add-dropdown">
             <button
