@@ -434,6 +434,12 @@ body {
   color: #333;
 }
 
+.action-button-hover-save:hover:not(:disabled) {
+  background-color: #edf5fc;
+  border-color: #d0d0d0;
+  color: #333;
+}
+
 .action-button span {
   line-height: 1;
 }

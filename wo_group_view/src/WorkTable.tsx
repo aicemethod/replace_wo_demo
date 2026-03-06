@@ -253,7 +253,11 @@ export default function WorkTable({ locale }: WorkTableProps) {
       <header className="panel-header">
         <div className="panel-title">
           <span>{msg.workTableTitle}</span>
-          <button className="top-btn" type="button" onClick={handleBindGroup}>
+          <button
+            className="action-button action-button-neutral action-button-hover-save"
+            type="button"
+            onClick={handleBindGroup}
+          >
             {msg.bindGroup}
           </button>
         </div>

@@ -92,7 +92,11 @@ export default function WorkSameGroupTable({ locale }: WorkSameGroupTableProps) 
       <header className="panel-header">
         <div className="panel-title">
           <span>{msg.sameGroupTitle}</span>
-          <button className="top-btn" type="button" onClick={handleClearGroup}>
+          <button
+            className="action-button action-button-neutral action-button-hover-save"
+            type="button"
+            onClick={handleClearGroup}
+          >
             {msg.unbindGroup}
           </button>
         </div>

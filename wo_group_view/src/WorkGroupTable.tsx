@@ -207,7 +207,7 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
           <div className="file-table-actions">
             <button
               type="button"
-              className="action-button action-button-neutral"
+              className="action-button action-button-neutral action-button-hover-save"
               onClick={handleCreateNew}
               disabled={showAddRow || !canCreateNew}
             >
@@ -275,9 +275,13 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
                     type="checkbox"
                     checked={deleteSelectedIds.has(row.id)}
                     onChange={() => handleDeleteCheckToggle(row.id)}
-                    aria-label="delete"
+                    aria-label={msg.selectRow}
                   />
-                  <span className="cb-box" />
+                  <span className="cb-box" aria-hidden="true">
+                    <svg viewBox="0 0 12 10">
+                      <path d="M1.5 5.5L4.5 8.5L10.5 1.5" />
+                    </svg>
+                  </span>
                 </label>
               </div>
               {newRowId === row.id ? (
