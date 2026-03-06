@@ -372,7 +372,70 @@ body {
 
 .work-group .table-head,
 .work-group .tr {
-  grid-template-columns: minmax(260px, 1.4fr) minmax(360px, 2.2fr);
+  grid-template-columns: 44px minmax(260px, 1.4fr) minmax(360px, 2.2fr);
+}
+
+.file-table-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.action-button:hover {
+  border-color: #115ea3;
+}
+
+.action-button:disabled {
+  color: #a8a8a8;
+  border-color: #e0e0e0;
+  background-color: #fafafa;
+  cursor: not-allowed;
+}
+
+.action-button-primary {
+  color: #115ea3;
+  border-color: #b7d1ea;
+  background-color: #f6fbff;
+}
+
+.action-button-primary:hover:not(:disabled) {
+  background-color: #edf5fc;
+}
+
+.action-button-danger {
+  color: #d32f2f;
+  border-color: #efc3c3;
+  background-color: #fff8f8;
+}
+
+.action-button-danger:hover:not(:disabled) {
+  background-color: #ffefef;
+  border-color: #e6aaaa;
+}
+
+.action-button-neutral {
+  color: #333;
+}
+
+.action-button span {
+  line-height: 1;
 }
 
 .table-head {
@@ -458,6 +521,14 @@ body {
 
 .tr.is-selected {
   background: #d7e9fb;
+}
+
+.work-group .tr.is-selected {
+  background: transparent;
+}
+
+.tr.is-add-row {
+  background: #fbfdff;
 }
 
 .checkbox {

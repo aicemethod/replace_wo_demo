@@ -20,6 +20,10 @@ const messages = {
     close: '閉じる',
     column_groupNumber: 'WOグループ番号',
     column_groupTitle: 'WOグループタイトル',
+    createNew: '＋新規作成',
+    save: '保存',
+    delete: '削除',
+    cancel: 'キャンセル',
     column_woNumber: 'WO番号',
     column_woTitle: 'WOタイトル',
     column_endUser: 'End User',
@@ -62,6 +66,10 @@ const messages = {
     close: 'Close',
     column_groupNumber: 'WO Group No.',
     column_groupTitle: 'WO Group Title',
+    createNew: '+ New',
+    save: 'Save',
+    delete: 'Delete',
+    cancel: 'Cancel',
     column_woNumber: 'WO No.',
     column_woTitle: 'WO Title',
     column_endUser: 'End User',
@@ -100,4 +108,3 @@ export const getAppLocaleFromXrm = (): AppLocale => {
 }
 
 export const getMessages = (locale: AppLocale) => messages[locale]
-

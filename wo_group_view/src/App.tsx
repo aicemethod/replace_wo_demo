@@ -11,7 +11,8 @@ function App() {
 
   return (
     <div className="page">
-      {section === 'group' ? <WorkGroupTable locale={locale} /> : null}
+      <WorkGroupTable locale={locale} />
+      {/* {section === 'group' ? <WorkGroupTable locale={locale} /> : null} */}
       {section === 'main' ? <WorkTable locale={locale} /> : null}
       {section === 'same' ? <WorkSameGroupTable locale={locale} /> : null}
     </div>
