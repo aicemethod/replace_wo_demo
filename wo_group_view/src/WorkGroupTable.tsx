@@ -7,6 +7,7 @@ import {
   updateProjectName,
   openProjectForm,
   deleteProjects,
+  createProjectAndBindCurrentWorkorder,
 } from './powerAppsData'
 
 type ColumnKey = 'groupNumber' | 'groupTitle'
@@ -32,6 +33,7 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
   const [showAddRow, setShowAddRow] = useState(false)
   const [newRowId, setNewRowId] = useState<string | null>(null)
   const [canCreateNew, setCanCreateNew] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   const refreshRows = async () => {
     const data = await getWorkGroupRows()
@@ -121,12 +123,28 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
     setCanCreateNew(false)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!showAddRow) return
-    setSourceRows(tableRows)
-    setShowAddRow(false)
-    setNewRowId(null)
-    setEditingId(null)
+    if (!newRowId) return
+    const row = tableRows.find((item) => item.id === newRowId)
+    const projectTitle = row?.groupTitle?.trim() ?? ''
+    if (!projectTitle) return
+
+    setIsSaving(true)
+    try {
+      const createdRow = await createProjectAndBindCurrentWorkorder(projectTitle)
+      if (!createdRow) return
+      setSourceRows([createdRow])
+      setTableRows([createdRow])
+      setDeleteSelectedIds(new Set())
+      setShowAddRow(false)
+      setNewRowId(null)
+      setEditingId(null)
+      setSelectedId(createdRow.id)
+      setCanCreateNew(false)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleDelete = () => {
@@ -139,9 +157,13 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
       .filter(Boolean)
 
     if (targetProjectIds.length > 0) {
-      void deleteProjects(targetProjectIds).then(() => {
-        void refreshRows()
-      })
+      void deleteProjects(targetProjectIds)
+        .then(() => {
+          void refreshRows()
+        })
+        .catch(() => {
+          void refreshRows()
+        })
       return
     }
 
@@ -195,8 +217,10 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
           <button
             type="button"
             className="action-button action-button-primary"
-            onClick={handleSave}
-            disabled={!showAddRow}
+            onClick={() => {
+              void handleSave()
+            }}
+            disabled={!showAddRow || isSaving}
           >
             <span>{msg.save}</span>
           </button>

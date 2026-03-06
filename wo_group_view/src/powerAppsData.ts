@@ -45,6 +45,7 @@ type XrmLike = {
     updateRecord: (entityName: string, id: string, data: Record<string, unknown>) => Promise<any>
     retrieveMultipleRecords: (entityName: string, query?: string) => Promise<any>
     deleteRecord: (entityName: string, id: string) => Promise<any>
+    createRecord: (entityName: string, data: Record<string, unknown>) => Promise<any>
   }
   Navigation?: {
     openForm: (options: { entityName: string; entityId: string }) => Promise<any>
@@ -101,13 +102,17 @@ export const getWorkGroupRows = async (): Promise<WorkGroupRow[]> => {
 
   const xrm = getXrm()
   if (xrm?.WebApi?.retrieveRecord) {
-    const record = await xrm.WebApi.retrieveRecord(
-      'proto_project',
-      projectId,
-      '?$select=proto_name,proto_wo_group_num'
-    )
-    projectTitle = record?.proto_name ?? projectTitle
-    groupNumber = record?.proto_wo_group_num ?? ''
+    try {
+      const record = await xrm.WebApi.retrieveRecord(
+        'proto_project',
+        projectId,
+        '?$select=proto_name,proto_wo_group_num'
+      )
+      projectTitle = record?.proto_name ?? projectTitle
+      groupNumber = record?.proto_wo_group_num ?? ''
+    } catch {
+      return []
+    }
   }
 
   return [
@@ -141,6 +146,53 @@ export const deleteProjects = async (projectIds: string[]) => {
   await Promise.all(
     normalizedIds.map((id) => xrm.WebApi!.deleteRecord('proto_project', id))
   )
+}
+
+export const createProjectAndBindCurrentWorkorder = async (
+  projectTitle: string
+): Promise<WorkGroupRow | null> => {
+  const name = projectTitle.trim()
+  if (!name) return null
+
+  const xrm = getXrm()
+  const workorderId = getCurrentWorkorderId()
+  if (!xrm?.WebApi?.createRecord || !xrm?.WebApi?.updateRecord || !workorderId) return null
+
+  const created = await xrm.WebApi.createRecord('proto_project', {
+    proto_name: name,
+  })
+  const projectId = normalizeId(created?.id)
+  if (!projectId) return null
+
+  await xrm.WebApi.updateRecord('proto_workorder', workorderId, {
+    'proto_project@odata.bind': `/proto_projects(${projectId})`,
+  })
+
+  let groupNumber = ''
+  let groupTitle = name
+  if (xrm.WebApi.retrieveRecord) {
+    try {
+      const record = await xrm.WebApi.retrieveRecord(
+        'proto_project',
+        projectId,
+        '?$select=proto_name,proto_wo_group_num'
+      )
+      groupNumber = record?.proto_wo_group_num ?? ''
+      groupTitle = record?.proto_name ?? groupTitle
+    } catch {
+      // no-op
+    }
+  }
+
+  return {
+    id: projectId,
+    woNumber: '',
+    woTitle: '',
+    status: '',
+    groupNumber,
+    groupTitle,
+    projectId,
+  }
 }
 
 export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
