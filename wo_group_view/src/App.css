@@ -1,5 +1,5 @@
 :root {
-  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
   color: #1f2328;
   background: #fff;
 }
@@ -390,6 +390,7 @@ body {
   background-color: #fff;
   color: #333;
   font-size: 14px;
+  font-weight: normal;
   font-family: SegoeUI, "Segoe UI", "Helvetica Neue", sans-serif;
   cursor: pointer;
   display: inline-flex;
