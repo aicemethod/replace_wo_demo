@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { BaseModal } from "./BaseModal";
 import { Button } from "../components/Button";
@@ -247,6 +247,67 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         () => ["EU", "CN", "KR"].includes(regionLabel.toUpperCase()),
         [regionLabel]
     );
+    const initialWoValueRef = useRef<string | null>(null);
+
+    const applyFallbackFields = useCallback(() => {
+        const protoFields = getWorkOrderProtoFields();
+        if (protoFields) {
+            setRegionLabel(protoFields.proto_region?.name || "");
+            const endUserName = (protoFields as any).proto_enduser?.name || protoFields.proto_wo_fab?.name || "";
+            if (endUserName) {
+                const endUserOption = endUserOptions.find((opt) => opt.label === endUserName || opt.value === endUserName);
+                setEndUser(endUserOption?.value || endUserName);
+            } else {
+                setEndUser("");
+            }
+
+            const deviceSnName = protoFields.proto_devicesearch?.name || "";
+            if (deviceSnName) {
+                const deviceSnOption = deviceSnOptions.find((opt) => opt.label === deviceSnName || opt.value === deviceSnName);
+                setDeviceSn(deviceSnOption?.value || deviceSnName);
+            } else {
+                setDeviceSn("");
+            }
+
+            const woTypeName = protoFields.proto_wotype?.name || "";
+            const woTypeId = protoFields.proto_wotype?.id || "";
+            if (woTypeId || woTypeName) {
+                const woTypeOption = woTypeOptions.find(
+                    (opt) => opt.value === woTypeId || opt.label === woTypeName || opt.value === woTypeName
+                );
+                setWoType(woTypeOption?.value || woTypeId || woTypeName);
+            } else {
+                setWoType("");
+            }
+
+            setBillableType(protoFields.proto_billabletype != null ? String(protoFields.proto_billabletype) : "");
+            setPaymentToBe(protoFields.proto_payment_tobe != null ? String(protoFields.proto_payment_tobe) : "");
+            setPaymentTo(protoFields.proto_paymentto_tobe != null ? String(protoFields.proto_paymentto_tobe) : "");
+            setConcessionType(protoFields.proto_concession_tobe != null ? String(protoFields.proto_concession_tobe) : "");
+            setMainCategory(protoFields.proto_maincategory != null ? String(protoFields.proto_maincategory) : "");
+            setSubcategory(protoFields.proto_subcategory?.id || "");
+            const woSoId = protoFields.proto_wo_soassociation?.id || "";
+            const woSoName = protoFields.proto_wo_soassociation?.name || "";
+            if (woSoId || woSoName) {
+                const woSoOption = woSoOptions.find((opt) => opt.value === woSoId || opt.label === woSoName);
+                setWoSo(woSoOption?.value || woSoId || "");
+            } else {
+                setWoSo("");
+            }
+        } else {
+            setRegionLabel("");
+            setEndUser("");
+            setDeviceSn("");
+            setBillableType("");
+            setPaymentToBe("");
+            setPaymentTo("");
+            setConcessionType("");
+            setWoSo("");
+            setMainCategory("");
+            setSubcategory("");
+            setWoType("");
+        }
+    }, [endUserOptions, deviceSnOptions, woTypeOptions, woSoOptions]);
 
     /* -------------------------------
        🪄 初期化処理
@@ -358,69 +419,11 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndMinute(String(end.getMinutes()).padStart(2, "0"));
 
             // 選択中WOを初期セット
-            setWo(selectedWO && selectedWO !== "all" ? selectedWO : "");
+            const initialWoValue = selectedWO && selectedWO !== "all" ? selectedWO : "";
+            initialWoValueRef.current = initialWoValue;
+            setWo(initialWoValue);
             setTimezone("235");
             setTimeCategory(directTimeCategoryValue);
-
-            const applyFallbackFields = () => {
-                const protoFields = getWorkOrderProtoFields();
-                if (protoFields) {
-                    setRegionLabel(protoFields.proto_region?.name || "");
-                    const endUserName = (protoFields as any).proto_enduser?.name || protoFields.proto_wo_fab?.name || "";
-                    if (endUserName) {
-                        const endUserOption = endUserOptions.find((opt) => opt.label === endUserName || opt.value === endUserName);
-                        setEndUser(endUserOption?.value || endUserName);
-                    } else {
-                        setEndUser("");
-                    }
-
-                    const deviceSnName = protoFields.proto_devicesearch?.name || "";
-                    if (deviceSnName) {
-                        const deviceSnOption = deviceSnOptions.find((opt) => opt.label === deviceSnName || opt.value === deviceSnName);
-                        setDeviceSn(deviceSnOption?.value || deviceSnName);
-                    } else {
-                        setDeviceSn("");
-                    }
-
-                    const woTypeName = protoFields.proto_wotype?.name || "";
-                    const woTypeId = protoFields.proto_wotype?.id || "";
-                    if (woTypeId || woTypeName) {
-                        const woTypeOption = woTypeOptions.find(
-                            (opt) => opt.value === woTypeId || opt.label === woTypeName || opt.value === woTypeName
-                        );
-                        setWoType(woTypeOption?.value || woTypeId || woTypeName);
-                    } else {
-                        setWoType("");
-                    }
-
-                    setBillableType(protoFields.proto_billabletype != null ? String(protoFields.proto_billabletype) : "");
-                    setPaymentToBe(protoFields.proto_payment_tobe != null ? String(protoFields.proto_payment_tobe) : "");
-                    setPaymentTo(protoFields.proto_paymentto_tobe != null ? String(protoFields.proto_paymentto_tobe) : "");
-                    setConcessionType(protoFields.proto_concession_tobe != null ? String(protoFields.proto_concession_tobe) : "");
-                    setMainCategory(protoFields.proto_maincategory != null ? String(protoFields.proto_maincategory) : "");
-                    setSubcategory(protoFields.proto_subcategory?.id || "");
-                    const woSoId = protoFields.proto_wo_soassociation?.id || "";
-                    const woSoName = protoFields.proto_wo_soassociation?.name || "";
-                    if (woSoId || woSoName) {
-                        const woSoOption = woSoOptions.find((opt) => opt.value === woSoId || opt.label === woSoName);
-                        setWoSo(woSoOption?.value || woSoId || "");
-                    } else {
-                        setWoSo("");
-                    }
-                } else {
-                    setRegionLabel("");
-                    setEndUser("");
-                    setDeviceSn("");
-                    setBillableType("");
-                    setPaymentToBe("");
-                    setPaymentTo("");
-                    setConcessionType("");
-                    setWoSo("");
-                    setMainCategory("");
-                    setSubcategory("");
-                    setWoType("");
-                }
-            };
 
             const loadSelectedWorkOrder = async () => {
                 if (!selectedWO || selectedWO === "all") {
@@ -494,6 +497,60 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             isCancelled = true;
         };
     }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO, selectedIndirectTask, timecategoryOptions, subcategoryOptions, endUserOptions, deviceSnOptions, woTypeOptions, woSoOptions, directTimeCategoryValue]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        if (selectedEvent) return;
+        if (mode !== "create") return;
+        if (initialWoValueRef.current === wo) {
+            initialWoValueRef.current = null;
+            return;
+        }
+
+        let isCancelled = false;
+        const loadWorkOrderFromSelection = async () => {
+            if (!wo) {
+                applyFallbackFields();
+                return;
+            }
+
+            const xrm = getXrm();
+            if (!xrm?.WebApi) {
+                applyFallbackFields();
+                return;
+            }
+
+            try {
+                const record = await xrm.WebApi.retrieveRecord(
+                    "proto_workorder",
+                    wo,
+                    "?$select=proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_maincategory,_proto_enduser_value,_proto_devicesearch_value,_proto_wotype_value,_proto_subcategory_value,_proto_region_value,_proto_wo_soassociation_value"
+                );
+
+                if (isCancelled) return;
+
+                setRegionLabel(record["_proto_region_value@OData.Community.Display.V1.FormattedValue"] || "");
+                setEndUser(record._proto_enduser_value?.replace(/[{}]/g, "") || "");
+                setDeviceSn(record._proto_devicesearch_value?.replace(/[{}]/g, "") || "");
+                setWoType(record._proto_wotype_value?.replace(/[{}]/g, "") || "");
+                setBillableType(record.proto_billabletype != null ? String(record.proto_billabletype) : "");
+                setPaymentToBe(record.proto_payment_tobe != null ? String(record.proto_payment_tobe) : "");
+                setPaymentTo(record.proto_paymentto_tobe != null ? String(record.proto_paymentto_tobe) : "");
+                setConcessionType(record.proto_concession_tobe != null ? String(record.proto_concession_tobe) : "");
+                setMainCategory(record.proto_maincategory != null ? String(record.proto_maincategory) : "");
+                setSubcategory(record._proto_subcategory_value?.replace(/[{}]/g, "") || "");
+                setWoSo(record._proto_wo_soassociation_value?.replace(/[{}]/g, "") || "");
+            } catch (error) {
+                console.error("WO選択時の proto_workorder 取得に失敗:", error);
+                if (!isCancelled) applyFallbackFields();
+            }
+        };
+
+        loadWorkOrderFromSelection();
+        return () => {
+            isCancelled = true;
+        };
+    }, [isOpen, selectedEvent, mode, wo, applyFallbackFields]);
 
     useEffect(() => {
         if (!isOpen) return;
