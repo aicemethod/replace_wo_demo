@@ -37,7 +37,7 @@ const messages = {
     add: 'Add',
     save: 'Submit',
     saveFile: 'Save File',
-    fileLink: 'File Link',
+    fileLink: 'Submit to xECM',
     refresh: 'Refresh List',
     cancel: 'Cancel',
     delete: 'Delete',
