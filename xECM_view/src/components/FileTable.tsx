@@ -228,7 +228,7 @@ export default function FileTable({ locale }: FileTableProps) {
           <div className="filetable-add-wrapper filetable-add-dropdown">
             <button
               type="button"
-              className={`action-button action-button-neutral action-button-menu ${isAddMenuOpen ? 'is-open' : ''}`}
+              className={`action-button action-button-neutral action-button-hover-save action-button-menu ${isAddMenuOpen ? 'is-open' : ''}`}
               onClick={handleAddMenuToggle}
               title={msg.add}
             >

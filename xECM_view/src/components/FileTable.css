@@ -110,6 +110,12 @@
   color: #333;
 }
 
+.action-button-hover-save:hover:not(:disabled) {
+  background-color: #edf5fc;
+  border-color: #d0d0d0;
+  color: #333;
+}
+
 .action-button-refresh {
   background-color: #f3f3f3;
   border-color: #d9d9d9;
