@@ -44,6 +44,7 @@ type XrmLike = {
     retrieveRecord: (entityName: string, id: string, query?: string) => Promise<any>
     updateRecord: (entityName: string, id: string, data: Record<string, unknown>) => Promise<any>
     retrieveMultipleRecords: (entityName: string, query?: string) => Promise<any>
+    deleteRecord: (entityName: string, id: string) => Promise<any>
   }
   Navigation?: {
     openForm: (options: { entityName: string; entityId: string }) => Promise<any>
@@ -60,11 +61,6 @@ const getFormContext = (): FormContext | null => {
   const xrm = getXrm()
   if (xrm?.Page) return xrm.Page
   return null
-}
-
-const readText = (form: FormContext, name: string) => {
-  const value = form.getAttribute(name)?.getValue()
-  return typeof value === 'string' ? value : ''
 }
 
 const readLookup = (form: FormContext, name: string): LookupValue | null => {
@@ -96,34 +92,31 @@ export const getWorkGroupRows = async (): Promise<WorkGroupRow[]> => {
   const form = getFormContext()
   if (!form) return []
 
-  const entityId = form.data.entity.getId()
-  const woNumber = readText(form, 'proto_wonumber')
-  const woTitle = readText(form, 'proto_wotitle')
-  const statusLookup = readLookup(form, 'proto_workordersubstatus')
   const projectLookup = readLookup(form, 'proto_project')
+  const projectId = normalizeId(projectLookup?.id)
+  if (!projectId) return []
 
   let projectTitle = projectLookup?.name ?? ''
-  const projectId = normalizeId(projectLookup?.id)
+  let groupNumber = ''
 
-  if (!projectTitle && projectId) {
-    const xrm = getXrm()
-    if (xrm?.WebApi?.retrieveRecord) {
-      const record = await xrm.WebApi.retrieveRecord(
-        'proto_project',
-        projectId,
-        '?$select=proto_name'
-      )
-      projectTitle = record?.proto_name ?? ''
-    }
+  const xrm = getXrm()
+  if (xrm?.WebApi?.retrieveRecord) {
+    const record = await xrm.WebApi.retrieveRecord(
+      'proto_project',
+      projectId,
+      '?$select=proto_name,proto_wo_group_num'
+    )
+    projectTitle = record?.proto_name ?? projectTitle
+    groupNumber = record?.proto_wo_group_num ?? ''
   }
 
   return [
     {
-      id: normalizeId(entityId),
-      woNumber,
-      woTitle,
-      status: statusLookup?.name ?? '',
-      groupNumber: projectLookup?.name ?? '',
+      id: projectId,
+      woNumber: '',
+      woTitle: '',
+      status: '',
+      groupNumber,
       groupTitle: projectTitle,
       projectId,
     },
@@ -138,6 +131,16 @@ export const updateProjectName = async (projectId: string, name: string) => {
   await xrm.WebApi.updateRecord('proto_project', normalizedId, {
     proto_name: name,
   })
+}
+
+export const deleteProjects = async (projectIds: string[]) => {
+  const xrm = getXrm()
+  if (!xrm?.WebApi?.deleteRecord || projectIds.length === 0) return
+  const normalizedIds = projectIds.map((id) => normalizeId(id)).filter(Boolean)
+  if (normalizedIds.length === 0) return
+  await Promise.all(
+    normalizedIds.map((id) => xrm.WebApi!.deleteRecord('proto_project', id))
+  )
 }
 
 export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {

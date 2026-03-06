@@ -6,6 +6,7 @@ import {
   type WorkGroupRow,
   updateProjectName,
   openProjectForm,
+  deleteProjects,
 } from './powerAppsData'
 
 type ColumnKey = 'groupNumber' | 'groupTitle'
@@ -30,12 +31,14 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
   const [newRowCount, setNewRowCount] = useState(0)
   const [showAddRow, setShowAddRow] = useState(false)
   const [newRowId, setNewRowId] = useState<string | null>(null)
+  const [canCreateNew, setCanCreateNew] = useState(false)
 
   const refreshRows = async () => {
     const data = await getWorkGroupRows()
     setSourceRows(data)
     setTableRows(data)
     setDeleteSelectedIds(new Set())
+    setCanCreateNew(data.length === 0)
   }
 
   useEffect(() => {
@@ -45,6 +48,7 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
       setSourceRows(data)
       setTableRows(data)
       setDeleteSelectedIds(new Set())
+      setCanCreateNew(data.length === 0)
     })
     return () => {
       mounted = false
@@ -114,6 +118,7 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
     setNewRowId(newId)
     setSelectedId(newId)
     setEditingId(newId)
+    setCanCreateNew(false)
   }
 
   const handleSave = () => {
@@ -127,7 +132,19 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
   const handleDelete = () => {
     if (showAddRow) return
     if (deleteSelectedIds.size === 0) return
-    const deleteSet = deleteSelectedIds
+    const deleteSet = new Set(deleteSelectedIds)
+    const targetProjectIds = tableRows
+      .filter((row) => deleteSet.has(row.id))
+      .map((row) => row.projectId)
+      .filter(Boolean)
+
+    if (targetProjectIds.length > 0) {
+      void deleteProjects(targetProjectIds).then(() => {
+        void refreshRows()
+      })
+      return
+    }
+
     setTableRows((prev) => prev.filter((row) => !deleteSet.has(row.id)))
     if (selectedId && deleteSet.has(selectedId)) {
       setSelectedId(null)
@@ -145,6 +162,7 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
     setNewRowId(null)
     setEditingId(null)
     setSelectedId(null)
+    setCanCreateNew(sourceRows.length === 0)
   }
 
   const handleDeleteCheckToggle = (id: string) => {
@@ -170,7 +188,7 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
             type="button"
             className="action-button action-button-neutral"
             onClick={handleCreateNew}
-            disabled={showAddRow}
+            disabled={showAddRow || !canCreateNew}
           >
             <span>{msg.createNew}</span>
           </button>
