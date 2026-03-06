@@ -204,41 +204,46 @@ export default function WorkGroupTable({ locale }: WorkGroupTableProps) {
       <header className="panel-header">
         <div className="panel-title">
           <span>{msg.currentGroupTitle}</span>
-        </div>
-        <div className="file-table-actions">
-          <button
-            type="button"
-            className="action-button action-button-neutral"
-            onClick={handleCreateNew}
-            disabled={showAddRow || !canCreateNew}
-          >
-            <span>{msg.createNew}</span>
-          </button>
-          <button
-            type="button"
-            className="action-button action-button-primary"
-            onClick={() => {
-              void handleSave()
-            }}
-            disabled={!showAddRow || isSaving}
-          >
-            <span>{msg.save}</span>
-          </button>
-          <button
-            type="button"
-            className="action-button action-button-danger"
-            onClick={handleDelete}
-            disabled={deleteSelectedIds.size === 0 || showAddRow}
-          >
-            <span>{msg.delete}</span>
-          </button>
-          <button
-            type="button"
-            className={`action-button ${showAddRow ? 'action-button-danger' : 'action-button-neutral'}`}
-            onClick={handleCancel}
-          >
-            <span>{msg.cancel}</span>
-          </button>
+          <div className="file-table-actions">
+            <button
+              type="button"
+              className="action-button action-button-neutral"
+              onClick={handleCreateNew}
+              disabled={showAddRow || !canCreateNew}
+            >
+              <span>{msg.createNew}</span>
+            </button>
+            <button
+              type="button"
+              className="action-button action-button-primary"
+              onClick={() => {
+                void handleSave()
+              }}
+              disabled={!showAddRow || isSaving}
+            >
+              <span>{msg.save}</span>
+            </button>
+            {showAddRow ? (
+              <button
+                type="button"
+                className="action-button action-button-danger"
+                onClick={handleCancel}
+                title={msg.cancel}
+              >
+                <span>{msg.cancel}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="action-button action-button-danger"
+                onClick={handleDelete}
+                disabled={deleteSelectedIds.size === 0}
+                title={msg.delete}
+              >
+                <span>{msg.delete}</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
