@@ -1,455 +1,1055 @@
-const PAYMENT_TYPE_TREE = {
-    1: {
-        931440000: { 931440000: null, 931440001: null },
-        931440001: { 931440002: { 931440000: null, 931440001: null }, 931440003: null },
-        931440002: { 931440004: { 931440001: { 931440000: null, 931440001: null }, 931440002: { 931440001: null } } }
-    },
-    2: {
-        931440002: {
-            931440005: { 931440000: null, 931440001: null },
-            931440004: {
-                931440000: { 931440000: null, 931440001: null },
-                931440001: { 931440000: null, 931440001: null },
-                931440002: { 931440000: null, 931440001: null },
-                931440003: { 931440000: null, 931440001: null }
-            }
-        }
-    },
-    3: {
-        931440001: { 931440002: { 931440000: null, 931440001: null }, 931440003: null },
-        931440002: {
-            931440004: {
-                931440000: { 931440000: null, 931440001: null },
-                931440001: { 931440000: null, 931440001: null },
-                931440002: { 931440000: null, 931440001: null },
-                931440003: { 931440000: null, 931440001: null }
-            }
-        }
-    },
-    4: {
-        931440000: { 931440001: null },
-        931440001: { 931440002: { 931440000: null, 931440001: null }, 931440003: null },
-        931440002: {
-            931440006: null,
-            931440007: null,
-            931440004: {
-                931440000: { 931440000: null, 931440001: null },
-                931440001: { 931440000: null, 931440001: null },
-                931440002: { 931440000: null, 931440001: null },
-                931440003: { 931440000: null, 931440001: null }
-            }
-        }
-    },
-    5: {
-        931440000: { 931440001: null },
-        931440001: { 931440002: { 931440000: null, 931440001: null }, 931440003: null },
-        931440002: {
-            931440006: null,
-            931440004: {
-                931440000: { 931440000: null, 931440001: null },
-                931440001: { 931440000: null, 931440001: null },
-                931440002: { 931440000: null, 931440001: null },
-                931440003: { 931440000: null, 931440001: null }
-            }
-        }
-    },
-    6: {
-        931440000: { 931440001: null },
-        931440001: { 931440002: { 931440000: null, 931440001: null }, 931440003: null },
-        931440002: {
-            931440004: {
-                931440000: { 931440000: null, 931440001: null },
-                931440001: { 931440000: null, 931440001: null },
-                931440002: { 931440000: null, 931440001: null },
-                931440003: { 931440000: null, 931440001: null }
-            }
-        }
-    },
-    7: {
-        931440001: { 931440002: { 931440000: null, 931440001: null }, 931440003: null },
-        931440002: {
-            931440008: { 931440000: null, 931440001: null },
-            931440004: { 931440003: { 931440000: null } }
-        }
-    }
-};
+const ProtoForm = new (function () {
+    "use strict";
 
-const PAYMENT_TARGET_FIELDS = [
-    "proto_billabletype",
-    "proto_payment_tobe",
-    "proto_paymentto_tobe",
-    "proto_concession_tobe"
-];
+    // =========================
+    // 定数
+    // =========================
 
-const CONDITIONAL_VISIBLE_FIELDS = [
-    "proto_primaryso",
-    "proto_wo_soassociation",
-    "proto_tel_wo_sow",
-    "proto_tel_wo_concession_reason",
-    "proto_cnt_contractsummary",
-    "proto_tel_wo_retrofitfcnno",
-    "proto_tel_wo_continuouswork",
-    "proto_wo_installation"
-];
-
-const WO_TYPE_VISIBLE_TAB_NAME = "tab_14";
-
-// パターン判定用に文字列を正規化する。
-function normalizeText(text) {
-    return String(text || "").toLowerCase().replace(/\s+/g, " ").trim();
-}
-
-// WO種別の文字列からパターン番号を判定する。
-function detectPatternFromWoType(woTypeText) {
-    const text = normalizeText(woTypeText);
-
-    if (text.includes("startup") || text.includes("新規・中古機再販")) return 1;
-    if (text.includes("fcn/si")) return 2;
-    if (text.includes("troubleshooting")) return 4;
-    if (
-        text.includes("modification")
-        || text.includes("relocation")
-        || text.includes("decommission")
-        || text.includes("re-installation")
-        || text === "oh"
-        || text === "pm"
-        || text.includes("装置の立ち下げ作業")
-        || text.includes("装置の再立ち上げ作業")
-        || text.includes("repair")
-    ) return 3;
-    if (text.includes("process / application") || text.includes("consulting / analysis")) return 5;
-    if (text.includes("software installation")) return 6;
-    if (text.includes("customer training")) return 7;
-
-    return null;
-}
-
-// ツリーノードから選択可能な子キー一覧を返す。
-function getChildKeys(node) {
-    if (!node || typeof node !== "object") return [];
-    return Object.keys(node);
-}
-
-// 選択値に対応する子ノードを返す。
-function getNodeByValue(node, selectedValue) {
-    if (!node || selectedValue == null) return null;
-    return node[String(selectedValue)] ?? null;
-}
-
-// フォーム項目の値を取得する。
-function getAttributeValue(formContext, fieldName) {
-    return formContext.getAttribute(fieldName)?.getValue();
-}
-
-// Lookup または選択肢項目のラベルを取得する。
-function getAttributeLabel(formContext, fieldName) {
-    const attr = formContext.getAttribute(fieldName);
-    if (!attr) return "";
-
-    const value = attr.getValue();
-    if (Array.isArray(value) && value[0] && value[0].name) {
-        return String(value[0].name);
-    }
-
-    if (typeof attr.getText === "function") {
-        return String(attr.getText() || "");
-    }
-
-    return "";
-}
-
-// 単一コントロールの表示/非表示を安全に切り替える。
-function setFieldVisible(formContext, fieldName, visible) {
-    const control = formContext.getControl(fieldName);
-    if (control) control.setVisible(!!visible);
-}
-
-// 複数コントロールを表示する。
-function showFields(formContext, fieldNames) {
-    fieldNames.forEach(function (fieldName) {
-        setFieldVisible(formContext, fieldName, true);
-    });
-}
-
-// 条件判定前に対象項目をすべて非表示に戻す。
-function resetConditionalVisibility(formContext) {
-    CONDITIONAL_VISIBLE_FIELDS.forEach(function (fieldName) {
-        setFieldVisible(formContext, fieldName, false);
-    });
-}
-
-// 表示判定で使う値をまとめた状態オブジェクトを作る。
-function getVisibilityState(formContext) {
-    return {
-        region: getAttributeLabel(formContext, "proto_region").toUpperCase(),
-        paymentToBe: Number(getAttributeValue(formContext, "proto_payment_tobe")),
-        paymentToToBe: Number(getAttributeValue(formContext, "proto_paymentto_tobe")),
-        concessionToBe: Number(getAttributeValue(formContext, "proto_concession_tobe"))
+    // Lookup: proto_test1
+    const PROTO_TEST1 = {
+        STARTUP: "GUID",
+        FCN_SI: "GUID",
+        RE_LOCATION: "GUID",
+        DECOMISSION: "GUID",
+        RE_INSTALLATION: "GUID",
+        OH: "GUID",
+        PM: "GUID",
+        MODIFICATION: "GUID",
+        REPAIR: "GUID",
+        TROUBLESHOOTING_REPAIR: "GUID",
+        PROCESS_APPLICATION: "GUID",
+        CONSAULTING_ANALYSIS: "GUID",
+        SOFTWARE_INSTALLATION: "GUID",
+        CUSTOMER_TRAINING: "GUID"
     };
-}
 
-// proto_payment_tobe = 931440003 の共通表示を行う。
-function showCommonPaymentToBe003Fields(formContext, region) {
-    showFields(formContext, ["proto_tel_wo_sow", "proto_cnt_contractsummary"]);
-
-    if (region === "EU") {
-        showFields(formContext, ["proto_wo_installation", "proto_wo_soassociation"]);
-    }
-}
-
-// proto_paymentto_tobe = 931440002 のとき値引き理由を表示する。
-function showConcessionReasonIfNeeded(formContext, paymentToToBe) {
-    if (paymentToToBe === 931440002) {
-        setFieldVisible(formContext, "proto_tel_wo_concession_reason", true);
-    }
-}
-
-// パターン1の表示ルールを適用する。
-function applyPattern1Visibility(formContext, state) {
-    if ((state.region === "JP" || state.region === "US") && [931440000, 931440001, 931440002].includes(state.paymentToBe)) {
-        setFieldVisible(formContext, "proto_primaryso", true);
-    }
-
-    if (state.region === "EU" && [931440000, 931440002, 931440003].includes(state.paymentToBe)) {
-        setFieldVisible(formContext, "proto_wo_soassociation", true);
-    }
-
-    if (state.paymentToBe === 931440003) {
-        showFields(formContext, ["proto_tel_wo_sow", "proto_cnt_contractsummary"]);
-    }
-
-    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
-}
-
-// パターン2の表示ルールを適用する。
-function applyPattern2Visibility(formContext, state) {
-    showFields(formContext, ["proto_tel_wo_retrofitfcnno", "proto_tel_wo_continuouswork"]);
-    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
-
-    if (state.region === "EU" && state.paymentToToBe === 931440003 && state.concessionToBe === 931440000) {
-        setFieldVisible(formContext, "proto_wo_installation", true);
-    }
-}
-
-// パターン3の表示ルールを適用する。
-function applyPattern3Visibility(formContext, state) {
-    if (state.paymentToBe === 931440002 && state.region === "EU") {
-        showFields(formContext, ["proto_wo_installation", "proto_wo_soassociation"]);
-    }
-
-    if (state.paymentToBe === 931440003) {
-        showCommonPaymentToBe003Fields(formContext, state.region);
-    }
-
-    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
-
-    if (state.paymentToToBe === 931440003 && state.concessionToBe === 931440000) {
-        setFieldVisible(formContext, "proto_wo_installation", true);
-    }
-}
-
-// パターン4/5の表示ルールを適用する。
-function applyPattern4And5Visibility(formContext, state, pattern) {
-    if (state.paymentToBe === 931440002 && state.region === "EU") {
-        setFieldVisible(formContext, "proto_wo_soassociation", true);
-    }
-
-    if (state.paymentToBe === 931440003) {
-        showCommonPaymentToBe003Fields(formContext, state.region);
-    }
-
-    if (pattern === 4 && state.paymentToBe === 931440007 && state.region === "EU") {
-        setFieldVisible(formContext, "proto_wo_installation", true);
-    }
-
-    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
-
-    if (state.paymentToToBe === 931440003 && state.concessionToBe === 931440000 && state.region === "EU") {
-        setFieldVisible(formContext, "proto_wo_installation", true);
-    }
-}
-
-// パターン6の表示ルールを適用する。
-function applyPattern6Visibility(formContext, state) {
-    if (state.paymentToBe === 931440002 && state.region === "EU") {
-        showFields(formContext, ["proto_wo_soassociation", "proto_wo_installation"]);
-    }
-
-    if (state.paymentToBe === 931440003) {
-        showCommonPaymentToBe003Fields(formContext, state.region);
-    }
-
-    showConcessionReasonIfNeeded(formContext, state.paymentToToBe);
-
-    if (state.paymentToToBe === 931440003 && state.concessionToBe === 931440000 && state.region === "EU") {
-        setFieldVisible(formContext, "proto_wo_installation", true);
-    }
-}
-
-// パターン7の表示ルールを適用する。
-function applyPattern7Visibility(formContext, state) {
-    if (state.paymentToBe === 931440002 && state.region === "EU") {
-        setFieldVisible(formContext, "proto_wo_soassociation", true);
-    }
-
-    if (state.paymentToBe === 931440003) {
-        showCommonPaymentToBe003Fields(formContext, state.region);
-    }
-
-    if (state.paymentToBe === 931440004 && state.region === "EU") {
-        setFieldVisible(formContext, "proto_wo_installation", true);
-    }
-}
-
-// 選択されたパターンの表示ルールを適用する。
-function applyConditionalVisibility(formContext, pattern) {
-    resetConditionalVisibility(formContext);
-
-    const state = getVisibilityState(formContext);
-
-    if (pattern === 1) {
-        applyPattern1Visibility(formContext, state);
-        return;
-    }
-
-    if (pattern === 2) {
-        applyPattern2Visibility(formContext, state);
-        return;
-    }
-
-    if (pattern === 3) {
-        applyPattern3Visibility(formContext, state);
-        return;
-    }
-
-    if (pattern === 4 || pattern === 5) {
-        applyPattern4And5Visibility(formContext, state, pattern);
-        return;
-    }
-
-    if (pattern === 6) {
-        applyPattern6Visibility(formContext, state);
-        return;
-    }
-
-    if (pattern === 7) {
-        applyPattern7Visibility(formContext, state);
-    }
-}
-
-// 選択肢を絞り込み、不正な選択値をクリアする。
-function applyFilterByValues(formContext, fieldName, allowedValues) {
-    const control = formContext.getControl(fieldName);
-    const attr = formContext.getAttribute(fieldName);
-    if (!control || !attr) return;
-
-    const source = attr.getOptions ? attr.getOptions() : control.getOptions();
-    const allowAll = !Array.isArray(allowedValues);
-    const allowedSet = new Set((allowedValues || []).map(function (value) { return Number(value); }));
-    const options = allowAll
-        ? source
-        : source.filter(function (opt) { return allowedSet.has(Number(opt.value)); });
-
-    control.clearOptions();
-    options.forEach(function (opt) {
-        control.addOption(opt);
-    });
-    control.setDisabled(options.length === 0);
-
-    const current = attr.getValue();
-    const hasCurrent = options.some(function (opt) {
-        return Number(opt.value) === Number(current);
-    });
-
-    if (current != null && !hasCurrent) {
-        attr.setValue(null);
-    }
-}
-
-// 選択肢適用前は支払関連コントロールを無効化する。
-function disablePaymentFields(formContext) {
-    PAYMENT_TARGET_FIELDS.forEach(function (fieldName) {
-        const control = formContext.getControl(fieldName);
-        if (control) control.setDisabled(true);
-    });
-}
-
-// WO種別からパターン情報とツリーを取得する。
-function getPaymentPatternInfo(formContext) {
-    const woTypeText = formContext.getAttribute("proto_wotype")?.getValue()?.[0]?.name || "";
-    const pattern = detectPatternFromWoType(woTypeText);
-    return {
-        pattern: pattern,
-        tree: pattern ? PAYMENT_TYPE_TREE[pattern] : null
+    // OptionSet: proto_test2
+    const PROTO_TEST2 = {
+        STARTUP: 931440000,
+        BILLABLE: 931440001,
+        NON_BILLABLE: 931440002
     };
-}
 
-// 支払ツリーに基づいて選択肢の絞り込みを順に適用する。
-function applyPaymentTreeFilters(formContext, tree) {
-    applyFilterByValues(formContext, "proto_billabletype", tree ? getChildKeys(tree) : []);
+    // OptionSet: proto_test3
+    const PROTO_TEST3 = {
+        STARTUP: 931440000,
+        PRE_WARRANTY: 931440001,
+        PAID: 931440002,
+        CONTRACT: 931440003,
+        CONCESSION: 931440004,
+        FCN_SI: 931440005,
+        EQUIPMENT_WARRANTY: 931440006,
+        MOD_WARRANTY: 931440007,
+        CREDIT: 931440008
+    };
 
-    const billableValue = getAttributeValue(formContext, "proto_billabletype");
-    const paymentTypeNode = getNodeByValue(tree, billableValue);
-    applyFilterByValues(formContext, "proto_payment_tobe", getChildKeys(paymentTypeNode));
+    // OptionSet: proto_test4
+    const PROTO_TEST4 = {
+        DSS: 931440000,
+        BU: 931440001,
+        FACTORY: 931440002,
+        GENPO: 931440003
+    };
 
-    const paymentTypeValue = getAttributeValue(formContext, "proto_payment_tobe");
-    const paymentToNode = getNodeByValue(paymentTypeNode, paymentTypeValue);
-    applyFilterByValues(formContext, "proto_paymentto_tobe", getChildKeys(paymentToNode));
+    // OptionSet: proto_test5
+    const PROTO_TEST5 = {
+        STRATEGIC: 931440000,
+        NON_STRATEGIC: 931440001
+    };
 
-    const paymentToValue = getAttributeValue(formContext, "proto_paymentto_tobe");
-    const concessionNode = getNodeByValue(paymentToNode, paymentToValue);
-    applyFilterByValues(formContext, "proto_concession_tobe", getChildKeys(concessionNode));
-}
+    // Lookup: proto_test11
+    const PROTO_TEST11 = {
+        CN: "GUID",
+        EU: "GUID",
+        JP: "GUID",
+        KR: "GUID",
+        SG: "GUID",
+        TW: "GUID",
+        US: "GUID"
+    };
 
-// Retrofit FCN番号の入力有無で FCN/SI ID の表示を切り替える。
-function onChangeRetrofitFcnNo(context) {
-    const formContext = context?.getFormContext?.();
-    if (!formContext) return;
+    // 表示制御対象
+    const REGION_FIELDS = [
+        "proto_test6",
+        "proto_test7",
+        "proto_test8",
+        "proto_test9",
+        "proto_test10",
+        "proto_test12",
+        "proto_test13",
+        "proto_test14",
+        "proto_test15"
+    ];
 
-    const value = getAttributeValue(formContext, "proto_tel_wo_retrofitfcnno");
-    const hasValue = Array.isArray(value) ? value.length > 0 : String(value || "").trim() !== "";
-    setFieldVisible(formContext, "proto_wo_fcnsiid", hasValue);
-}
+    // =========================
+    // 公開関数
+    // =========================
 
-// フォーム読込時に支払選択肢と表示状態を初期化する。
-function onLoadPaymentType(context) {
-    const formContext = context?.getFormContext?.();
-    if (!formContext) return;
+    // フォーム読み込み時に画面制御を更新する。
+    this.onLoad = (executionContext) => {
+        const formContext = executionContext.getFormContext();
+        this.refreshForm(formContext);
+    };
 
-    disablePaymentFields(formContext);
+    // 対象フィールド変更時に画面制御を更新する。
+    this.onChange = (executionContext) => {
+        const formContext = executionContext.getFormContext();
+        this.refreshForm(formContext);
+    };
 
-    const info = getPaymentPatternInfo(formContext);
-    applyFilterByValues(formContext, "proto_billabletype", info.tree ? getChildKeys(info.tree) : []);
-    applyConditionalVisibility(formContext, info.pattern);
-    toggleTabByWoType(context, WO_TYPE_VISIBLE_TAB_NAME);
-}
+    // =========================
+    // メイン処理
+    // =========================
 
-// 値変更時に支払選択肢と表示状態を再計算する。
-function onChangePaymentType(context) {
-    const formContext = context?.getFormContext?.();
-    if (!formContext) return;
+    // 入力状態に応じて選択肢と表示項目を再計算する。
+    this.refreshForm = (formContext) => {
+        const test1Id = this.getLookupId(formContext, "proto_test1");
+        const test11Id = this.getLookupId(formContext, "proto_test11");
 
-    const info = getPaymentPatternInfo(formContext);
-    applyPaymentTreeFilters(formContext, info.tree);
-    applyConditionalVisibility(formContext, info.pattern);
-    toggleTabByWoType(context, WO_TYPE_VISIBLE_TAB_NAME);
-}
+        const test2 = this.getOptionValue(formContext, "proto_test2");
+        const test3 = this.getOptionValue(formContext, "proto_test3");
+        const test4 = this.getOptionValue(formContext, "proto_test4");
+        const test5 = this.getOptionValue(formContext, "proto_test5");
 
-// WO種別に応じて指定タブの表示/非表示を切り替える。
-function toggleTabByWoType(context) {
-    const formContext = context?.getFormContext?.();
-    const tabName = "tab_14";
-    if (!formContext || !tabName) return;
+        this.resetRegionFields(formContext);
+        this.resetOptionControls(formContext);
 
-    const woTypeText = getAttributeValue(formContext, "proto_wotype")?.[0]?.name || "";
-    const text = normalizeText(woTypeText);
-    const shouldShow = text.includes("modification") || text.includes("software installation");
-    const modificationEquipmentTab = formContext.ui.tabs.get(tabName);
+        // proto_test1 が未選択なら後続をすべて読み取り
+        if (!test1Id) {
+            this.setDisabled(formContext, "proto_test2", true);
+            this.setDisabled(formContext, "proto_test3", true);
+            this.setDisabled(formContext, "proto_test4", true);
+            this.setDisabled(formContext, "proto_test5", true);
+            return;
+        }
 
-    if (modificationEquipmentTab) modificationEquipmentTab.setVisible(shouldShow);
-}
+        // proto_test2 制御
+        const test2Options = this.getAllowedProtoTest2(test1Id);
+        this.applyOptions(formContext, "proto_test2", test2Options);
 
-// フォームイベントで使っている既存エイリアスを維持する。
-function filterPaymentType(context) {
-    onChangePaymentType(context);
-}
+        // proto_test3 制御
+        if (test2 !== null) {
+            const test3Options = this.getAllowedProtoTest3(test1Id, test2);
+            this.applyOptions(formContext, "proto_test3", test3Options);
+        } else {
+            this.clearField(formContext, "proto_test3");
+            this.clearField(formContext, "proto_test4");
+            this.clearField(formContext, "proto_test5");
+            this.setDisabled(formContext, "proto_test3", true);
+            this.setDisabled(formContext, "proto_test4", true);
+            this.setDisabled(formContext, "proto_test5", true);
+            return;
+        }
+
+        // proto_test4 制御
+        if (test3 !== null) {
+            const test4Options = this.getAllowedProtoTest4(test1Id, test2, test3);
+            this.applyOptions(formContext, "proto_test4", test4Options);
+        } else {
+            this.clearField(formContext, "proto_test4");
+            this.clearField(formContext, "proto_test5");
+            this.setDisabled(formContext, "proto_test4", true);
+            this.setDisabled(formContext, "proto_test5", true);
+            this.showRegionFields(formContext, test1Id, test2, null, null, null, test11Id);
+            return;
+        }
+
+        // proto_test5 制御
+        if (test4 !== null) {
+            const test5Options = this.getAllowedProtoTest5(test1Id, test2, test3, test4);
+            this.applyOptions(formContext, "proto_test5", test5Options);
+        } else {
+            this.clearField(formContext, "proto_test5");
+            this.setDisabled(formContext, "proto_test5", true);
+        }
+
+        // 地域固有表示
+        this.showRegionFields(formContext, test1Id, test2, test3, test4, test5, test11Id);
+    };
+
+    // =========================
+    // パターン判定
+    // =========================
+
+    // PROTO_TEST1 の値から PROTO_TEST2 の許可選択肢を返す。
+    this.getAllowedProtoTest2 = (test1Id) => {
+        // パターン1
+        if (this.isLookupId(test1Id, PROTO_TEST1.STARTUP)) {
+            return [
+                this.option("Startup", PROTO_TEST2.STARTUP),
+                this.option("Billable", PROTO_TEST2.BILLABLE),
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        // パターン2
+        if (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)) {
+            return [
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        // パターン3
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+            this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+            this.isLookupId(test1Id, PROTO_TEST1.REPAIR)
+        ) {
+            return [
+                this.option("Billable", PROTO_TEST2.BILLABLE),
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        // パターン4
+        if (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR)) {
+            return [
+                this.option("Startup", PROTO_TEST2.STARTUP),
+                this.option("Billable", PROTO_TEST2.BILLABLE),
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        // パターン5
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)
+        ) {
+            return [
+                this.option("Startup", PROTO_TEST2.STARTUP),
+                this.option("Billable", PROTO_TEST2.BILLABLE),
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        // パターン6
+        if (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION)) {
+            return [
+                this.option("Startup", PROTO_TEST2.STARTUP),
+                this.option("Billable", PROTO_TEST2.BILLABLE),
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        // パターン7
+        if (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) {
+            return [
+                this.option("Billable", PROTO_TEST2.BILLABLE),
+                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+            ];
+        }
+
+        return [];
+    };
+
+    // PROTO_TEST1 と PROTO_TEST2 の値から PROTO_TEST3 の許可選択肢を返す。
+    this.getAllowedProtoTest3 = (test1Id, test2) => {
+        // パターン1 STARTUP
+        if (this.isLookupId(test1Id, PROTO_TEST1.STARTUP)) {
+            if (test2 === PROTO_TEST2.STARTUP) {
+                return [
+                    this.option("Startup", PROTO_TEST3.STARTUP),
+                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                ];
+            }
+            if (test2 === PROTO_TEST2.BILLABLE) {
+                return [
+                    this.option("Paid", PROTO_TEST3.PAID),
+                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                ];
+            }
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        // パターン2 FCN_SI
+        if (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)) {
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("fcn_si", PROTO_TEST3.FCN_SI),
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        // パターン3
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+            this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+            this.isLookupId(test1Id, PROTO_TEST1.REPAIR)
+        ) {
+            if (test2 === PROTO_TEST2.BILLABLE) {
+                return [
+                    this.option("Paid", PROTO_TEST3.PAID),
+                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                ];
+            }
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        // パターン4 TROUBLESHOOTING_REPAIR
+        if (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR)) {
+            if (test2 === PROTO_TEST2.STARTUP) {
+                return [
+                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                ];
+            }
+            if (test2 === PROTO_TEST2.BILLABLE) {
+                return [
+                    this.option("Paid", PROTO_TEST3.PAID),
+                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                ];
+            }
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("equipment_warranty", PROTO_TEST3.EQUIPMENT_WARRANTY),
+                    this.option("mod_warranty", PROTO_TEST3.MOD_WARRANTY),
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        // パターン5 PROCESS_APPLICATION / CONSAULTING_ANALYSIS
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)
+        ) {
+            if (test2 === PROTO_TEST2.STARTUP) {
+                return [
+                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                ];
+            }
+            if (test2 === PROTO_TEST2.BILLABLE) {
+                return [
+                    this.option("Paid", PROTO_TEST3.PAID),
+                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                ];
+            }
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("equipment_warranty", PROTO_TEST3.EQUIPMENT_WARRANTY),
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        // パターン6 SOFTWARE_INSTALLATION
+        if (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION)) {
+            if (test2 === PROTO_TEST2.STARTUP) {
+                return [
+                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                ];
+            }
+            if (test2 === PROTO_TEST2.BILLABLE) {
+                return [
+                    this.option("Paid", PROTO_TEST3.PAID),
+                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                ];
+            }
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        // パターン7 CUSTOMER_TRAINING
+        if (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) {
+            if (test2 === PROTO_TEST2.BILLABLE) {
+                return [
+                    this.option("Paid", PROTO_TEST3.PAID),
+                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                ];
+            }
+            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+                return [
+                    this.option("Credit", PROTO_TEST3.CREDIT),
+                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                ];
+            }
+        }
+
+        return [];
+    };
+
+    // PROTO_TEST1〜PROTO_TEST3 の値から PROTO_TEST4 の許可選択肢を返す。
+    this.getAllowedProtoTest4 = (test1Id, test2, test3) => {
+        // proto_test4 を使わない場合
+        if (
+            test3 === PROTO_TEST3.STARTUP ||
+            test3 === PROTO_TEST3.PRE_WARRANTY ||
+            test3 === PROTO_TEST3.EQUIPMENT_WARRANTY ||
+            test3 === PROTO_TEST3.MOD_WARRANTY
+        ) {
+            return [];
+        }
+
+        // STARTUP + BILLABLE + PAID
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+            test2 === PROTO_TEST2.BILLABLE &&
+            test3 === PROTO_TEST3.PAID
+        ) {
+            return [
+                this.option("dss", PROTO_TEST4.DSS),
+                this.option("Bu", PROTO_TEST4.BU)
+            ];
+        }
+
+        // STARTUP + NON_BILLABLE + CONCESSION
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+            test2 === PROTO_TEST2.NON_BILLABLE &&
+            test3 === PROTO_TEST3.CONCESSION
+        ) {
+            return [
+                this.option("Bu", PROTO_TEST4.BU),
+                this.option("Factory", PROTO_TEST4.FACTORY)
+            ];
+        }
+
+        // FCN_SI
+        if (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)) {
+            if (test3 === PROTO_TEST3.FCN_SI) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CONCESSION) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU),
+                    this.option("Factory", PROTO_TEST4.FACTORY),
+                    this.option("Genpo", PROTO_TEST4.GENPO)
+                ];
+            }
+        }
+
+        // パターン3
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+            this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+            this.isLookupId(test1Id, PROTO_TEST1.REPAIR)
+        ) {
+            if (test3 === PROTO_TEST3.PAID) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CONCESSION) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU),
+                    this.option("Factory", PROTO_TEST4.FACTORY),
+                    this.option("Genpo", PROTO_TEST4.GENPO)
+                ];
+            }
+        }
+
+        // TROUBLESHOOTING_REPAIR
+        if (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR)) {
+            if (test3 === PROTO_TEST3.PAID) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CONCESSION) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU),
+                    this.option("Factory", PROTO_TEST4.FACTORY),
+                    this.option("Genpo", PROTO_TEST4.GENPO)
+                ];
+            }
+        }
+
+        // PROCESS_APPLICATION / CONSAULTING_ANALYSIS
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+            this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)
+        ) {
+            if (test3 === PROTO_TEST3.PAID) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CONCESSION) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU),
+                    this.option("Factory", PROTO_TEST4.FACTORY),
+                    this.option("Genpo", PROTO_TEST4.GENPO)
+                ];
+            }
+        }
+
+        // SOFTWARE_INSTALLATION
+        if (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION)) {
+            if (test3 === PROTO_TEST3.PAID) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CONCESSION) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU),
+                    this.option("Factory", PROTO_TEST4.FACTORY),
+                    this.option("Genpo", PROTO_TEST4.GENPO)
+                ];
+            }
+        }
+
+        // CUSTOMER_TRAINING
+        if (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) {
+            if (test3 === PROTO_TEST3.PAID) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CREDIT) {
+                return [
+                    this.option("dss", PROTO_TEST4.DSS),
+                    this.option("Bu", PROTO_TEST4.BU)
+                ];
+            }
+            if (test3 === PROTO_TEST3.CONCESSION) {
+                return [
+                    this.option("Genpo", PROTO_TEST4.GENPO)
+                ];
+            }
+        }
+
+        return [];
+    };
+
+    // PROTO_TEST1〜PROTO_TEST4 の値から PROTO_TEST5 の許可選択肢を返す。
+    this.getAllowedProtoTest5 = (test1Id, test2, test3, test4) => {
+        // proto_test5 を使わない場合
+        if (
+            test4 !== PROTO_TEST4.DSS &&
+            test4 !== PROTO_TEST4.BU &&
+            test4 !== PROTO_TEST4.FACTORY &&
+            test4 !== PROTO_TEST4.GENPO
+        ) {
+            return [];
+        }
+
+        // STARTUP + CONCESSION + FACTORY = NON_STRATEGIC★
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+            test2 === PROTO_TEST2.NON_BILLABLE &&
+            test3 === PROTO_TEST3.CONCESSION &&
+            test4 === PROTO_TEST4.FACTORY
+        ) {
+            return [
+                this.option("non_strategic", PROTO_TEST5.NON_STRATEGIC)
+            ];
+        }
+
+        // CUSTOMER_TRAINING + NON_BILLABLE + CONCESSION + GENPO = STRATEGIC★
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+            test2 === PROTO_TEST2.NON_BILLABLE &&
+            test3 === PROTO_TEST3.CONCESSION &&
+            test4 === PROTO_TEST4.GENPO
+        ) {
+            return [
+                this.option("Strategic", PROTO_TEST5.STRATEGIC)
+            ];
+        }
+
+        // proto_test5 不要ケース
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+            test2 === PROTO_TEST2.BILLABLE &&
+            test3 === PROTO_TEST3.PAID
+        ) {
+            return [];
+        }
+
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.FCN_SI) &&
+            test3 === PROTO_TEST3.FCN_SI
+        ) {
+            return [];
+        }
+
+        if (
+            (this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+                this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+                this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
+            test3 === PROTO_TEST3.PAID
+        ) {
+            return [];
+        }
+
+        if (
+            (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) ||
+                this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS) ||
+                this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) &&
+            (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CREDIT)
+        ) {
+            return [];
+        }
+
+        // 残りは基本 STRATEGIC / NON_STRATEGIC
+        return [
+            this.option("Strategic", PROTO_TEST5.STRATEGIC),
+            this.option("non_strategic", PROTO_TEST5.NON_STRATEGIC)
+        ];
+    };
+
+    // =========================
+    // 地域固有条件
+    // =========================
+
+    // 地域と選択状態の組み合わせに応じて地域項目を表示する。
+    this.showRegionFields = (formContext, test1Id, test2, test3, test4, test5, test11Id) => {
+        if (!test11Id) {
+            return;
+        }
+
+        // ① proto_test11 = JP or US -> proto_test6
+        if (
+            this.isLookupId(test11Id, PROTO_TEST11.JP) ||
+            this.isLookupId(test11Id, PROTO_TEST11.US)
+        ) {
+            if (
+                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+                test2 === PROTO_TEST2.STARTUP &&
+                (test3 === PROTO_TEST3.STARTUP || test3 === PROTO_TEST3.PRE_WARRANTY)
+            ) {
+                this.showField(formContext, "proto_test6");
+            }
+
+            if (
+                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.PAID
+            ) {
+                this.showField(formContext, "proto_test6");
+            }
+        }
+
+        // ② proto_test11 = EU -> proto_test7
+        if (this.isLookupId(test11Id, PROTO_TEST11.EU)) {
+            if (
+                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+                test2 === PROTO_TEST2.STARTUP &&
+                test3 === PROTO_TEST3.STARTUP
+            ) {
+                this.showField(formContext, "proto_test7");
+            }
+
+            if (
+                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.PAID
+            ) {
+                this.showField(formContext, "proto_test7");
+            }
+        }
+
+        // ③ proto_test8 / proto_test9 表示
+        if (
+            (this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.CONTRACT) ||
+
+            (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.CONTRACT) ||
+
+            ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.CONTRACT) ||
+
+            (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.CONTRACT) ||
+
+            (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+                test2 === PROTO_TEST2.BILLABLE &&
+                test3 === PROTO_TEST3.CONTRACT)
+        ) {
+            this.showField(formContext, "proto_test8");
+            this.showField(formContext, "proto_test9");
+        }
+
+        // ④ proto_test10 表示
+        if (
+            test4 === PROTO_TEST4.FACTORY
+        ) {
+            this.showField(formContext, "proto_test10");
+        }
+
+        // ⑤ FCN_SI -> proto_test12 / proto_test13
+        if (
+            this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)
+        ) {
+            this.showField(formContext, "proto_test12");
+            this.showField(formContext, "proto_test13");
+        }
+
+        // ⑥ proto_test11 = EU かつ GENPO + STRATEGIC 系
+        if (this.isLookupId(test11Id, PROTO_TEST11.EU)) {
+            if (
+                (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI) &&
+                    test3 === PROTO_TEST3.CONCESSION &&
+                    test4 === PROTO_TEST4.GENPO &&
+                    test5 === PROTO_TEST5.STRATEGIC) ||
+
+                ((this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
+                    test3 === PROTO_TEST3.CONCESSION &&
+                    test4 === PROTO_TEST4.GENPO &&
+                    test5 === PROTO_TEST5.STRATEGIC) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
+                    ((test3 === PROTO_TEST3.MOD_WARRANTY) ||
+                        (test3 === PROTO_TEST3.CONCESSION &&
+                            test4 === PROTO_TEST4.GENPO &&
+                            test5 === PROTO_TEST5.STRATEGIC))) ||
+
+                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
+                    test3 === PROTO_TEST3.CONCESSION &&
+                    test4 === PROTO_TEST4.GENPO &&
+                    test5 === PROTO_TEST5.STRATEGIC) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
+                    test3 === PROTO_TEST3.CONCESSION &&
+                    test4 === PROTO_TEST4.GENPO &&
+                    test5 === PROTO_TEST5.STRATEGIC) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+                    test3 === PROTO_TEST3.CONCESSION)
+            ) {
+                this.showField(formContext, "proto_test14");
+            }
+        }
+
+        // ⑦ proto_test11 = SG or TW -> proto_test15
+        if (
+            this.isLookupId(test11Id, PROTO_TEST11.SG) ||
+            this.isLookupId(test11Id, PROTO_TEST11.TW)
+        ) {
+            if (
+                ((this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.PAID) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT)) ||
+
+                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT)) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT)) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT))
+            ) {
+                this.showField(formContext, "proto_test15");
+            }
+        }
+
+        // ⑧ proto_test11 = EU or CN or KR -> proto_test14 + proto_test7
+        if (
+            this.isLookupId(test11Id, PROTO_TEST11.EU) ||
+            this.isLookupId(test11Id, PROTO_TEST11.CN) ||
+            this.isLookupId(test11Id, PROTO_TEST11.KR)
+        ) {
+            if (
+                ((this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.OH) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.PM) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT))
+            ) {
+                this.showField(formContext, "proto_test14");
+                this.showField(formContext, "proto_test7");
+            }
+        }
+
+        // ⑨ proto_test11 = EU or CN or KR -> proto_test7
+        if (
+            this.isLookupId(test11Id, PROTO_TEST11.EU) ||
+            this.isLookupId(test11Id, PROTO_TEST11.CN) ||
+            this.isLookupId(test11Id, PROTO_TEST11.KR)
+        ) {
+            if (
+                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.PAID) ||
+
+                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.PAID) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.PAID) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT)
+            ) {
+                this.showField(formContext, "proto_test7");
+            }
+        }
+
+        // ⑩ proto_test11 = CN or KR -> proto_test7
+        if (
+            this.isLookupId(test11Id, PROTO_TEST11.CN) ||
+            this.isLookupId(test11Id, PROTO_TEST11.KR)
+        ) {
+            if (
+                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT) ||
+
+                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.PAID)
+            ) {
+                this.showField(formContext, "proto_test7");
+            }
+        }
+
+        // 11 proto_test11 = EU -> proto_test14 + proto_test7
+        if (this.isLookupId(test11Id, PROTO_TEST11.EU)) {
+            if (
+                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT) ||
+
+                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
+                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.PAID) ||
+
+                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
+                    test2 === PROTO_TEST2.BILLABLE &&
+                    test3 === PROTO_TEST3.CONTRACT)
+            ) {
+                this.showField(formContext, "proto_test14");
+                this.showField(formContext, "proto_test7");
+            }
+        }
+    };
+
+    // =========================
+    // 共通関数
+    // =========================
+
+    // OptionSet 用の選択肢オブジェクトを生成する。
+    this.option = (text, value) => {
+        return {
+            text: text,
+            value: value
+        };
+    };
+
+    // Lookup フィールドから GUID を取得して正規化する。
+    this.getLookupId = (formContext, fieldName) => {
+        const attr = formContext.getAttribute(fieldName);
+        if (!attr) {
+            return null;
+        }
+
+        const value = attr.getValue();
+        if (!value || value.length === 0 || !value[0].id) {
+            return null;
+        }
+
+        return this.normalizeGuid(value[0].id);
+    };
+
+    // OptionSet フィールドの値を取得する。
+    this.getOptionValue = (formContext, fieldName) => {
+        const attr = formContext.getAttribute(fieldName);
+        if (!attr) {
+            return null;
+        }
+
+        const value = attr.getValue();
+        return value === null || value === undefined ? null : value;
+    };
+
+    // GUID の波括弧を除去して小文字に正規化する。
+    this.normalizeGuid = (id) => {
+        if (!id) {
+            return "";
+        }
+        return id.replace("{", "").replace("}", "").toLowerCase();
+    };
+
+    // 2つの GUID を正規化して一致判定する。
+    this.isLookupId = (actualId, expectedId) => {
+        return this.normalizeGuid(actualId) === this.normalizeGuid(expectedId);
+    };
+
+    // 指定フィールドの値をクリアして変更イベントを発火する。
+    this.clearField = (formContext, fieldName) => {
+        const attr = formContext.getAttribute(fieldName);
+        if (attr) {
+            attr.setValue(null);
+            attr.fireOnChange();
+        }
+    };
+
+    // 指定コントロールの活性状態を切り替える。
+    this.setDisabled = (formContext, fieldName, disabled) => {
+        const ctrl = formContext.getControl(fieldName);
+        if (ctrl) {
+            ctrl.setDisabled(disabled);
+        }
+    };
+
+    // 指定コントロールを表示する。
+    this.showField = (formContext, fieldName) => {
+        const ctrl = formContext.getControl(fieldName);
+        if (ctrl) {
+            ctrl.setVisible(true);
+        }
+    };
+
+    // 指定コントロールを非表示にする。
+    this.hideField = (formContext, fieldName) => {
+        const ctrl = formContext.getControl(fieldName);
+        if (ctrl) {
+            ctrl.setVisible(false);
+        }
+    };
+
+    // 地域表示対象フィールドをすべて非表示に戻す。
+    this.resetRegionFields = (formContext) => {
+        for (let i = 0; i < REGION_FIELDS.length; i++) {
+            this.hideField(formContext, REGION_FIELDS[i]);
+        }
+    };
+
+    // 連動する OptionSet コントロールを有効化する。
+    this.resetOptionControls = (formContext) => {
+        this.setDisabled(formContext, "proto_test2", false);
+        this.setDisabled(formContext, "proto_test3", false);
+        this.setDisabled(formContext, "proto_test4", false);
+        this.setDisabled(formContext, "proto_test5", false);
+    };
+
+    // 指定フィールドへ選択肢を適用し現在値の整合性を保つ。
+    this.applyOptions = (formContext, fieldName, options) => {
+        const ctrl = formContext.getControl(fieldName);
+        const attr = formContext.getAttribute(fieldName);
+
+        if (!ctrl || !attr) {
+            return;
+        }
+
+        ctrl.clearOptions();
+
+        for (let i = 0; i < options.length; i++) {
+            ctrl.addOption({
+                text: options[i].text,
+                value: options[i].value
+            });
+        }
+
+        const currentValue = attr.getValue();
+        let valid = false;
+
+        for (let j = 0; j < options.length; j++) {
+            if (options[j].value === currentValue) {
+                valid = true;
+                break;
+            }
+        }
+
+        if (!valid) {
+            attr.setValue(null);
+        }
+
+        if (options.length === 0) {
+            attr.setValue(null);
+            ctrl.setDisabled(true);
+            return;
+        }
+
+        if (options.length === 1) {
+            attr.setValue(options[0].value);
+            ctrl.setDisabled(true);
+            return;
+        }
+
+        ctrl.setDisabled(false);
+    };
+})();
