@@ -117,10 +117,10 @@ var ProtoForm = window.ProtoForm || {};
 
         // proto_wotype が未選択なら後続をすべて読み取り
         if (!woTypeId) {
-            this.setDisabled(formContext, "proto_billabletype", true);
-            this.setDisabled(formContext, "proto_payment_tobe", true);
-            this.setDisabled(formContext, "proto_paymentto_tobe", true);
-            this.setDisabled(formContext, "proto_concession_tobe", true);
+            this.applyOptions(formContext, "proto_billabletype", []);
+            this.applyOptions(formContext, "proto_payment_tobe", []);
+            this.applyOptions(formContext, "proto_paymentto_tobe", []);
+            this.applyOptions(formContext, "proto_concession_tobe", []);
             return;
         }
 
