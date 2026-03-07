@@ -107,10 +107,10 @@ var ProtoForm = window.ProtoForm || {};
         const woTypeId = this.getLookupId(formContext, "proto_wotype");
         const regionId = this.getLookupId(formContext, "proto_region");
 
-        const billableType = this.getOptionValue(formContext, "proto_billabletype");
-        const paymentTobe = this.getOptionValue(formContext, "proto_payment_tobe");
-        const paymentToTobe = this.getOptionValue(formContext, "proto_paymentto_tobe");
-        const concessionTobe = this.getOptionValue(formContext, "proto_concession_tobe");
+        let billableType = this.getOptionValue(formContext, "proto_billabletype");
+        let paymentTobe = this.getOptionValue(formContext, "proto_payment_tobe");
+        let paymentToTobe = this.getOptionValue(formContext, "proto_paymentto_tobe");
+        let concessionTobe = this.getOptionValue(formContext, "proto_concession_tobe");
 
         this.resetRegionFields(formContext);
         this.resetOptionControls(formContext);
@@ -127,11 +127,13 @@ var ProtoForm = window.ProtoForm || {};
         // proto_billabletype 制御
         const billableTypeOptions = this.getAllowedBillableTypeOptions(woTypeId);
         this.applyOptions(formContext, "proto_billabletype", billableTypeOptions);
+        billableType = this.getOptionValue(formContext, "proto_billabletype");
 
         // proto_payment_tobe 制御
         if (billableType !== null) {
             const paymentTobeOptions = this.getAllowedPaymentTobeOptions(woTypeId, billableType);
             this.applyOptions(formContext, "proto_payment_tobe", paymentTobeOptions);
+            paymentTobe = this.getOptionValue(formContext, "proto_payment_tobe");
         } else {
             this.clearField(formContext, "proto_payment_tobe");
             this.clearField(formContext, "proto_paymentto_tobe");
@@ -146,6 +148,7 @@ var ProtoForm = window.ProtoForm || {};
         if (paymentTobe !== null) {
             const paymentToTobeOptions = this.getAllowedPaymentToTobeOptions(woTypeId, billableType, paymentTobe);
             this.applyOptions(formContext, "proto_paymentto_tobe", paymentToTobeOptions);
+            paymentToTobe = this.getOptionValue(formContext, "proto_paymentto_tobe");
         } else {
             this.clearField(formContext, "proto_paymentto_tobe");
             this.clearField(formContext, "proto_concession_tobe");
@@ -159,9 +162,11 @@ var ProtoForm = window.ProtoForm || {};
         if (paymentToTobe !== null) {
             const concessionTobeOptions = this.getAllowedConcessionTobeOptions(woTypeId, billableType, paymentTobe, paymentToTobe);
             this.applyOptions(formContext, "proto_concession_tobe", concessionTobeOptions);
+            concessionTobe = this.getOptionValue(formContext, "proto_concession_tobe");
         } else {
             this.clearField(formContext, "proto_concession_tobe");
             this.setDisabled(formContext, "proto_concession_tobe", true);
+            concessionTobe = null;
         }
 
         // 地域固有表示
