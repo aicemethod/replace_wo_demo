@@ -682,7 +682,8 @@ var ProtoForm = window.ProtoForm || {};
             if (
                 this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
                 billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
-                paymentTobe === PAYMENT_TOBE_OPTIONS.PAID
+                (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID ||
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)
             ) {
                 this.showField(formContext, "proto_wo_soassociation");
             }
