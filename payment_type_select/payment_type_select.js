@@ -1,4 +1,5 @@
-const ProtoForm = new (function () {
+var ProtoForm = window.ProtoForm || {};
+(function () {
     "use strict";
 
     // =========================
@@ -1052,4 +1053,4 @@ const ProtoForm = new (function () {
 
         ctrl.setDisabled(false);
     };
-})();
+}).call(ProtoForm);
