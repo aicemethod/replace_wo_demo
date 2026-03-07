@@ -114,6 +114,7 @@ var ProtoForm = window.ProtoForm || {};
 
         this.resetRegionFields(formContext);
         this.resetOptionControls(formContext);
+        this.updateTab14Visibility(formContext, woTypeId);
 
         // proto_wotype が未選択なら後続をすべて読み取り
         if (!woTypeId) {
@@ -995,6 +996,22 @@ var ProtoForm = window.ProtoForm || {};
         const ctrl = formContext.getControl(fieldName);
         if (ctrl) {
             ctrl.setVisible(false);
+        }
+    };
+
+    // tab_14 を wotype に応じて表示/非表示にする。
+    this.updateTab14Visibility = (formContext, woTypeId) => {
+        const shouldShowTab14 =
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION);
+        this.setTabVisible(formContext, "tab_14", shouldShowTab14);
+    };
+
+    // 指定タブの表示状態を切り替える。
+    this.setTabVisible = (formContext, tabName, visible) => {
+        const tab = formContext.ui.tabs.get(tabName);
+        if (tab) {
+            tab.setVisible(visible);
         }
     };
 
