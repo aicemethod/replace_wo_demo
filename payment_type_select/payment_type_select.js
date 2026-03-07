@@ -6,8 +6,8 @@ var ProtoForm = window.ProtoForm || {};
     // 定数
     // =========================
 
-    // Lookup: proto_test1
-    const PROTO_TEST1 = {
+    // Lookup: proto_wotype
+    const WO_TYPE_LOOKUP = {
         STARTUP: "GUID",
         FCN_SI: "GUID",
         RE_LOCATION: "GUID",
@@ -24,15 +24,15 @@ var ProtoForm = window.ProtoForm || {};
         CUSTOMER_TRAINING: "GUID"
     };
 
-    // OptionSet: proto_test2
-    const PROTO_TEST2 = {
+    // OptionSet: proto_billabletype
+    const BILLABLE_TYPE_OPTIONS = {
         STARTUP: 931440000,
         BILLABLE: 931440001,
         NON_BILLABLE: 931440002
     };
 
-    // OptionSet: proto_test3
-    const PROTO_TEST3 = {
+    // OptionSet: proto_payment_tobe
+    const PAYMENT_TOBE_OPTIONS = {
         STARTUP: 931440000,
         PRE_WARRANTY: 931440001,
         PAID: 931440002,
@@ -44,22 +44,22 @@ var ProtoForm = window.ProtoForm || {};
         CREDIT: 931440008
     };
 
-    // OptionSet: proto_test4
-    const PROTO_TEST4 = {
+    // OptionSet: proto_paymentto_tobe
+    const PAYMENT_TO_TOBE_OPTIONS = {
         DSS: 931440000,
         BU: 931440001,
         FACTORY: 931440002,
         GENPO: 931440003
     };
 
-    // OptionSet: proto_test5
-    const PROTO_TEST5 = {
+    // OptionSet: proto_concession_tobe
+    const CONCESSION_TOBE_OPTIONS = {
         STRATEGIC: 931440000,
         NON_STRATEGIC: 931440001
     };
 
-    // Lookup: proto_test11
-    const PROTO_TEST11 = {
+    // Lookup: proto_region
+    const REGION_LOOKUP = {
         CN: "GUID",
         EU: "GUID",
         JP: "GUID",
@@ -70,16 +70,16 @@ var ProtoForm = window.ProtoForm || {};
     };
 
     // 表示制御対象
-    const REGION_FIELDS = [
-        "proto_test6",
-        "proto_test7",
-        "proto_test8",
-        "proto_test9",
-        "proto_test10",
-        "proto_test12",
-        "proto_test13",
-        "proto_test14",
-        "proto_test15"
+    const REGION_DEPENDENT_FIELDS = [
+        "proto_primaryso",
+        "proto_wo_soassociation",
+        "proto_cnt_contractsummary",
+        "proto_tel_wo_sow",
+        "proto_tel_wo_concession_reason",
+        "proto_tel_wo_retrofitfcnno",
+        "proto_tel_wo_continuouswork",
+        "proto_wo_installation",
+        "proto_wo_tmp_so_no_text"
     ];
 
     // =========================
@@ -104,283 +104,283 @@ var ProtoForm = window.ProtoForm || {};
 
     // 入力状態に応じて選択肢と表示項目を再計算する。
     this.refreshForm = (formContext) => {
-        const test1Id = this.getLookupId(formContext, "proto_test1");
-        const test11Id = this.getLookupId(formContext, "proto_test11");
+        const woTypeId = this.getLookupId(formContext, "proto_wotype");
+        const regionId = this.getLookupId(formContext, "proto_region");
 
-        const test2 = this.getOptionValue(formContext, "proto_test2");
-        const test3 = this.getOptionValue(formContext, "proto_test3");
-        const test4 = this.getOptionValue(formContext, "proto_test4");
-        const test5 = this.getOptionValue(formContext, "proto_test5");
+        const billableType = this.getOptionValue(formContext, "proto_billabletype");
+        const paymentTobe = this.getOptionValue(formContext, "proto_payment_tobe");
+        const paymentToTobe = this.getOptionValue(formContext, "proto_paymentto_tobe");
+        const concessionTobe = this.getOptionValue(formContext, "proto_concession_tobe");
 
         this.resetRegionFields(formContext);
         this.resetOptionControls(formContext);
 
-        // proto_test1 が未選択なら後続をすべて読み取り
-        if (!test1Id) {
-            this.setDisabled(formContext, "proto_test2", true);
-            this.setDisabled(formContext, "proto_test3", true);
-            this.setDisabled(formContext, "proto_test4", true);
-            this.setDisabled(formContext, "proto_test5", true);
+        // proto_wotype が未選択なら後続をすべて読み取り
+        if (!woTypeId) {
+            this.setDisabled(formContext, "proto_billabletype", true);
+            this.setDisabled(formContext, "proto_payment_tobe", true);
+            this.setDisabled(formContext, "proto_paymentto_tobe", true);
+            this.setDisabled(formContext, "proto_concession_tobe", true);
             return;
         }
 
-        // proto_test2 制御
-        const test2Options = this.getAllowedProtoTest2(test1Id);
-        this.applyOptions(formContext, "proto_test2", test2Options);
+        // proto_billabletype 制御
+        const billableTypeOptions = this.getAllowedBillableTypeOptions(woTypeId);
+        this.applyOptions(formContext, "proto_billabletype", billableTypeOptions);
 
-        // proto_test3 制御
-        if (test2 !== null) {
-            const test3Options = this.getAllowedProtoTest3(test1Id, test2);
-            this.applyOptions(formContext, "proto_test3", test3Options);
+        // proto_payment_tobe 制御
+        if (billableType !== null) {
+            const paymentTobeOptions = this.getAllowedPaymentTobeOptions(woTypeId, billableType);
+            this.applyOptions(formContext, "proto_payment_tobe", paymentTobeOptions);
         } else {
-            this.clearField(formContext, "proto_test3");
-            this.clearField(formContext, "proto_test4");
-            this.clearField(formContext, "proto_test5");
-            this.setDisabled(formContext, "proto_test3", true);
-            this.setDisabled(formContext, "proto_test4", true);
-            this.setDisabled(formContext, "proto_test5", true);
+            this.clearField(formContext, "proto_payment_tobe");
+            this.clearField(formContext, "proto_paymentto_tobe");
+            this.clearField(formContext, "proto_concession_tobe");
+            this.setDisabled(formContext, "proto_payment_tobe", true);
+            this.setDisabled(formContext, "proto_paymentto_tobe", true);
+            this.setDisabled(formContext, "proto_concession_tobe", true);
             return;
         }
 
-        // proto_test4 制御
-        if (test3 !== null) {
-            const test4Options = this.getAllowedProtoTest4(test1Id, test2, test3);
-            this.applyOptions(formContext, "proto_test4", test4Options);
+        // proto_paymentto_tobe 制御
+        if (paymentTobe !== null) {
+            const paymentToTobeOptions = this.getAllowedPaymentToTobeOptions(woTypeId, billableType, paymentTobe);
+            this.applyOptions(formContext, "proto_paymentto_tobe", paymentToTobeOptions);
         } else {
-            this.clearField(formContext, "proto_test4");
-            this.clearField(formContext, "proto_test5");
-            this.setDisabled(formContext, "proto_test4", true);
-            this.setDisabled(formContext, "proto_test5", true);
-            this.showRegionFields(formContext, test1Id, test2, null, null, null, test11Id);
+            this.clearField(formContext, "proto_paymentto_tobe");
+            this.clearField(formContext, "proto_concession_tobe");
+            this.setDisabled(formContext, "proto_paymentto_tobe", true);
+            this.setDisabled(formContext, "proto_concession_tobe", true);
+            this.showRegionFields(formContext, woTypeId, billableType, null, null, null, regionId);
             return;
         }
 
-        // proto_test5 制御
-        if (test4 !== null) {
-            const test5Options = this.getAllowedProtoTest5(test1Id, test2, test3, test4);
-            this.applyOptions(formContext, "proto_test5", test5Options);
+        // proto_concession_tobe 制御
+        if (paymentToTobe !== null) {
+            const concessionTobeOptions = this.getAllowedConcessionTobeOptions(woTypeId, billableType, paymentTobe, paymentToTobe);
+            this.applyOptions(formContext, "proto_concession_tobe", concessionTobeOptions);
         } else {
-            this.clearField(formContext, "proto_test5");
-            this.setDisabled(formContext, "proto_test5", true);
+            this.clearField(formContext, "proto_concession_tobe");
+            this.setDisabled(formContext, "proto_concession_tobe", true);
         }
 
         // 地域固有表示
-        this.showRegionFields(formContext, test1Id, test2, test3, test4, test5, test11Id);
+        this.showRegionFields(formContext, woTypeId, billableType, paymentTobe, paymentToTobe, concessionTobe, regionId);
     };
 
     // =========================
     // パターン判定
     // =========================
 
-    // PROTO_TEST1 の値から PROTO_TEST2 の許可選択肢を返す。
-    this.getAllowedProtoTest2 = (test1Id) => {
+    // WO_TYPE_LOOKUP の値から BILLABLE_TYPE_OPTIONS の許可選択肢を返す。
+    this.getAllowedBillableTypeOptions = (woTypeId) => {
         // パターン1
-        if (this.isLookupId(test1Id, PROTO_TEST1.STARTUP)) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP)) {
             return [
-                this.option("Startup", PROTO_TEST2.STARTUP),
-                this.option("Billable", PROTO_TEST2.BILLABLE),
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("Startup", BILLABLE_TYPE_OPTIONS.STARTUP),
+                this.option("Billable", BILLABLE_TYPE_OPTIONS.BILLABLE),
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         // パターン2
-        if (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.FCN_SI)) {
             return [
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         // パターン3
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-            this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-            this.isLookupId(test1Id, PROTO_TEST1.REPAIR)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)
         ) {
             return [
-                this.option("Billable", PROTO_TEST2.BILLABLE),
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("Billable", BILLABLE_TYPE_OPTIONS.BILLABLE),
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         // パターン4
-        if (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR)) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR)) {
             return [
-                this.option("Startup", PROTO_TEST2.STARTUP),
-                this.option("Billable", PROTO_TEST2.BILLABLE),
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("Startup", BILLABLE_TYPE_OPTIONS.STARTUP),
+                this.option("Billable", BILLABLE_TYPE_OPTIONS.BILLABLE),
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         // パターン5
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)
         ) {
             return [
-                this.option("Startup", PROTO_TEST2.STARTUP),
-                this.option("Billable", PROTO_TEST2.BILLABLE),
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("Startup", BILLABLE_TYPE_OPTIONS.STARTUP),
+                this.option("Billable", BILLABLE_TYPE_OPTIONS.BILLABLE),
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         // パターン6
-        if (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION)) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION)) {
             return [
-                this.option("Startup", PROTO_TEST2.STARTUP),
-                this.option("Billable", PROTO_TEST2.BILLABLE),
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("Startup", BILLABLE_TYPE_OPTIONS.STARTUP),
+                this.option("Billable", BILLABLE_TYPE_OPTIONS.BILLABLE),
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         // パターン7
-        if (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING)) {
             return [
-                this.option("Billable", PROTO_TEST2.BILLABLE),
-                this.option("non_billable", PROTO_TEST2.NON_BILLABLE)
+                this.option("Billable", BILLABLE_TYPE_OPTIONS.BILLABLE),
+                this.option("non_billable", BILLABLE_TYPE_OPTIONS.NON_BILLABLE)
             ];
         }
 
         return [];
     };
 
-    // PROTO_TEST1 と PROTO_TEST2 の値から PROTO_TEST3 の許可選択肢を返す。
-    this.getAllowedProtoTest3 = (test1Id, test2) => {
+    // WO_TYPE_LOOKUP と BILLABLE_TYPE_OPTIONS の値から PAYMENT_TOBE_OPTIONS の許可選択肢を返す。
+    this.getAllowedPaymentTobeOptions = (woTypeId, billableType) => {
         // パターン1 STARTUP
-        if (this.isLookupId(test1Id, PROTO_TEST1.STARTUP)) {
-            if (test2 === PROTO_TEST2.STARTUP) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP)) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.STARTUP) {
                 return [
-                    this.option("Startup", PROTO_TEST3.STARTUP),
-                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                    this.option("Startup", PAYMENT_TOBE_OPTIONS.STARTUP),
+                    this.option("pre_warranty", PAYMENT_TOBE_OPTIONS.PRE_WARRANTY)
                 ];
             }
-            if (test2 === PROTO_TEST2.BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.BILLABLE) {
                 return [
-                    this.option("Paid", PROTO_TEST3.PAID),
-                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                    this.option("Paid", PAYMENT_TOBE_OPTIONS.PAID),
+                    this.option("Contract", PAYMENT_TOBE_OPTIONS.CONTRACT)
                 ];
             }
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
 
         // パターン2 FCN_SI
-        if (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)) {
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.FCN_SI)) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("fcn_si", PROTO_TEST3.FCN_SI),
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("fcn_si", PAYMENT_TOBE_OPTIONS.FCN_SI),
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
 
         // パターン3
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-            this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-            this.isLookupId(test1Id, PROTO_TEST1.REPAIR)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)
         ) {
-            if (test2 === PROTO_TEST2.BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.BILLABLE) {
                 return [
-                    this.option("Paid", PROTO_TEST3.PAID),
-                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                    this.option("Paid", PAYMENT_TOBE_OPTIONS.PAID),
+                    this.option("Contract", PAYMENT_TOBE_OPTIONS.CONTRACT)
                 ];
             }
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
 
         // パターン4 TROUBLESHOOTING_REPAIR
-        if (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR)) {
-            if (test2 === PROTO_TEST2.STARTUP) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR)) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.STARTUP) {
                 return [
-                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                    this.option("pre_warranty", PAYMENT_TOBE_OPTIONS.PRE_WARRANTY)
                 ];
             }
-            if (test2 === PROTO_TEST2.BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.BILLABLE) {
                 return [
-                    this.option("Paid", PROTO_TEST3.PAID),
-                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                    this.option("Paid", PAYMENT_TOBE_OPTIONS.PAID),
+                    this.option("Contract", PAYMENT_TOBE_OPTIONS.CONTRACT)
                 ];
             }
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("equipment_warranty", PROTO_TEST3.EQUIPMENT_WARRANTY),
-                    this.option("mod_warranty", PROTO_TEST3.MOD_WARRANTY),
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("equipment_warranty", PAYMENT_TOBE_OPTIONS.EQUIPMENT_WARRANTY),
+                    this.option("mod_warranty", PAYMENT_TOBE_OPTIONS.MOD_WARRANTY),
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
 
         // パターン5 PROCESS_APPLICATION / CONSAULTING_ANALYSIS
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)
         ) {
-            if (test2 === PROTO_TEST2.STARTUP) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.STARTUP) {
                 return [
-                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                    this.option("pre_warranty", PAYMENT_TOBE_OPTIONS.PRE_WARRANTY)
                 ];
             }
-            if (test2 === PROTO_TEST2.BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.BILLABLE) {
                 return [
-                    this.option("Paid", PROTO_TEST3.PAID),
-                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                    this.option("Paid", PAYMENT_TOBE_OPTIONS.PAID),
+                    this.option("Contract", PAYMENT_TOBE_OPTIONS.CONTRACT)
                 ];
             }
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("equipment_warranty", PROTO_TEST3.EQUIPMENT_WARRANTY),
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("equipment_warranty", PAYMENT_TOBE_OPTIONS.EQUIPMENT_WARRANTY),
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
 
         // パターン6 SOFTWARE_INSTALLATION
-        if (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION)) {
-            if (test2 === PROTO_TEST2.STARTUP) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION)) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.STARTUP) {
                 return [
-                    this.option("pre_warranty", PROTO_TEST3.PRE_WARRANTY)
+                    this.option("pre_warranty", PAYMENT_TOBE_OPTIONS.PRE_WARRANTY)
                 ];
             }
-            if (test2 === PROTO_TEST2.BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.BILLABLE) {
                 return [
-                    this.option("Paid", PROTO_TEST3.PAID),
-                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                    this.option("Paid", PAYMENT_TOBE_OPTIONS.PAID),
+                    this.option("Contract", PAYMENT_TOBE_OPTIONS.CONTRACT)
                 ];
             }
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
 
         // パターン7 CUSTOMER_TRAINING
-        if (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) {
-            if (test2 === PROTO_TEST2.BILLABLE) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING)) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.BILLABLE) {
                 return [
-                    this.option("Paid", PROTO_TEST3.PAID),
-                    this.option("Contract", PROTO_TEST3.CONTRACT)
+                    this.option("Paid", PAYMENT_TOBE_OPTIONS.PAID),
+                    this.option("Contract", PAYMENT_TOBE_OPTIONS.CONTRACT)
                 ];
             }
-            if (test2 === PROTO_TEST2.NON_BILLABLE) {
+            if (billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE) {
                 return [
-                    this.option("Credit", PROTO_TEST3.CREDIT),
-                    this.option("Concession", PROTO_TEST3.CONCESSION)
+                    this.option("Credit", PAYMENT_TOBE_OPTIONS.CREDIT),
+                    this.option("Concession", PAYMENT_TOBE_OPTIONS.CONCESSION)
                 ];
             }
         }
@@ -388,160 +388,160 @@ var ProtoForm = window.ProtoForm || {};
         return [];
     };
 
-    // PROTO_TEST1〜PROTO_TEST3 の値から PROTO_TEST4 の許可選択肢を返す。
-    this.getAllowedProtoTest4 = (test1Id, test2, test3) => {
-        // proto_test4 を使わない場合
+    // WO_TYPE_LOOKUP〜PAYMENT_TOBE_OPTIONS の値から PAYMENT_TO_TOBE_OPTIONS の許可選択肢を返す。
+    this.getAllowedPaymentToTobeOptions = (woTypeId, billableType, paymentTobe) => {
+        // proto_paymentto_tobe を使わない場合
         if (
-            test3 === PROTO_TEST3.STARTUP ||
-            test3 === PROTO_TEST3.PRE_WARRANTY ||
-            test3 === PROTO_TEST3.EQUIPMENT_WARRANTY ||
-            test3 === PROTO_TEST3.MOD_WARRANTY
+            paymentTobe === PAYMENT_TOBE_OPTIONS.STARTUP ||
+            paymentTobe === PAYMENT_TOBE_OPTIONS.PRE_WARRANTY ||
+            paymentTobe === PAYMENT_TOBE_OPTIONS.EQUIPMENT_WARRANTY ||
+            paymentTobe === PAYMENT_TOBE_OPTIONS.MOD_WARRANTY
         ) {
             return [];
         }
 
         // STARTUP + BILLABLE + PAID
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-            test2 === PROTO_TEST2.BILLABLE &&
-            test3 === PROTO_TEST3.PAID
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+            billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.PAID
         ) {
             return [
-                this.option("dss", PROTO_TEST4.DSS),
-                this.option("Bu", PROTO_TEST4.BU)
+                this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
             ];
         }
 
         // STARTUP + NON_BILLABLE + CONCESSION
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-            test2 === PROTO_TEST2.NON_BILLABLE &&
-            test3 === PROTO_TEST3.CONCESSION
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+            billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION
         ) {
             return [
-                this.option("Bu", PROTO_TEST4.BU),
-                this.option("Factory", PROTO_TEST4.FACTORY)
+                this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU),
+                this.option("Factory", PAYMENT_TO_TOBE_OPTIONS.FACTORY)
             ];
         }
 
         // FCN_SI
-        if (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)) {
-            if (test3 === PROTO_TEST3.FCN_SI) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.FCN_SI)) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.FCN_SI) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CONCESSION) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU),
-                    this.option("Factory", PROTO_TEST4.FACTORY),
-                    this.option("Genpo", PROTO_TEST4.GENPO)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU),
+                    this.option("Factory", PAYMENT_TO_TOBE_OPTIONS.FACTORY),
+                    this.option("Genpo", PAYMENT_TO_TOBE_OPTIONS.GENPO)
                 ];
             }
         }
 
         // パターン3
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-            this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-            this.isLookupId(test1Id, PROTO_TEST1.REPAIR)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)
         ) {
-            if (test3 === PROTO_TEST3.PAID) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CONCESSION) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU),
-                    this.option("Factory", PROTO_TEST4.FACTORY),
-                    this.option("Genpo", PROTO_TEST4.GENPO)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU),
+                    this.option("Factory", PAYMENT_TO_TOBE_OPTIONS.FACTORY),
+                    this.option("Genpo", PAYMENT_TO_TOBE_OPTIONS.GENPO)
                 ];
             }
         }
 
         // TROUBLESHOOTING_REPAIR
-        if (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR)) {
-            if (test3 === PROTO_TEST3.PAID) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR)) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CONCESSION) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU),
-                    this.option("Factory", PROTO_TEST4.FACTORY),
-                    this.option("Genpo", PROTO_TEST4.GENPO)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU),
+                    this.option("Factory", PAYMENT_TO_TOBE_OPTIONS.FACTORY),
+                    this.option("Genpo", PAYMENT_TO_TOBE_OPTIONS.GENPO)
                 ];
             }
         }
 
         // PROCESS_APPLICATION / CONSAULTING_ANALYSIS
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-            this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)
         ) {
-            if (test3 === PROTO_TEST3.PAID) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CONCESSION) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU),
-                    this.option("Factory", PROTO_TEST4.FACTORY),
-                    this.option("Genpo", PROTO_TEST4.GENPO)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU),
+                    this.option("Factory", PAYMENT_TO_TOBE_OPTIONS.FACTORY),
+                    this.option("Genpo", PAYMENT_TO_TOBE_OPTIONS.GENPO)
                 ];
             }
         }
 
         // SOFTWARE_INSTALLATION
-        if (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION)) {
-            if (test3 === PROTO_TEST3.PAID) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION)) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CONCESSION) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU),
-                    this.option("Factory", PROTO_TEST4.FACTORY),
-                    this.option("Genpo", PROTO_TEST4.GENPO)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU),
+                    this.option("Factory", PAYMENT_TO_TOBE_OPTIONS.FACTORY),
+                    this.option("Genpo", PAYMENT_TO_TOBE_OPTIONS.GENPO)
                 ];
             }
         }
 
         // CUSTOMER_TRAINING
-        if (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) {
-            if (test3 === PROTO_TEST3.PAID) {
+        if (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING)) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CREDIT) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CREDIT) {
                 return [
-                    this.option("dss", PROTO_TEST4.DSS),
-                    this.option("Bu", PROTO_TEST4.BU)
+                    this.option("dss", PAYMENT_TO_TOBE_OPTIONS.DSS),
+                    this.option("Bu", PAYMENT_TO_TOBE_OPTIONS.BU)
                 ];
             }
-            if (test3 === PROTO_TEST3.CONCESSION) {
+            if (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION) {
                 return [
-                    this.option("Genpo", PROTO_TEST4.GENPO)
+                    this.option("Genpo", PAYMENT_TO_TOBE_OPTIONS.GENPO)
                 ];
             }
         }
@@ -549,86 +549,86 @@ var ProtoForm = window.ProtoForm || {};
         return [];
     };
 
-    // PROTO_TEST1〜PROTO_TEST4 の値から PROTO_TEST5 の許可選択肢を返す。
-    this.getAllowedProtoTest5 = (test1Id, test2, test3, test4) => {
-        // proto_test5 を使わない場合
+    // WO_TYPE_LOOKUP〜PAYMENT_TO_TOBE_OPTIONS の値から CONCESSION_TOBE_OPTIONS の許可選択肢を返す。
+    this.getAllowedConcessionTobeOptions = (woTypeId, billableType, paymentTobe, paymentToTobe) => {
+        // proto_concession_tobe を使わない場合
         if (
-            test4 !== PROTO_TEST4.DSS &&
-            test4 !== PROTO_TEST4.BU &&
-            test4 !== PROTO_TEST4.FACTORY &&
-            test4 !== PROTO_TEST4.GENPO
+            paymentToTobe !== PAYMENT_TO_TOBE_OPTIONS.DSS &&
+            paymentToTobe !== PAYMENT_TO_TOBE_OPTIONS.BU &&
+            paymentToTobe !== PAYMENT_TO_TOBE_OPTIONS.FACTORY &&
+            paymentToTobe !== PAYMENT_TO_TOBE_OPTIONS.GENPO
         ) {
             return [];
         }
 
         // STARTUP + CONCESSION + FACTORY = NON_STRATEGIC★
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-            test2 === PROTO_TEST2.NON_BILLABLE &&
-            test3 === PROTO_TEST3.CONCESSION &&
-            test4 === PROTO_TEST4.FACTORY
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+            billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+            paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.FACTORY
         ) {
             return [
-                this.option("non_strategic", PROTO_TEST5.NON_STRATEGIC)
+                this.option("non_strategic", CONCESSION_TOBE_OPTIONS.NON_STRATEGIC)
             ];
         }
 
         // CUSTOMER_TRAINING + NON_BILLABLE + CONCESSION + GENPO = STRATEGIC★
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-            test2 === PROTO_TEST2.NON_BILLABLE &&
-            test3 === PROTO_TEST3.CONCESSION &&
-            test4 === PROTO_TEST4.GENPO
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+            billableType === BILLABLE_TYPE_OPTIONS.NON_BILLABLE &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+            paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.GENPO
         ) {
             return [
-                this.option("Strategic", PROTO_TEST5.STRATEGIC)
+                this.option("Strategic", CONCESSION_TOBE_OPTIONS.STRATEGIC)
             ];
         }
 
-        // proto_test5 不要ケース
+        // proto_concession_tobe 不要ケース
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-            test2 === PROTO_TEST2.BILLABLE &&
-            test3 === PROTO_TEST3.PAID
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+            billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.PAID
         ) {
             return [];
         }
 
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.FCN_SI) &&
-            test3 === PROTO_TEST3.FCN_SI
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.FCN_SI) &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.FCN_SI
         ) {
             return [];
         }
 
         if (
-            (this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-                this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-                this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
-            test3 === PROTO_TEST3.PAID
+            (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)) &&
+            paymentTobe === PAYMENT_TOBE_OPTIONS.PAID
         ) {
             return [];
         }
 
         if (
-            (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) ||
-                this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS) ||
-                this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING)) &&
-            (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CREDIT)
+            (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING)) &&
+            (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID || paymentTobe === PAYMENT_TOBE_OPTIONS.CREDIT)
         ) {
             return [];
         }
 
         // 残りは基本 STRATEGIC / NON_STRATEGIC
         return [
-            this.option("Strategic", PROTO_TEST5.STRATEGIC),
-            this.option("non_strategic", PROTO_TEST5.NON_STRATEGIC)
+            this.option("Strategic", CONCESSION_TOBE_OPTIONS.STRATEGIC),
+            this.option("non_strategic", CONCESSION_TOBE_OPTIONS.NON_STRATEGIC)
         ];
     };
 
@@ -637,273 +637,273 @@ var ProtoForm = window.ProtoForm || {};
     // =========================
 
     // 地域と選択状態の組み合わせに応じて地域項目を表示する。
-    this.showRegionFields = (formContext, test1Id, test2, test3, test4, test5, test11Id) => {
-        if (!test11Id) {
+    this.showRegionFields = (formContext, woTypeId, billableType, paymentTobe, paymentToTobe, concessionTobe, regionId) => {
+        if (!regionId) {
             return;
         }
 
-        // ① proto_test11 = JP or US -> proto_test6
+        // ① proto_region = JP or US -> proto_primaryso
         if (
-            this.isLookupId(test11Id, PROTO_TEST11.JP) ||
-            this.isLookupId(test11Id, PROTO_TEST11.US)
+            this.isLookupId(regionId, REGION_LOOKUP.JP) ||
+            this.isLookupId(regionId, REGION_LOOKUP.US)
         ) {
             if (
-                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-                test2 === PROTO_TEST2.STARTUP &&
-                (test3 === PROTO_TEST3.STARTUP || test3 === PROTO_TEST3.PRE_WARRANTY)
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+                billableType === BILLABLE_TYPE_OPTIONS.STARTUP &&
+                (paymentTobe === PAYMENT_TOBE_OPTIONS.STARTUP || paymentTobe === PAYMENT_TOBE_OPTIONS.PRE_WARRANTY)
             ) {
-                this.showField(formContext, "proto_test6");
+                this.showField(formContext, "proto_primaryso");
             }
 
             if (
-                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.PAID
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.PAID
             ) {
-                this.showField(formContext, "proto_test6");
+                this.showField(formContext, "proto_primaryso");
             }
         }
 
-        // ② proto_test11 = EU -> proto_test7
-        if (this.isLookupId(test11Id, PROTO_TEST11.EU)) {
+        // ② proto_region = EU -> proto_wo_soassociation
+        if (this.isLookupId(regionId, REGION_LOOKUP.EU)) {
             if (
-                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-                test2 === PROTO_TEST2.STARTUP &&
-                test3 === PROTO_TEST3.STARTUP
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+                billableType === BILLABLE_TYPE_OPTIONS.STARTUP &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.STARTUP
             ) {
-                this.showField(formContext, "proto_test7");
+                this.showField(formContext, "proto_wo_soassociation");
             }
 
             if (
-                this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.PAID
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.PAID
             ) {
-                this.showField(formContext, "proto_test7");
+                this.showField(formContext, "proto_wo_soassociation");
             }
         }
 
-        // ③ proto_test8 / proto_test9 表示
+        // ③ proto_cnt_contractsummary / proto_tel_wo_sow 表示
         if (
-            (this.isLookupId(test1Id, PROTO_TEST1.STARTUP) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.CONTRACT) ||
+            (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-            (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.CONTRACT) ||
+            (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-            ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.CONTRACT) ||
+            ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-            (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.CONTRACT) ||
+            (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-            (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-                test2 === PROTO_TEST2.BILLABLE &&
-                test3 === PROTO_TEST3.CONTRACT)
+            (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)
         ) {
-            this.showField(formContext, "proto_test8");
-            this.showField(formContext, "proto_test9");
+            this.showField(formContext, "proto_cnt_contractsummary");
+            this.showField(formContext, "proto_tel_wo_sow");
         }
 
-        // ④ proto_test10 表示
+        // ④ proto_tel_wo_concession_reason 表示
         if (
-            test4 === PROTO_TEST4.FACTORY
+            paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.FACTORY
         ) {
-            this.showField(formContext, "proto_test10");
+            this.showField(formContext, "proto_tel_wo_concession_reason");
         }
 
-        // ⑤ FCN_SI -> proto_test12 / proto_test13
+        // ⑤ FCN_SI -> proto_tel_wo_retrofitfcnno / proto_tel_wo_continuouswork
         if (
-            this.isLookupId(test1Id, PROTO_TEST1.FCN_SI)
+            this.isLookupId(woTypeId, WO_TYPE_LOOKUP.FCN_SI)
         ) {
-            this.showField(formContext, "proto_test12");
-            this.showField(formContext, "proto_test13");
+            this.showField(formContext, "proto_tel_wo_retrofitfcnno");
+            this.showField(formContext, "proto_tel_wo_continuouswork");
         }
 
-        // ⑥ proto_test11 = EU かつ GENPO + STRATEGIC 系
-        if (this.isLookupId(test11Id, PROTO_TEST11.EU)) {
+        // ⑥ proto_region = EU かつ GENPO + STRATEGIC 系
+        if (this.isLookupId(regionId, REGION_LOOKUP.EU)) {
             if (
-                (this.isLookupId(test1Id, PROTO_TEST1.FCN_SI) &&
-                    test3 === PROTO_TEST3.CONCESSION &&
-                    test4 === PROTO_TEST4.GENPO &&
-                    test5 === PROTO_TEST5.STRATEGIC) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.FCN_SI) &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+                    paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.GENPO &&
+                    concessionTobe === CONCESSION_TOBE_OPTIONS.STRATEGIC) ||
 
-                ((this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
-                    test3 === PROTO_TEST3.CONCESSION &&
-                    test4 === PROTO_TEST4.GENPO &&
-                    test5 === PROTO_TEST5.STRATEGIC) ||
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)) &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+                    paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.GENPO &&
+                    concessionTobe === CONCESSION_TOBE_OPTIONS.STRATEGIC) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
-                    ((test3 === PROTO_TEST3.MOD_WARRANTY) ||
-                        (test3 === PROTO_TEST3.CONCESSION &&
-                            test4 === PROTO_TEST4.GENPO &&
-                            test5 === PROTO_TEST5.STRATEGIC))) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) &&
+                    ((paymentTobe === PAYMENT_TOBE_OPTIONS.MOD_WARRANTY) ||
+                        (paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+                            paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.GENPO &&
+                            concessionTobe === CONCESSION_TOBE_OPTIONS.STRATEGIC))) ||
 
-                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
-                    test3 === PROTO_TEST3.CONCESSION &&
-                    test4 === PROTO_TEST4.GENPO &&
-                    test5 === PROTO_TEST5.STRATEGIC) ||
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)) &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+                    paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.GENPO &&
+                    concessionTobe === CONCESSION_TOBE_OPTIONS.STRATEGIC) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
-                    test3 === PROTO_TEST3.CONCESSION &&
-                    test4 === PROTO_TEST4.GENPO &&
-                    test5 === PROTO_TEST5.STRATEGIC) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION &&
+                    paymentToTobe === PAYMENT_TO_TOBE_OPTIONS.GENPO &&
+                    concessionTobe === CONCESSION_TOBE_OPTIONS.STRATEGIC) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-                    test3 === PROTO_TEST3.CONCESSION)
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONCESSION)
             ) {
-                this.showField(formContext, "proto_test14");
+                this.showField(formContext, "proto_wo_installation");
             }
         }
 
-        // ⑦ proto_test11 = SG or TW -> proto_test15
+        // ⑦ proto_region = SG or TW -> proto_wo_tmp_so_no_text
         if (
-            this.isLookupId(test11Id, PROTO_TEST11.SG) ||
-            this.isLookupId(test11Id, PROTO_TEST11.TW)
-        ) {
-            if (
-                ((this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.PAID) ||
-
-                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT)) ||
-
-                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT)) ||
-
-                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT)) ||
-
-                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT))
-            ) {
-                this.showField(formContext, "proto_test15");
-            }
-        }
-
-        // ⑧ proto_test11 = EU or CN or KR -> proto_test14 + proto_test7
-        if (
-            this.isLookupId(test11Id, PROTO_TEST11.EU) ||
-            this.isLookupId(test11Id, PROTO_TEST11.CN) ||
-            this.isLookupId(test11Id, PROTO_TEST11.KR)
+            this.isLookupId(regionId, REGION_LOOKUP.SG) ||
+            this.isLookupId(regionId, REGION_LOOKUP.TW)
         ) {
             if (
-                ((this.isLookupId(test1Id, PROTO_TEST1.MODIFICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.RE_LOCATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.DECOMISSION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.RE_INSTALLATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.OH) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.PM) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.REPAIR)) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    (test3 === PROTO_TEST3.PAID || test3 === PROTO_TEST3.CONTRACT))
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) ||
+
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID || paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)) ||
+
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID || paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)) ||
+
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID || paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)) ||
+
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID || paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT))
             ) {
-                this.showField(formContext, "proto_test14");
-                this.showField(formContext, "proto_test7");
+                this.showField(formContext, "proto_wo_tmp_so_no_text");
             }
         }
 
-        // ⑨ proto_test11 = EU or CN or KR -> proto_test7
+        // ⑧ proto_region = EU or CN or KR -> proto_wo_installation + proto_wo_soassociation
         if (
-            this.isLookupId(test11Id, PROTO_TEST11.EU) ||
-            this.isLookupId(test11Id, PROTO_TEST11.CN) ||
-            this.isLookupId(test11Id, PROTO_TEST11.KR)
+            this.isLookupId(regionId, REGION_LOOKUP.EU) ||
+            this.isLookupId(regionId, REGION_LOOKUP.CN) ||
+            this.isLookupId(regionId, REGION_LOOKUP.KR)
         ) {
             if (
-                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.PAID) ||
-
-                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.PAID) ||
-
-                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.PAID) ||
-
-                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT)
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    (paymentTobe === PAYMENT_TOBE_OPTIONS.PAID || paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT))
             ) {
-                this.showField(formContext, "proto_test7");
+                this.showField(formContext, "proto_wo_installation");
+                this.showField(formContext, "proto_wo_soassociation");
             }
         }
 
-        // ⑩ proto_test11 = CN or KR -> proto_test7
+        // ⑨ proto_region = EU or CN or KR -> proto_wo_soassociation
         if (
-            this.isLookupId(test11Id, PROTO_TEST11.CN) ||
-            this.isLookupId(test11Id, PROTO_TEST11.KR)
+            this.isLookupId(regionId, REGION_LOOKUP.EU) ||
+            this.isLookupId(regionId, REGION_LOOKUP.CN) ||
+            this.isLookupId(regionId, REGION_LOOKUP.KR)
         ) {
             if (
-                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) ||
 
-                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT) ||
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.PAID)
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)
             ) {
-                this.showField(formContext, "proto_test7");
+                this.showField(formContext, "proto_wo_soassociation");
             }
         }
 
-        // 11 proto_test11 = EU -> proto_test14 + proto_test7
-        if (this.isLookupId(test11Id, PROTO_TEST11.EU)) {
+        // ⑩ proto_region = CN or KR -> proto_wo_soassociation
+        if (
+            this.isLookupId(regionId, REGION_LOOKUP.CN) ||
+            this.isLookupId(regionId, REGION_LOOKUP.KR)
+        ) {
             if (
-                (this.isLookupId(test1Id, PROTO_TEST1.TROUBLESHOOTING_REPAIR) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-                ((this.isLookupId(test1Id, PROTO_TEST1.PROCESS_APPLICATION) ||
-                    this.isLookupId(test1Id, PROTO_TEST1.CONSAULTING_ANALYSIS)) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT) ||
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.SOFTWARE_INSTALLATION) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.PAID) ||
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
-                (this.isLookupId(test1Id, PROTO_TEST1.CUSTOMER_TRAINING) &&
-                    test2 === PROTO_TEST2.BILLABLE &&
-                    test3 === PROTO_TEST3.CONTRACT)
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.PAID)
             ) {
-                this.showField(formContext, "proto_test14");
-                this.showField(formContext, "proto_test7");
+                this.showField(formContext, "proto_wo_soassociation");
+            }
+        }
+
+        // 11 proto_region = EU -> proto_wo_installation + proto_wo_soassociation
+        if (this.isLookupId(regionId, REGION_LOOKUP.EU)) {
+            if (
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.TROUBLESHOOTING_REPAIR) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
+
+                ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PROCESS_APPLICATION) ||
+                    this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CONSAULTING_ANALYSIS)) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
+
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.SOFTWARE_INSTALLATION) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.PAID) ||
+
+                (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.CUSTOMER_TRAINING) &&
+                    billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                    paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT)
+            ) {
+                this.showField(formContext, "proto_wo_installation");
+                this.showField(formContext, "proto_wo_soassociation");
             }
         }
     };
@@ -994,17 +994,17 @@ var ProtoForm = window.ProtoForm || {};
 
     // 地域表示対象フィールドをすべて非表示に戻す。
     this.resetRegionFields = (formContext) => {
-        for (let i = 0; i < REGION_FIELDS.length; i++) {
-            this.hideField(formContext, REGION_FIELDS[i]);
+        for (let i = 0; i < REGION_DEPENDENT_FIELDS.length; i++) {
+            this.hideField(formContext, REGION_DEPENDENT_FIELDS[i]);
         }
     };
 
     // 連動する OptionSet コントロールを有効化する。
     this.resetOptionControls = (formContext) => {
-        this.setDisabled(formContext, "proto_test2", false);
-        this.setDisabled(formContext, "proto_test3", false);
-        this.setDisabled(formContext, "proto_test4", false);
-        this.setDisabled(formContext, "proto_test5", false);
+        this.setDisabled(formContext, "proto_billabletype", false);
+        this.setDisabled(formContext, "proto_payment_tobe", false);
+        this.setDisabled(formContext, "proto_paymentto_tobe", false);
+        this.setDisabled(formContext, "proto_concession_tobe", false);
     };
 
     // 指定フィールドへ選択肢を適用し現在値の整合性を保つ。
