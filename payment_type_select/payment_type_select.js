@@ -106,11 +106,26 @@ var ProtoForm = window.ProtoForm || {};
     this.refreshForm = (formContext) => {
         const woTypeId = this.getLookupId(formContext, "proto_wotype");
         const regionId = this.getLookupId(formContext, "proto_region");
+        const previousWoTypeId = this.lastWoTypeId;
 
         let billableType = this.getOptionValue(formContext, "proto_billabletype");
         let paymentTobe = this.getOptionValue(formContext, "proto_payment_tobe");
         let paymentToTobe = this.getOptionValue(formContext, "proto_paymentto_tobe");
         let concessionTobe = this.getOptionValue(formContext, "proto_concession_tobe");
+
+        // wotype が変更されたら後続項目を初期化する。
+        if (previousWoTypeId !== undefined && previousWoTypeId !== woTypeId) {
+            this.clearField(formContext, "proto_billabletype");
+            this.clearField(formContext, "proto_payment_tobe");
+            this.clearField(formContext, "proto_paymentto_tobe");
+            this.clearField(formContext, "proto_concession_tobe");
+            this.resetRegionFields(formContext);
+            billableType = null;
+            paymentTobe = null;
+            paymentToTobe = null;
+            concessionTobe = null;
+        }
+        this.lastWoTypeId = woTypeId;
 
         this.resetRegionFields(formContext);
         this.resetOptionControls(formContext);
@@ -693,6 +708,16 @@ var ProtoForm = window.ProtoForm || {};
         // ③ proto_cnt_contractsummary / proto_tel_wo_sow 表示
         if (
             (this.isLookupId(woTypeId, WO_TYPE_LOOKUP.STARTUP) &&
+                billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
+                paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
+
+            ((this.isLookupId(woTypeId, WO_TYPE_LOOKUP.MODIFICATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_LOCATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.DECOMISSION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.RE_INSTALLATION) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.OH) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.PM) ||
+                this.isLookupId(woTypeId, WO_TYPE_LOOKUP.REPAIR)) &&
                 billableType === BILLABLE_TYPE_OPTIONS.BILLABLE &&
                 paymentTobe === PAYMENT_TOBE_OPTIONS.CONTRACT) ||
 
