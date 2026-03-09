@@ -106,10 +106,10 @@ export const getWorkGroupRows = async (): Promise<WorkGroupRow[]> => {
       const record = await xrm.WebApi.retrieveRecord(
         'proto_project',
         projectId,
-        '?$select=proto_name,proto_wo_group_num'
+        '?$select=proto_name,proto_project_name'
       )
-      projectTitle = record?.proto_name ?? projectTitle
-      groupNumber = record?.proto_wo_group_num ?? ''
+      projectTitle = record?.proto_project_name ?? projectTitle
+      groupNumber = record?.proto_name ?? ''
     } catch {
       return []
     }
@@ -134,7 +134,7 @@ export const updateProjectName = async (projectId: string, name: string) => {
   const xrm = getXrm()
   if (!xrm?.WebApi?.updateRecord) return
   await xrm.WebApi.updateRecord('proto_project', normalizedId, {
-    proto_name: name,
+    proto_project_name: name,
   })
 }
 
@@ -159,7 +159,7 @@ export const createProjectAndBindCurrentWorkorder = async (
   if (!xrm?.WebApi?.createRecord || !xrm?.WebApi?.updateRecord || !workorderId) return null
 
   const created = await xrm.WebApi.createRecord('proto_project', {
-    proto_name: name,
+    proto_project_name: name,
   })
   const projectId = normalizeId(created?.id)
   if (!projectId) return null
@@ -175,10 +175,10 @@ export const createProjectAndBindCurrentWorkorder = async (
       const record = await xrm.WebApi.retrieveRecord(
         'proto_project',
         projectId,
-        '?$select=proto_name,proto_wo_group_num'
+        '?$select=proto_name,proto_project_name'
       )
-      groupNumber = record?.proto_wo_group_num ?? ''
-      groupTitle = record?.proto_name ?? groupTitle
+      groupNumber = record?.proto_name ?? ''
+      groupTitle = record?.proto_project_name ?? groupTitle
     } catch {
       // no-op
     }
@@ -205,7 +205,7 @@ export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
     `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value` +
     `&$filter=_proto_project_value eq ${projectId}` +
     (currentWorkorderId ? ` and proto_workorderid ne ${currentWorkorderId}` : '') +
-    `&$expand=proto_project($select=proto_name,proto_wo_group_num)`
+    `&$expand=proto_project($select=proto_name,proto_project_name)`
 
   const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
   const rows = (result?.entities ?? []) as any[]
@@ -215,8 +215,8 @@ export const getSameGroupRows = async (): Promise<WorkGroupRow[]> => {
     woNumber: row.proto_wonumber ?? '',
     woTitle: row.proto_wotitle ?? '',
     status: row['_proto_workordersubstatus_value@OData.Community.Display.V1.FormattedValue'] ?? '',
-    groupNumber: row.proto_project?.proto_wo_group_num ?? '',
-    groupTitle: row.proto_project?.proto_name ?? '',
+    groupNumber: row.proto_project?.proto_name ?? '',
+    groupTitle: row.proto_project?.proto_project_name ?? '',
     projectId: normalizeId(row._proto_project_value),
   }))
 }
@@ -245,7 +245,7 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
   const query =
     `?$select=proto_wonumber,proto_wotitle,_proto_workordersubstatus_value,_proto_project_value,_proto_enduser_value,_owningbusinessunit_value,_proto_wotype_value,_proto_devicesearch_value,proto_calc_status,_proto_primaryso_value,proto_kyakusakichuban,proto_kyakusakichubantext,proto_wo_tmp_so_no_text,_proto_wo_soassociation_value` +
     `&$filter=${filters.join(' and ')}` +
-    `&$expand=proto_project($select=proto_name)`
+    `&$expand=proto_project($select=proto_name,proto_project_name)`
 
   const result = await xrm.WebApi.retrieveMultipleRecords('proto_workorder', query)
   const rows = (result?.entities ?? []) as any[]
@@ -255,8 +255,8 @@ export const getMainRows = async (): Promise<WorkGroupRow[]> => {
     woNumber: row.proto_wonumber ?? '',
     woTitle: row.proto_wotitle ?? '',
     status: row['_proto_workordersubstatus_value@OData.Community.Display.V1.FormattedValue'] ?? '',
-    groupNumber: row['_proto_project_value@OData.Community.Display.V1.FormattedValue'] ?? '',
-    groupTitle: row.proto_project?.proto_name ?? '',
+    groupNumber: row.proto_project?.proto_name ?? '',
+    groupTitle: row.proto_project?.proto_project_name ?? '',
     projectId: normalizeId(row._proto_project_value),
     endUser:
       row['_proto_enduser_value@OData.Community.Display.V1.FormattedValue'] ??
