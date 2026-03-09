@@ -931,6 +931,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
+                            <label className="modal-label">{t("timeEntryModal.deviceSn")}</label>
+                            {mode === "duplicate" || deviceSn ? (
+                                <div className="readonly-text">
+                                    {(selectedEvent as any)?.deviceSnName || deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={deviceSnOptions}
+                                    value={deviceSn || ""}
+                                    onChange={setDeviceSn}
+                                    placeholder={t("timeEntryModal.placeholders.selectDeviceSn")}
+                                />
+                            )}
+
                             {shouldShowWoSo && (
                                 <>
                                     <label className="modal-label">{t("timeEntryModal.soBaan")}</label>
@@ -965,17 +979,46 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 />
                             )}
 
-                            <label className="modal-label">{t("timeEntryModal.deviceSn")}</label>
-                            {mode === "duplicate" || deviceSn ? (
+                            <label className="modal-label">{t("timeEntryModal.workStatus")}</label>
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
-                                    {(selectedEvent as any)?.deviceSnName || deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
+                                    {workStatusOptions.find(opt => opt.value === workStatus)?.label || workStatus || "-"}
                                 </div>
                             ) : (
                                 <Select
-                                    options={deviceSnOptions}
-                                    value={deviceSn || ""}
-                                    onChange={setDeviceSn}
-                                    placeholder={t("timeEntryModal.placeholders.selectDeviceSn")}
+                                    options={workStatusOptions}
+                                    value={workStatus || ""}
+                                    onChange={setWorkStatus}
+                                    placeholder={t("timeEntryModal.placeholders.selectWorkStatus")}
+                                />
+                            )}
+
+                            <label className="modal-label">{t("timeEntryModal.task")}</label>
+                            {mode === "duplicate" || selectedIndirectTask ? (
+                                <div className="readonly-text">
+                                    {taskOptions.find(opt => opt.value === task)?.label || task || "-"}
+                                </div>
+                            ) : (
+                                <Select
+                                    options={taskOptions}
+                                    value={task || ""}
+                                    onChange={setTask}
+                                    placeholder={t("timeEntryModal.placeholders.selectTask")}
+                                />
+                            )}
+
+                            {/* <label className="modal-label">{t("timeEntryModal.comment")}</label> */}
+                            {mode === "duplicate" ? (
+                                <div className="readonly-text">{comment || "-"}</div>
+                            ) : (
+                                <Textarea
+                                    label={t("timeEntryModal.comment")}
+                                    value={comment}
+                                    onChange={setComment}
+                                    placeholder={t("timeEntryModal.placeholders.enterComment")}
+                                    rows={4}
+                                    showCount
+                                    maxLength={2000}
                                 />
                             )}
 
@@ -1094,49 +1137,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     value={subcategory ?? ""}
                                     onChange={setSubcategory}
                                     placeholder={t("favoriteTask.selectSubCategory") || "サブカテゴリを選択"}
-                                />
-                            )}
-
-                            <label className="modal-label">{t("timeEntryModal.workStatus")}</label>
-                            {mode === "duplicate" ? (
-                                <div className="readonly-text">
-                                    {workStatusOptions.find(opt => opt.value === workStatus)?.label || workStatus || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={workStatusOptions}
-                                    value={workStatus || ""}
-                                    onChange={setWorkStatus}
-                                    placeholder={t("timeEntryModal.placeholders.selectWorkStatus")}
-                                />
-                            )}
-
-                            <label className="modal-label">{t("timeEntryModal.task")}</label>
-                            {mode === "duplicate" || selectedIndirectTask ? (
-                                <div className="readonly-text">
-                                    {taskOptions.find(opt => opt.value === task)?.label || task || "-"}
-                                </div>
-                            ) : (
-                                <Select
-                                    options={taskOptions}
-                                    value={task || ""}
-                                    onChange={setTask}
-                                    placeholder={t("timeEntryModal.placeholders.selectTask")}
-                                />
-                            )}
-
-                            {/* <label className="modal-label">{t("timeEntryModal.comment")}</label> */}
-                            {mode === "duplicate" ? (
-                                <div className="readonly-text">{comment || "-"}</div>
-                            ) : (
-                                <Textarea
-                                    label={t("timeEntryModal.comment")}
-                                    value={comment}
-                                    onChange={setComment}
-                                    placeholder={t("timeEntryModal.placeholders.enterComment")}
-                                    rows={4}
-                                    showCount
-                                    maxLength={2000}
                                 />
                             )}
                         </div>
