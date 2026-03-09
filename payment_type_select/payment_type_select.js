@@ -991,12 +991,13 @@ var ProtoForm = window.ProtoForm || {};
         return this.normalizeGuid(actualId) === this.normalizeGuid(expectedId);
     };
 
-    // 指定フィールドの値をクリアして変更イベントを発火する。
+    // 指定フィールドの値をクリアする（不要な onChange 連鎖は発火しない）。
     this.clearField = (formContext, fieldName) => {
         const attr = formContext.getAttribute(fieldName);
         if (attr) {
-            attr.setValue(null);
-            attr.fireOnChange();
+            if (attr.getValue() !== null) {
+                attr.setValue(null);
+            }
         }
     };
 
