@@ -53,7 +53,7 @@ const messages = {
     workTableTitle: 'Work Orders Available for Grouping',
     bindGroup: 'Group the selected WOs',
     unbindGroup: 'Remove from This Group',
-    sameGroupTitle: 'WO Grouping Candidates',
+    sameGroupTitle: 'Included WOs List in The Current Group',
     currentGroupTitle: 'Parent WO Group',
     sortAsc: 'Sort Ascending',
     sortDesc: 'Sort Descending',

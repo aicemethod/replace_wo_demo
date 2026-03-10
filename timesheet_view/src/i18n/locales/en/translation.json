@@ -100,7 +100,7 @@
         "soBaan": "SO (Baan)",
         "deviceSn": "Machine Search",
         "mainCategoryLabel": "Main Category",
-        "workStatus": "Work Status",
+        "workStatus": "Booking Status",
         "comment": "Comment",
         "commentPlaceholder": "Enter comment",
         "sampleEndUser1": "ABC Corporation",
@@ -139,7 +139,7 @@
             "selectSoBaan": "Select SO (Baan)",
             "selectDeviceSn": "Select Equipment S/N",
             "selectMainCategory": "Select Main Category",
-            "selectWorkStatus": "Select Work Status"
+            "selectWorkStatus": "Select Booking Status"
         }
     },
     "dayCopyModal": {
