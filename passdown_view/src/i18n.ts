@@ -20,13 +20,13 @@ const messages = {
     mobileCreated: '保存日時',
     mobileSync: '連携実行日',
     fileTypePassdown: 'Passdown/Daily Report',
-    fileTypePpacYkm: 'PPAC/YKM',
+    fileTypePpacYkm: 'PPAC/KYM',
     fileTypeTechnicalDocument: 'Technical Document',
     fileTypeOther: 'Other'
   },
   en: {
     add: 'Add',
-    save: 'Submit',
+    save: 'Save File',
     refresh: 'Refresh List',
     cancel: 'Cancel',
     loading: 'Loading...',
@@ -41,7 +41,7 @@ const messages = {
     mobileCreated: 'Saved At',
     mobileSync: 'Sync Date',
     fileTypePassdown: 'Passdown/Daily Report',
-    fileTypePpacYkm: 'PPAC/YKM',
+    fileTypePpacYkm: 'PPAC/KYM',
     fileTypeTechnicalDocument: 'Technical Document',
     fileTypeOther: 'Other'
   }

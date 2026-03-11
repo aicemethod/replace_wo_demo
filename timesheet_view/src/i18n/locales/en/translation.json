@@ -4,7 +4,7 @@
         "noData": "No data available"
     },
     "header": {
-        "title": "Time Sheet",
+        "title": "TimeSheet",
         "targetWO": "Target WO",
         "selectWO": "Select Target WO",
         "upload": "Upload",
