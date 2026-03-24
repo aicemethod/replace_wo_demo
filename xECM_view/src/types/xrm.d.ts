@@ -20,6 +20,7 @@ declare namespace Xrm {
 
   namespace Page {
     namespace data {
+      function refresh(save?: boolean): Promise<void>;
       namespace entity {
         function getId(): string;
       }

@@ -1,5 +1,15 @@
 import type { FileData } from '../types';
 
+/** 親フレームの Model-driven フォームをサーバーから再読み込みする */
+export function refreshParentForm(): void {
+  try {
+    const xrm = (window.parent as unknown as { Xrm?: typeof Xrm }).Xrm;
+    void xrm?.Page?.data?.refresh?.(false);
+  } catch (err) {
+    console.warn('フォームのリフレッシュに失敗しました:', err);
+  }
+}
+
 // Dataverseからファイルデータを取得
 export async function fetchFileData(): Promise<FileData[]> {
   // Xrm.WebApiが利用可能かチェック

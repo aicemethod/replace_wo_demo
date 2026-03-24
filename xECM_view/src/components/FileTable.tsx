@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { FiSave, FiPlus, FiTrash2, FiPaperclip, FiChevronDown } from 'react-icons/fi';
 import { FaCloudUploadAlt } from "react-icons/fa";
 import type { FileData } from '../types';
-import { fetchFileData, saveFileAttachment, deleteFileAttachments } from '../services/dataverse';
+import { fetchFileData, saveFileAttachment, deleteFileAttachments, refreshParentForm } from '../services/dataverse';
 import { formatDate } from '../utils/dateFormatter';
 import { getMessages, type AppLocale } from '../i18n';
 import './FileTable.css';
@@ -91,6 +91,7 @@ export default function FileTable({ locale }: FileTableProps) {
       if (deletedIds.length > 0) {
         const deletedSet = new Set(deletedIds);
         setFiles((prevFiles) => prevFiles.filter((file) => !deletedSet.has(file.id)));
+        refreshParentForm();
       }
       setDeleteSelectedIds(new Set());
     } finally {
@@ -124,6 +125,7 @@ export default function FileTable({ locale }: FileTableProps) {
           }
           setIsAddMenuOpen(false);
           setAddMenuPosition(null);
+          refreshParentForm();
         }
         return;
       }
