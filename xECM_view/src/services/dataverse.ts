@@ -121,6 +121,21 @@ type SaveFileParams = {
   file: File;
 };
 
+/** フォーム上に同じ属性が複数あっても、表示中のコントロールすべてに setDisabled する */
+function setAllControlsDisabledForAttribute(page: any, logicalName: string, disabled: boolean): void {
+  if (!page) return;
+  const attr = page.getAttribute?.(logicalName);
+  const controls = attr?.controls;
+  if (controls?.getLength) {
+    const len = controls.getLength();
+    for (let i = 0; i < len; i++) {
+      controls.get(i)?.setDisabled?.(disabled);
+    }
+    return;
+  }
+  page.getControl?.(logicalName)?.setDisabled?.(disabled);
+}
+
 const getCurrentRecordId = (): string | null => {
   try {
     const xrm = (window.parent as any).Xrm;
@@ -259,12 +274,13 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
           proto_wo_customersignreceivedon: new Date()
         });
       }
+      const page = xrm?.Page;
       if (automaticLink) {
-        xrm?.Page?.getControl?.('proto_customerapprovaltype')?.setDisabled?.(true);
-        xrm?.Page?.getControl?.('proto_wo_customersignreceivedon')?.setDisabled?.(true);
+        setAllControlsDisabledForAttribute(page, 'proto_customerapprovaltype', true);
+        setAllControlsDisabledForAttribute(page, 'proto_wo_customersignreceivedon', true);
       } else {
-        xrm?.Page?.getControl?.('proto_customerapprovaltype')?.setDisabled?.(false);
-        xrm?.Page?.getControl?.('proto_wo_customersignreceivedon')?.setDisabled?.(false);
+        setAllControlsDisabledForAttribute(page, 'proto_customerapprovaltype', false);
+        setAllControlsDisabledForAttribute(page, 'proto_wo_customersignreceivedon', false);
       }
     }
 
