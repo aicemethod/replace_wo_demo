@@ -35,6 +35,49 @@ export type EventData = {
 const normalizeEntityId = (id?: string | null): string =>
     String(id || "").replace(/[{}]/g, "").toLowerCase();
 
+/** proto_timeentry 1件を EventData に整形（WO 経路・直接取得で共通） */
+const mapTimeEntryRow = (t: any, workOrderId: string): EventData => ({
+    id: t.proto_timeentryid,
+    title: t.proto_name || "作業",
+    start: t.proto_startdatetime,
+    end: t.proto_enddatetime,
+    workOrderId: normalizeEntityId(workOrderId),
+    maincategory: t.proto_maincategory,
+    timecategory: t.proto_timecategory,
+    subcategory: t._proto_subcategory_value?.replace(/[{}]/g, "") || t.proto_subcategory?.proto_subcategoryid?.replace(/[{}]/g, "") || null,
+    subcategoryName: t.proto_subcategory?.proto_name || null,
+    endUser: t._proto_wo_fab_value?.replace(/[{}]/g, "") || null,
+    endUserName: t['_proto_wo_fab_value@OData.Community.Display.V1.FormattedValue'] || null,
+    deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
+    deviceSnName: t.proto_devicesearch?.proto_name || null,
+    woType: t._proto_wo_category_value?.replace(/[{}]/g, "") || t.proto_wo_category?.proto_workordertypeid?.replace(/[{}]/g, "") || null,
+    woTypeName: t.proto_wo_category?.proto_name || t['_proto_wo_category_value@OData.Community.Display.V1.FormattedValue'] || null,
+    paymenttype: t.proto_paymenttype,
+    billabletype: t.proto_billabletype,
+    paymenttobe: t.proto_payment_tobe,
+    paymentto: t.proto_paymentto_tobe,
+    concessiontype: t.proto_concession_tobe,
+    woSo: t._proto_wo_so_value?.replace(/[{}]/g, "") || null,
+    woSoName: t['_proto_wo_so_value@OData.Community.Display.V1.FormattedValue'] || null,
+    timezone: t.proto_timezone ?? null,
+    extendedProps: {
+        timezone: t.proto_timezone ?? null,
+        deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
+        deviceSnName: t.proto_devicesearch?.proto_name || null,
+    },
+});
+
+const mergeEventsById = (a: EventData[], b: EventData[]): EventData[] => {
+    const seen = new Set<string>();
+    const out: EventData[] = [];
+    for (const e of [...a, ...b]) {
+        if (seen.has(e.id)) continue;
+        seen.add(e.id);
+        out.push(e);
+    }
+    return out;
+};
+
 /**
  * Dataverse またはローカルモックからイベント一覧を取得
  * @param workOrderId 特定のWorkOrderのID（サブグリッドの場合に指定）
@@ -98,61 +141,78 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         }))
         .filter((row: ResourceRow) => row.workOrderId.length > 0 && row.bookableResourceId.length > 0);
 
-    if (resourceRows.length === 0) {
-        return [];
+    let fromResource: EventData[] = [];
+
+    if (resourceRows.length > 0) {
+        const bookableResourceIds = Array.from(new Set(resourceRows.map((row: ResourceRow) => row.bookableResourceId)));
+        const bookableResourceFilter = bookableResourceIds
+            .map((id) => `proto_bookableresourceid eq ${id}`)
+            .join(" or ");
+        const matchedBookableResourceQuery =
+            `?$select=proto_bookableresourceid,_proto_systemuser_value` +
+            `&$filter=(${bookableResourceFilter}) and _proto_systemuser_value eq ${userId}`;
+        const matchedBookableResourceResult = await xrm.WebApi.retrieveMultipleRecords(
+            "proto_bookableresource",
+            matchedBookableResourceQuery
+        );
+        const matchedBookableResourceIds = new Set(
+            matchedBookableResourceResult.entities
+                .map((record: any) => String(record.proto_bookableresourceid || "").replace(/[{}]/g, ""))
+                .filter((id: string) => id.length > 0)
+        );
+
+        if (matchedBookableResourceIds.size > 0) {
+            let targetWorkOrderIds = Array.from(
+                new Set(
+                    resourceRows
+                        .filter((row: ResourceRow) => matchedBookableResourceIds.has(row.bookableResourceId))
+                        .map((row: ResourceRow) => row.workOrderId)
+                )
+            );
+
+            if (workOrderId) {
+                const targetId = normalizeEntityId(workOrderId);
+                targetWorkOrderIds = targetWorkOrderIds.filter((id) => normalizeEntityId(id) === targetId);
+            }
+
+            if (targetWorkOrderIds.length > 0) {
+                const woFilter = targetWorkOrderIds
+                    .map((id) => `proto_workorderid eq ${id}`)
+                    .join(" or ");
+
+                const query =
+                    `?$select=proto_workorderid,proto_wonumber` +
+                    `&$filter=(${woFilter})` +
+                    `&$expand=${navigationName}(` +
+                    `$select=` +
+                    `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
+                    `proto_maincategory,proto_paymenttype,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_timecategory,proto_timezone,` +
+                    `_proto_wo_fab_value,_proto_wo_category_value,_proto_wo_so_value;` +
+                    `$expand=` +
+                    `proto_subcategory(` +
+                    `$select=proto_subcategoryid,proto_name` +
+                    `),` +
+                    `proto_devicesearch(` +
+                    `$select=proto_name` +
+                    `),` +
+                    `proto_wo_category(` +
+                    `$select=proto_workordertypeid,proto_name` +
+                    `)` +
+                    `)`;
+
+                const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
+
+                fromResource = result.entities.flatMap((wo: any) =>
+                    (wo[navigationName] || []).map((t: any) =>
+                        mapTimeEntryRow(t, String(wo.proto_workorderid || ""))
+                    )
+                );
+            }
+        }
     }
 
-    const bookableResourceIds = Array.from(new Set(resourceRows.map((row: ResourceRow) => row.bookableResourceId)));
-    const bookableResourceFilter = bookableResourceIds
-        .map((id) => `proto_bookableresourceid eq ${id}`)
-        .join(" or ");
-    const matchedBookableResourceQuery =
-        `?$select=proto_bookableresourceid,_proto_systemuser_value` +
-        `&$filter=(${bookableResourceFilter}) and _proto_systemuser_value eq ${userId}`;
-    const matchedBookableResourceResult = await xrm.WebApi.retrieveMultipleRecords(
-        "proto_bookableresource",
-        matchedBookableResourceQuery
-    );
-    const matchedBookableResourceIds = new Set(
-        matchedBookableResourceResult.entities
-            .map((record: any) => String(record.proto_bookableresourceid || "").replace(/[{}]/g, ""))
-            .filter((id: string) => id.length > 0)
-    );
-
-    if (matchedBookableResourceIds.size === 0) {
-        return [];
-    }
-
-    let targetWorkOrderIds = Array.from(
-        new Set(
-            resourceRows
-                .filter((row: ResourceRow) => matchedBookableResourceIds.has(row.bookableResourceId))
-                .map((row: ResourceRow) => row.workOrderId)
-        )
-    );
-
-    // サブグリッド指定時は対象WOをさらに絞る（通常画面では workOrderId は未指定）
-    if (workOrderId) {
-        const targetId = normalizeEntityId(workOrderId);
-        targetWorkOrderIds = targetWorkOrderIds.filter((id) => normalizeEntityId(id) === targetId);
-    }
-
-    if (targetWorkOrderIds.length === 0) {
-        return [];
-    }
-
-    const filter = targetWorkOrderIds
-        .map((id) => `proto_workorderid eq ${id}`)
-        .join(" or ");
-
-    const query =
-        `?$select=proto_workorderid,proto_wonumber` +
-        `&$filter=(${filter})` +
-        `&$expand=${navigationName}(` +
-        `$select=` +
-        `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_timecategory,proto_timezone,` +
-        `_proto_wo_fab_value,_proto_wo_category_value,_proto_wo_so_value;` +
+    /** ログインユーザーが作成した proto_timeentry（リソース経路に無い WO も含め表示） */
+    const timeEntryExpand =
         `$expand=` +
         `proto_subcategory(` +
         `$select=proto_subcategoryid,proto_name` +
@@ -162,47 +222,28 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
         `),` +
         `proto_wo_category(` +
         `$select=proto_workordertypeid,proto_name` +
-        `)` +
         `)`;
 
+    let createdByFilter = `_createdby_value eq ${userId}`;
+    if (workOrderId) {
+        const wid = normalizeEntityId(workOrderId);
+        createdByFilter += ` and _proto_wonumber_value eq ${wid}`;
+    }
 
-    const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
+    const myQuery =
+        `?$filter=${createdByFilter}` +
+        `&$select=` +
+        `proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
+        `proto_maincategory,proto_paymenttype,proto_billabletype,proto_payment_tobe,proto_paymentto_tobe,proto_concession_tobe,proto_timecategory,proto_timezone,` +
+        `_proto_wo_fab_value,_proto_wo_category_value,_proto_wo_so_value,_proto_wonumber_value` +
+        `&${timeEntryExpand}`;
 
-    // データ整形
-    // FullCalendarはUTCのISO文字列を自動的にローカル時間（JST）に変換して表示するため、
-    // Dataverseから取得したUTC時間をそのまま使用する
-    return result.entities.flatMap((wo: any) =>
-        (wo[navigationName] || []).map((t: any) => ({
-            id: t.proto_timeentryid,
-            title: t.proto_name || "作業",
-            start: t.proto_startdatetime,
-            end: t.proto_enddatetime,
-            workOrderId: normalizeEntityId(wo.proto_workorderid),
-            maincategory: t.proto_maincategory,
-            timecategory: t.proto_timecategory,
-            subcategory: t._proto_subcategory_value?.replace(/[{}]/g, "") || t.proto_subcategory?.proto_subcategoryid?.replace(/[{}]/g, "") || null,
-            subcategoryName: t.proto_subcategory?.proto_name || null,
-            endUser: t._proto_wo_fab_value?.replace(/[{}]/g, "") || null,
-            endUserName: t['_proto_wo_fab_value@OData.Community.Display.V1.FormattedValue'] || null,
-            deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
-            deviceSnName: t.proto_devicesearch?.proto_name || null,
-            woType: t._proto_wo_category_value?.replace(/[{}]/g, "") || t.proto_wo_category?.proto_workordertypeid?.replace(/[{}]/g, "") || null,
-            woTypeName: t.proto_wo_category?.proto_name || t['_proto_wo_category_value@OData.Community.Display.V1.FormattedValue'] || null,
-            paymenttype: t.proto_paymenttype,
-            billabletype: t.proto_billabletype,
-            paymenttobe: t.proto_payment_tobe,
-            paymentto: t.proto_paymentto_tobe,
-            concessiontype: t.proto_concession_tobe,
-            woSo: t._proto_wo_so_value?.replace(/[{}]/g, "") || null,
-            woSoName: t['_proto_wo_so_value@OData.Community.Display.V1.FormattedValue'] || null,
-            timezone: t.proto_timezone ?? null,
-            extendedProps: {
-                timezone: t.proto_timezone ?? null,
-                deviceSn: t._proto_devicesearch_value?.replace(/[{}]/g, "") || t.proto_devicesearch?.proto_devicesearchid?.replace(/[{}]/g, "") || null,
-                deviceSnName: t.proto_devicesearch?.proto_name || null,
-            },
-        }))
+    const myResult = await xrm.WebApi.retrieveMultipleRecords("proto_timeentry", myQuery);
+    const fromCreatedByMe = myResult.entities.map((t: any) =>
+        mapTimeEntryRow(t, t._proto_wonumber_value || "")
     );
+
+    return mergeEventsById(fromResource, fromCreatedByMe);
 };
 
 /**
@@ -266,57 +307,14 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
     });
 
     /** 選択中の WorkOrder に対応するイベントを強調 */
-    const events = allEvents.map((e) => {
-        // 休憩時間のイベントは薄いグレーで表示
-        const isBreakTime =
-            e.title === "休憩" ||
-            e.title === "休憩1" ||
-            e.title === "休憩2" ||
-            e.extendedProps?.comment === "休憩" ||
-            e.extendedProps?.comment === "休憩1" ||
-            e.extendedProps?.comment === "休憩2" ||
-            e.extendedProps?.isBreakTime === true;
-
-        // 隙間時間のイベントも薄いグレーで表示
-        const isGapTime =
-            e.title === "隙間時間" ||
-            e.title === "隙間時間1" ||
-            e.title === "隙間時間2" ||
-            e.title?.includes("隙間") ||
-            e.extendedProps?.comment === "隙間時間" ||
-            e.extendedProps?.comment === "隙間時間1" ||
-            e.extendedProps?.comment === "隙間時間2" ||
-            e.extendedProps?.comment?.includes("隙間") ||
-            e.extendedProps?.isGapTime === true;
-
-        // 休憩時間または隙間時間の場合はグレーで表示
-        const isSpecialTime = isBreakTime || isGapTime;
-
-        // 既存のbackgroundColorを保持（APIから取得したイベントに既に色が設定されている場合）
-        // EventData型にはbackgroundColor等が定義されていないため、anyとして扱う
-        const eventWithColors = e as any;
-        const backgroundColor = isSpecialTime
-            ? "#e0e0e0"
-            : (eventWithColors.backgroundColor || undefined);
-        const borderColor = isSpecialTime
-            ? "#d0d0d0"
-            : (eventWithColors.borderColor || undefined);
-        const textColor = isSpecialTime
-            ? "#666"
-            : (eventWithColors.textColor || undefined);
-
-        return {
-            ...e,
-            backgroundColor,
-            borderColor,
-            textColor,
-            extendedProps: {
-                ...e.extendedProps,
-                deviceSn: e.deviceSn ?? e.extendedProps?.deviceSn ?? null,
-                isTargetWO: selectedWO === "all" || normalizeEntityId(e.workOrderId) === normalizedSelectedWO,
-            },
-        };
-    });
+    const events = allEvents.map((e) => ({
+        ...e,
+        extendedProps: {
+            ...e.extendedProps,
+            deviceSn: e.deviceSn ?? e.extendedProps?.deviceSn ?? null,
+            isTargetWO: selectedWO === "all" || normalizeEntityId(e.workOrderId) === normalizedSelectedWO,
+        },
+    }));
 
     /** 登録・更新処理 */
     const mutation = useMutation({
