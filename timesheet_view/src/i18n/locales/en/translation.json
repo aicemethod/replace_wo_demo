@@ -36,6 +36,7 @@
         "searchByNumber": "User No.",
         "placeholderName": "Enter User Name",
         "placeholderNumber": "Enter User No.",
+        "placeholderSearch": "Search by User Name or User No.",
         "self": "Self",
         "userSortLabel": "User Name",
         "taskSortLabel": "Subcategory",

@@ -36,6 +36,7 @@
         "searchByNumber": "社員番号",
         "placeholderName": "ユーザー名を入力",
         "placeholderNumber": "社員番号を入力",
+        "placeholderSearch": "ユーザー名・社員番号で検索",
         "self": "自分",
         "userSortLabel": "ユーザー名",
         "taskSortLabel": "サブカテゴリ",

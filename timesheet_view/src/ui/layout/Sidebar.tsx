@@ -7,7 +7,7 @@ import { useResources } from "../../hooks/useResources";
 import { useFavoriteTasks } from "../../context/FavoriteTaskContext"; //  追加
 import { useTranslation } from "react-i18next";
 import type { SidebarProps } from "../../types/components";
-import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
+import type { UserSortKey, TaskSortKey } from "../../types";
 import { FIXED_USER_NAMES } from "../../constants/fixedUsers";
 
 /**
@@ -23,7 +23,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const { favoriteTasks } = useFavoriteTasks(); //  Contextからお気に入りタスク取得
 
     /** 検索・選択状態 */
-    const [searchType, setSearchType] = useState<SearchType>("name");
     const [keyword, setKeyword] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
 
@@ -94,12 +93,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         });
     }, [resources, isResourceLoading]);
 
-    /** 検索・ソート適用後のユーザー一覧 */
+    /** 検索・ソート適用後のユーザー一覧（名前・社員番号のどちらかに一致） */
     const filteredUsers = useMemo(() => {
-        const list =
-            searchType === "name"
-                ? visibleUsers.filter((u) => (u.name || "").includes(keyword))
-                : visibleUsers.filter((u) => (u.number || "").includes(keyword));
+        const list = visibleUsers.filter(
+            (u) =>
+                (u.name || "").includes(keyword) || (u.number || "").includes(keyword)
+        );
 
         const sortBy: Record<UserSortKey, (a: any, b: any) => number> = {
             numberAsc: (a, b) => (a.number || "").localeCompare(b.number || ""),
@@ -109,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         };
 
         return [...list].sort(sortBy[userSortOption]);
-    }, [keyword, searchType, visibleUsers, userSortOption]);
+    }, [keyword, visibleUsers, userSortOption]);
 
     /**  お気に入りタスクのソート処理 */
     const sortedFavoriteTasks = useMemo(() => {
@@ -152,27 +151,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <>
                     <h2 className="sidebar-title">{t("sidebar.searchTitle")}</h2>
 
-                    {/* 検索タイプ切替 */}
-                    <div className="sidebar-radios">
-                        {["name", "number"].map((type) => (
-                            <label key={type}>
-                                <input
-                                    type="radio"
-                                    name="sidebarSearchType"
-                                    value={type}
-                                    checked={searchType === type}
-                                    onChange={() => setSearchType(type as SearchType)}
-                                />
-                                {type === "name" ? t("sidebar.searchByName") : t("sidebar.searchByNumber")}
-                            </label>
-                        ))}
-                    </div>
-
-                    {/* 検索入力 */}
                     <Input
-                        placeholder={
-                            searchType === "name" ? t("sidebar.placeholderName") : t("sidebar.placeholderNumber")
-                        }
+                        placeholder={t("sidebar.placeholderSearch")}
                         className="sidebar-input"
                         value={keyword}
                         onChange={setKeyword}
