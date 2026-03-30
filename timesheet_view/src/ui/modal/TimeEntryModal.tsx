@@ -858,7 +858,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
 
                             <label className="modal-label">{t("timeEntryModal.endUser")}</label>
-                            {mode === "duplicate" || endUser ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {(selectedEvent as any)?.endUserName || endUserOptions.find(opt => opt.value === endUser || opt.label === endUser)?.label || endUser || "-"}
                                 </div>
@@ -932,7 +932,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.deviceSn")}</label>
-                            {mode === "duplicate" || deviceSn ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {(selectedEvent as any)?.deviceSnName || deviceSnOptions.find(opt => opt.value === deviceSn || opt.label === deviceSn)?.label || deviceSn || "-"}
                                 </div>
@@ -1023,7 +1023,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.woType")}</label>
-                            {mode === "duplicate" || woType ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {(selectedEvent as any)?.woTypeName || woTypeOptions.find(opt => opt.value === woType || opt.label === woType)?.label || woType || "-"}
                                 </div>
@@ -1113,7 +1113,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.mainCategoryLabel")}</label>
-                            {mode === "duplicate" || mainCategory ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {maincategoryOptions.find(opt => opt.value === mainCategory)?.label || mainCategory || "-"}
                                 </div>
@@ -1127,7 +1127,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             )}
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
-                            {mode === "duplicate" || subcategory ? (
+                            {mode === "duplicate" ? (
                                 <div className="readonly-text">
                                     {(selectedEvent as any)?.subcategoryName || subcategoryOptions.find(opt => opt.value === subcategory || opt.label === subcategory)?.label || subcategory || "-"}
                                 </div>
