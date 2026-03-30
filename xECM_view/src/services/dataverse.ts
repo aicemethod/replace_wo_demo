@@ -254,10 +254,18 @@ export async function saveFileAttachment(params: SaveFileParams): Promise<FileDa
       await xrm.WebApi.updateRecord(entityName, currentRecordId, {
         proto_customerapprovaltype: nextCustomerApprovalType
       });
+      if (automaticLink) {
+        xrm?.Page?.getControl?.('proto_customerapprovaltype')?.setDisabled?.(true);
+      }
       if (nextCustomerApprovalType === 931440000) {
         await xrm.WebApi.updateRecord(entityName, currentRecordId, {
           proto_wo_customersignreceivedon: new Date()
         });
+        if (automaticLink) {
+          xrm?.Page?.getControl?.('proto_wo_customersignreceivedon')?.setDisabled?.(true);
+        }
+      } else if (automaticLink) {
+        xrm?.Page?.getControl?.('proto_wo_customersignreceivedon')?.setDisabled?.(true);
       }
     }
 
