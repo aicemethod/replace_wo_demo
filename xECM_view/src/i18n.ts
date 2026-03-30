@@ -18,7 +18,7 @@ const messages = {
     headerFilename: 'ファイル名',
     headerType: 'ファイル種別',
     headerCreated: '保存日時',
-    headerSync: 'xECM連携実行日',
+    headerSync: 'xECM実行連携日時',
     headerTccSync: 'TCC連携実行日',
     placeholderFilename: 'ファイル名',
     attach: '添付',
@@ -30,7 +30,7 @@ const messages = {
     ariaUnselect: '選択解除',
     mobileType: 'ファイル種別',
     mobileCreated: '保存日時',
-    mobileSync: 'xECM連携実行日',
+    mobileSync: 'xECM実行連携日時',
     fileTypeTechnicalAcceptance: '技術検収書(Technical Acceptance)',
     fileTypeOther: 'Other'
   },
