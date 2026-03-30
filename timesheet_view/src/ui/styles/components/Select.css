@@ -33,6 +33,12 @@
     box-shadow: 0 0 0 2px var(--main-color-light);
 }
 
+/* 最後に選択した項目（ドロップダウンが閉じていても枠を維持） */
+.select-wrapper.field-active:not(.open) .select-display {
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 2px rgba(0, 137, 186, 0.15);
+}
+
 /* 無効化 */
 .select-wrapper.disabled .select-display {
     opacity: 0.6;

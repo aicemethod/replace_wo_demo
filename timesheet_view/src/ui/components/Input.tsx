@@ -1,6 +1,7 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useId } from "react";
 import "../styles/components/Input.css";
 import type { InputProps } from "../../types/components";
+import { useFieldActive } from "../../context/FieldActiveContext";
 
 /**
  * 共通 Input コンポーネント
@@ -25,17 +26,27 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         },
         ref
     ) => {
+        const fieldId = useId();
+        const { activeId, activate } = useFieldActive();
+        const isActive = activeId === fieldId;
+
         /** 入力変更時ハンドラ（null安全対応） */
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             onChange?.(e.target.value);
         };
 
         /** クラス構築 */
-        const wrapperClass = ["input-wrapper", className].filter(Boolean).join(" ");
+        const wrapperClass = ["input-wrapper", isActive && "field-active", className]
+            .filter(Boolean)
+            .join(" ");
         const inputClass = ["input-field", disabled ? "disabled" : ""].filter(Boolean).join(" ");
 
         return (
-            <div className={wrapperClass} style={{ width }}>
+            <div
+                className={wrapperClass}
+                style={{ width }}
+                onMouseDown={() => activate(fieldId)}
+            >
                 {label && (
                     <label className="input-label">
                         {label}
@@ -48,6 +59,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         type={type}
                         value={value}
                         onChange={handleChange}
+                        onFocus={() => activate(fieldId)}
                         placeholder={placeholder}
                         disabled={disabled}
                         className={inputClass}

@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useId } from "react";
 import "../styles/components/Textarea.css";
 import type { TextareaProps } from "../../types/components";
+import { useFieldActive } from "../../context/FieldActiveContext";
 
 /**
  * 共通 Textarea コンポーネント
@@ -21,6 +22,10 @@ export const Textarea: React.FC<TextareaProps> = ({
     className = "",
     onClick,
 }) => {
+    const fieldId = useId();
+    const { activeId, activate } = useFieldActive();
+    const isActive = activeId === fieldId;
+
     /** 改行を除いた文字数を算出 */
     const charCount = useMemo(() => value.replace(/\n/g, "").length, [value]);
 
@@ -28,7 +33,9 @@ export const Textarea: React.FC<TextareaProps> = ({
     const isOverLimit = maxLength !== undefined && charCount > maxLength;
 
     /** コンテナクラス結合 */
-    const wrapperClass = ["textarea-wrapper", className].filter(Boolean).join(" ");
+    const wrapperClass = ["textarea-wrapper", isActive && "field-active", className]
+        .filter(Boolean)
+        .join(" ");
     const textareaClass = [
         "textarea-field",
         disabled && "disabled",
@@ -38,7 +45,7 @@ export const Textarea: React.FC<TextareaProps> = ({
         .join(" ");
 
     return (
-        <div className={wrapperClass}>
+        <div className={wrapperClass} onMouseDown={() => activate(fieldId)}>
             {/* ヘッダー：ラベル + カウンター */}
             {(label || showCount) && (
                 <div className="textarea-header">
@@ -59,6 +66,7 @@ export const Textarea: React.FC<TextareaProps> = ({
                 <textarea
                     value={value}
                     onChange={(e) => onChange?.(e.target.value)}
+                    onFocus={() => activate(fieldId)}
                     onClick={onClick}
                     placeholder={placeholder}
                     rows={rows}

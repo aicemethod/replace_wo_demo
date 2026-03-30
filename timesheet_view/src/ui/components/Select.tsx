@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useId } from "react";
 import * as FaIcons from "react-icons/fa";
 import "../styles/components/Select.css";
 import type { SelectProps } from "../../types/components";
 import { useTranslation } from "react-i18next";
+import { useFieldActive } from "../../context/FieldActiveContext";
 
 /**
  * 共通Selectコンポーネント
@@ -19,6 +20,9 @@ export const Select: React.FC<SelectProps> = ({
     className = "",
 }) => {
     const { t } = useTranslation();
+    const fieldId = useId();
+    const { activeId, activate } = useFieldActive();
+    const isActive = activeId === fieldId;
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,6 +51,7 @@ export const Select: React.FC<SelectProps> = ({
         "select-wrapper",
         open && "open",
         disabled && "disabled",
+        isActive && "field-active",
         className,
     ]
         .filter(Boolean)
@@ -58,11 +63,16 @@ export const Select: React.FC<SelectProps> = ({
     const resolvedPlaceholder = placeholder || t("common.selectPlaceholder");
 
     return (
-        <div ref={wrapperRef} className={wrapperClass}>
+        <div
+            ref={wrapperRef}
+            className={wrapperClass}
+            onMouseDown={() => activate(fieldId)}
+        >
             {/* 表示部分 */}
             <div
                 className="select-display"
                 onClick={() => !disabled && setOpen((prev) => !prev)}
+                onFocus={() => activate(fieldId)}
                 role="button"
                 aria-expanded={open}
                 aria-haspopup="listbox"

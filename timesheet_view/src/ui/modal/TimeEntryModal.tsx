@@ -6,6 +6,7 @@ import { Select } from "../components/Select";
 import { Input } from "../components/Input";
 import { Textarea } from "../components/Textarea";
 import type { Option } from "../../types";
+import { FieldActiveProvider } from "../../context/FieldActiveContext";
 import { ResourceSelectModal } from "./ResourceSelectModal";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import "../styles/modal/TimeEntryModal.css";
@@ -797,6 +798,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 }
                 size="large"
             >
+                <FieldActiveProvider>
                 <div className="timeentry-modal-body">
                     {/* WO番号選択（サブグリッドの場合は非表示） */}
                     {!isSubgrid && (
@@ -1142,6 +1144,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                         </div>
                     </div>
                 </div>
+                </FieldActiveProvider>
             </BaseModal>
 
             {/*  削除確認モーダル */}
