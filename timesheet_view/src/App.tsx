@@ -135,15 +135,15 @@ function TimesheetApp() {
         // ログインユーザーIDを取得
         const userId: string = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
-        // ログインユーザーのbusinessunitid / proto_regionを取得
+        // ログインユーザーのbusinessunitid / proto_region(Lookup)を取得
         const currentUser = await xrm.WebApi.retrieveRecord(
           "systemuser",
           userId,
-          "?$select=systemuserid,fullname,_businessunitid_value,proto_region"
+          "?$select=systemuserid,fullname,_businessunitid_value,_proto_region_value"
         );
         const rawRegion = (
-          currentUser?.proto_region ??
-          currentUser?.["proto_region@OData.Community.Display.V1.FormattedValue"] ??
+          currentUser?.["_proto_region_value@OData.Community.Display.V1.FormattedValue"] ??
+          currentUser?._proto_region_value ??
           ""
         )
           .toString()
