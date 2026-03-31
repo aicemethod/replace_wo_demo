@@ -48,6 +48,7 @@ export interface TimeEntryModalProps {
     selectedWO?: string;
     selectedIndirectTask?: { subcategoryName: string; taskName: string } | null;
     selectedResourcesText?: string;
+    showResourceSelectLink?: boolean;
 }
 
 /* =========================================================
@@ -75,6 +76,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     selectedWO = "",
     selectedIndirectTask = null,
     selectedResourcesText = "",
+    showResourceSelectLink = true,
 }) => {
     const { t } = useTranslation();
 
@@ -889,9 +891,11 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
                             <div className="resource-header">
                                 <label className="modal-label">{t("timeEntryModal.resource")}</label>
-                                <a href="#" className="resource-link" onClick={openResourceModal}>
-                                    {t("timeEntryModal.selectResource")}
-                                </a>
+                                {showResourceSelectLink && (
+                                    <a href="#" className="resource-link" onClick={openResourceModal}>
+                                        {t("timeEntryModal.selectResource")}
+                                    </a>
+                                )}
                             </div>
 
                             <div className="resource-display">

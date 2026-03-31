@@ -75,6 +75,8 @@ function TimesheetApp() {
   const [headerSelectOptions, setHeaderSelectOptions] = useState<Option[]>([]);
   /** ヘッダーセレクトのローディング状態 */
   const [isHeaderSelectLoading, setIsHeaderSelectLoading] = useState(true);
+  /** proto_region による UI 表示制御（JP/KR のみ表示） */
+  const [isRegionSidebarVisible, setIsRegionSidebarVisible] = useState(true);
   /** サイドバーで選択されているタスク */
   const [selectedSidebarTask, setSelectedSidebarTask] = useState<string[]>([]);
   /** サイドバーで選択されているリソース（表示用文字列） */
@@ -133,12 +135,21 @@ function TimesheetApp() {
         // ログインユーザーIDを取得
         const userId: string = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
-        // ログインユーザーのbusinessunitidを取得
+        // ログインユーザーのbusinessunitid / proto_regionを取得
         const currentUser = await xrm.WebApi.retrieveRecord(
           "systemuser",
           userId,
-          "?$select=systemuserid,fullname,_businessunitid_value"
+          "?$select=systemuserid,fullname,_businessunitid_value,proto_region"
         );
+        const rawRegion = (
+          currentUser?.proto_region ??
+          currentUser?.["proto_region@OData.Community.Display.V1.FormattedValue"] ??
+          ""
+        )
+          .toString()
+          .trim()
+          .toUpperCase();
+        setIsRegionSidebarVisible(rawRegion === "JP" || rawRegion === "KR");
 
         const businessUnitId = currentUser._businessunitid_value;
         if (!businessUnitId) return;
@@ -375,14 +386,16 @@ function TimesheetApp() {
             </div>
           )}
           {/* Sidebar が Context からお気に入りタスクを取得 */}
-          <Sidebar
-            mainTab={mainTab}
-            selectedTask={selectedSidebarTask}
-            onTaskSelect={setSelectedSidebarTask}
-            onResourceSelectionChange={(resources) =>
-              setSelectedSidebarResourcesText(resources.map((r) => r.label).join("\n"))
-            }
-          />
+          {isRegionSidebarVisible && (
+            <Sidebar
+              mainTab={mainTab}
+              selectedTask={selectedSidebarTask}
+              onTaskSelect={setSelectedSidebarTask}
+              onResourceSelectionChange={(resources) =>
+                setSelectedSidebarResourcesText(resources.map((r) => r.label).join("\n"))
+              }
+            />
+          )}
 
           <div className="content-main">
             <CalendarView
@@ -404,9 +417,11 @@ function TimesheetApp() {
           </div>
         </div>
 
-      <Footer
-        onOpenUserList={() => setIsUserListModalOpen(true)}
-      />
+      {isRegionSidebarVisible && (
+        <Footer
+          onOpenUserList={() => setIsUserListModalOpen(true)}
+        />
+      )}
 
       </section>
 
@@ -433,6 +448,7 @@ function TimesheetApp() {
         selectedWO={selectedWO}
         selectedIndirectTask={selectedIndirectTask}
         selectedResourcesText={selectedSidebarResourcesText}
+        showResourceSelectLink={isRegionSidebarVisible}
       />
 
       <FavoriteTaskModal
